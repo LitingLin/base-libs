@@ -23,9 +23,9 @@ namespace Base
 		catch (...)
 		{
 			if (hFileMapping)
-				CloseHandle(hFileMapping);
+				LOG_IF_FAILED_WIN32API(CloseHandle(hFileMapping));
 			if (hFile)
-				CloseHandle(hFile);
+				LOG_IF_FAILED_WIN32API(CloseHandle(hFile));
 			throw;
 		}
 	}

@@ -3,7 +3,8 @@
 
 namespace Base
 {
-	class SharedLockGuard_LockShared
+	// Use std::shared_lock instead
+	class __declspec(deprecated) SharedLockGuard_LockShared
 	{
 	public:
 		SharedLockGuard_LockShared(std::shared_mutex &lock);
@@ -13,7 +14,8 @@ namespace Base
 		std::shared_mutex *_lock;
 	};
 
-	class SharedLockGuard
+	// Use std::unique_lock instead
+	class __declspec(deprecated) SharedLockGuard
 	{
 	public:
 		SharedLockGuard(std::shared_mutex &lock);

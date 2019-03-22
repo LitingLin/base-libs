@@ -103,9 +103,9 @@ namespace Base
 		bool _excludeSelf;
 	};
 
-	void generateDump(const std::wstring &productPathPrefix, const std::wstring &path, bool excludeSelf)
+	void generateProcessesMiniDumpInPath(const std::wstring &processesPathPrefix, const std::wstring &path, bool excludeSelf)
 	{
-		std::vector<uint32_t> productProcessIds = getProductProcessIds(productPathPrefix);
+		std::vector<uint32_t> productProcessIds = getProductProcessIds(processesPathPrefix);
 		std::vector<std::unique_ptr<WorkerWrapper>> workers;
 		workers.reserve(productProcessIds.size());
 

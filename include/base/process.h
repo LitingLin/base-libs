@@ -16,9 +16,7 @@ namespace Base
 	{
 	public:
 		OpenProcessGuard(DWORD dwDesiredAccess, DWORD dwProcessId);
-
 		~OpenProcessGuard();
-
 		HANDLE getHANDLE() const;
 	private:
 		HANDLE handle;

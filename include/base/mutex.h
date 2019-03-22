@@ -6,7 +6,8 @@
 
 namespace Base
 {
-	class Mutex
+	// Use std::mutex instead
+	class __declspec(deprecated) Mutex
 	{
 	public:
 		Mutex();

@@ -84,9 +84,6 @@
     <ClInclude Include="include\base\com.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\base\context.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\base\d2d_window.h">
       <Filter>Header Files</Filter>
     </ClInclude>

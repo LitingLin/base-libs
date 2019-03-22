@@ -73,7 +73,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\base\com.h" />
-    <ClInclude Include="include\base\context.h" />
     <ClInclude Include="include\base\d2d_window.h" />
     <ClInclude Include="include\base\debugoutput_logger_sink.h" />
     <ClInclude Include="include\base\dump_generator.h" />

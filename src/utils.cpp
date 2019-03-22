@@ -117,12 +117,10 @@ namespace Base
 
 	uint8_t generateRandomUint8(uint8_t from, uint8_t to)
 	{
-		std::random_device rd;  //Will be used to obtain a seed for the random number engine
-		std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-		std::uniform_int_distribution<uint16_t> dis(from, to);
-		return uint8_t(dis(gen));
+		return uint8_t(generateRandomUint16(from, to));
 	}
 
+	// !! Warn: Bad Performance
 	uint16_t generateRandomUint16(uint16_t from, uint16_t to)
 	{
 		std::random_device rd;  //Will be used to obtain a seed for the random number engine

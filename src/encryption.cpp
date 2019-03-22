@@ -177,7 +177,7 @@ namespace Base
 
 	std::vector<unsigned char> SHA256::hash(const std::vector<unsigned char>& data) const
 	{
-		ENSURE_LT(data.size(), std::numeric_limits<ULONG>::max());
+		CHECK_LT(data.size(), std::numeric_limits<ULONG>::max());
 		return hash(data.data(), (ULONG)data.size());
 	}
 
@@ -221,7 +221,7 @@ namespace Base
 	AES128ECB::AES128ECB(const std::vector<unsigned char> &key)
 		: _hALG(BCRYPT_ALG_HANDLE_GUARD::AlgorithmType::AES)
 	{
-		ENSURE_LT(key.size(), std::numeric_limits<ULONG>::max());
+		CHECK_LT(key.size(), std::numeric_limits<ULONG>::max());
 		ULONG cbData = 0;
 		ENSURE_NTSTATUS(BCryptGetProperty(
 			_hALG.getHandle(),
@@ -448,7 +448,7 @@ namespace Base
 
 	std::vector<unsigned char> AES128ECB::decrypt(const std::vector<unsigned char>& data)
 	{
-		ENSURE_LT(data.size(), std::numeric_limits<ULONG>::max());
+		CHECK_LT(data.size(), std::numeric_limits<ULONG>::max());
 		ULONG cbPlainText = 0;
 
 		ENSURE_NTSTATUS(BCryptDecrypt(
@@ -534,7 +534,7 @@ namespace Base
 
 	std::string Base64Encode(const std::vector<unsigned char>& data)
 	{
-		ENSURE_LT(data.size(), std::numeric_limits<DWORD>::max());
+		CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 		DWORD size;
 		ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, NULL, &size));
 		std::string base64;
@@ -545,7 +545,7 @@ namespace Base
 
 	std::vector<unsigned char> Base64Decode(const std::string& data)
 	{
-		ENSURE_LT(data.size(), std::numeric_limits<DWORD>::max());
+		CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 		DWORD size;
 		CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_BASE64, NULL, &size, NULL, NULL));
 		std::vector<unsigned char> plaindata;
@@ -556,7 +556,7 @@ namespace Base
 
 	std::string BinaryToHexadecimalString(const std::vector<unsigned char>& data)
 	{
-		ENSURE_LT(data.size(), std::numeric_limits<DWORD>::max());
+		CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 		DWORD size;
 		ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_HEXRAW | CRYPT_STRING_NOCRLF, NULL, &size));
 		std::string hex;
@@ -567,7 +567,7 @@ namespace Base
 
 	std::vector<unsigned char> HexadecimalStringToBinary(const std::string& data)
 	{
-		ENSURE_LT(data.size(), std::numeric_limits<DWORD>::max());
+		CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 		DWORD size;
 		CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_HEXRAW, NULL, &size, NULL, NULL));
 		std::vector<unsigned char> plaindata;

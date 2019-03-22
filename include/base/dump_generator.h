@@ -3,5 +3,5 @@
 #include <string>
 
 namespace Base {
-	void generateDump(const std::wstring &productPathPrefix, const std::wstring &path, bool excludeSelf);
+	void generateProcessesMiniDumpInPath(const std::wstring &processesPathPrefix, const std::wstring &path, bool excludeSelf);
 }

@@ -5,6 +5,7 @@ typedef void * HANDLE;
 
 namespace Base
 {
+	// Read Only
 	class MemoryMappedIO
 	{
 	public:

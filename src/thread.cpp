@@ -22,9 +22,9 @@ namespace Base
 			try
 			{
 				cancel();
+				join();
 			}
 			catch (...) {}
-			join();
 			LOG_IF_FAILED_WIN32API(CloseHandle(_handle));
 		}
 	}
