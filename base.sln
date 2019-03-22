@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "base.vcxproj", "{34B7C3F3-324A-4370-963E-8725DF78C145}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "vcproj\base.vcxproj", "{34B7C3F3-324A-4370-963E-8725DF78C145}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cuda_ext", "vcproj\cuda_ext.vcxproj", "{9E779272-62A4-4540-81F6-467F9707F6BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{34B7C3F3-324A-4370-963E-8725DF78C145}.Debug|x64.Build.0 = Debug|x64
 		{34B7C3F3-324A-4370-963E-8725DF78C145}.Release|x64.ActiveCfg = Release|x64
 		{34B7C3F3-324A-4370-963E-8725DF78C145}.Release|x64.Build.0 = Release|x64
+		{9E779272-62A4-4540-81F6-467F9707F6BF}.Debug|x64.ActiveCfg = Debug|x64
+		{9E779272-62A4-4540-81F6-467F9707F6BF}.Debug|x64.Build.0 = Debug|x64
+		{9E779272-62A4-4540-81F6-467F9707F6BF}.Release|x64.ActiveCfg = Release|x64
+		{9E779272-62A4-4540-81F6-467F9707F6BF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

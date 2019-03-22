@@ -68,7 +68,7 @@ namespace Base {
 	class File
 	{
 	public:
-		//	                        |                    When the file...
+		//                          |                    When the file...
 		// This argument:           |             Exists            Does not exist
 		// -------------------------+------------------------------------------------------
 		// CREATE_ALWAYS            |            Truncates             Creates

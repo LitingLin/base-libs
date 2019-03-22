@@ -9,7 +9,7 @@
 namespace Base {
 	enum class ErrorCodeType
 	{
-		WIN32API, HRESULT, NTSTATUS, CRT, SQLITE3, USERDEFINED
+		WIN32API, HRESULT, NTSTATUS, CRT, SQLITE3, CUDA, USERDEFINED
 	};
 
 	class FatalError : public std::runtime_error

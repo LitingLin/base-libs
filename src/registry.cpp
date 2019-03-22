@@ -1,8 +1,6 @@
 #include "base/registry.h"
 #include "base/logging.h"
 
-#include <Synchapi.h>
-
 namespace Base
 {
 	class HKEYGuard
