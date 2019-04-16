@@ -2,26 +2,32 @@
 
 #include <string>
 #include <stdint.h>
+#ifdef WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+typedef std::wstring StringType;
+#else
+#include <dirent.h>
+typedef std::string StringType;
+#endif
 #include <vector>
 namespace Base {
-	bool isPathExists(const std::wstring& path);
-	std::wstring getWorkDirectory();
-	std::wstring getModuleInstanceFullPath(HINSTANCE instance);
-	std::wstring getApplicationPath();
-	std::wstring getTempPath();
-	std::wstring getParentPath(const std::wstring &path);
-	std::wstring getFileName(const std::wstring &path);
+	bool isPathExists(const StringType& path);
+    StringType getWorkDirectory();
+    StringType getModuleInstanceFullPath(HINSTANCE instance);
+    StringType getApplicationPath();
+    StringType getTempPath();
+    StringType getParentPath(const std::wstring &path);
+    StringType getFileName(const std::wstring &path);
 
-	bool isURL(const std::wstring &string);
-	bool isDirectory(const std::wstring &string);
-	std::wstring getFullPath(const std::wstring &path);
-	std::wstring appendPath(const std::wstring &path, const std::wstring &fileName);
+	bool isURL(const StringType &string);
+	bool isDirectory(const StringType &string);
+    StringType getFullPath(const StringType &path);
+    StringType appendPath(const StringType &path, const StringType &fileName);
 
-	std::wstring getFileExtension(const std::wstring &path);
-	std::wstring getCanonicalPath(const std::wstring &path);
+    StringType getFileExtension(const StringType &path);
+    StringType getCanonicalPath(const StringType &path);
 
 	class DirectoryIterator
 	{
@@ -31,7 +37,11 @@ namespace Base {
 		bool next(std::wstring &fileName, bool &isDirectory, uint64_t &lastFileWriteTime);
 		void reset();
 	private:
+#ifdef WIN32
 		HANDLE _handle;
+#else
+
+#endif
 		std::wstring _path;
 	};
 

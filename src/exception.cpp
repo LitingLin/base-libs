@@ -17,6 +17,7 @@ namespace Base
 		return errorCode;
 	}
 
+#ifdef WIN32
 	DWORD FatalError::getErrorCodeAsWinAPI() const
 	{
 		return (DWORD)errorCode;
@@ -31,6 +32,7 @@ namespace Base
 	{
 		return (NTSTATUS)errorCode;
 	}
+#endif
 
 	errno_t FatalError::getErrorCodeAsCRT() const
 	{
@@ -58,6 +60,7 @@ namespace Base
 		return errorCode;
 	}
 
+#ifdef WIN32
 	DWORD RuntimeException::getErrorCodeAsWinAPI() const
 	{
 		return (DWORD)errorCode;
@@ -72,6 +75,7 @@ namespace Base
 	{
 		return (NTSTATUS)errorCode;
 	}
+#endif
 
 	errno_t RuntimeException::getErrorCodeAsCRT() const
 	{
@@ -83,22 +87,25 @@ namespace Base
 		return errorCodeType;
 	}
 
-	HRESULT getHRESULTFromExceptionType(const FatalError &exp)
+#ifdef WIN32
+    HRESULT getHRESULTFromException(const RuntimeException& exp)
 	{
-		if (exp.getErrorCodeType() == ErrorCodeType::WIN32API)
-			return HRESULT_FROM_WIN32(exp.getErrorCodeAsWinAPI());
-		else if (exp.getErrorCodeType() == ErrorCodeType::HRESULT)
+		if (exp.getErrorCodeType() == ErrorCodeType::HRESULT)
 			return exp.getErrorCodeAsHRESULT();
+		else if (exp.getErrorCodeType() == ErrorCodeType::WIN32API)
+			return HRESULT_FROM_WIN32(exp.getErrorCodeAsWinAPI());
 		else
 			return E_FAIL;
 	}
-	HRESULT getHRESULTFromExceptionType(const RuntimeException &exp)
+
+	HRESULT getHRESULTFromException(const FatalError& exp)
 	{
-		if (exp.getErrorCodeType() == ErrorCodeType::WIN32API)
-			return HRESULT_FROM_WIN32(exp.getErrorCodeAsWinAPI());
-		else if (exp.getErrorCodeType() == ErrorCodeType::HRESULT)
+		if (exp.getErrorCodeType() == ErrorCodeType::HRESULT)
 			return exp.getErrorCodeAsHRESULT();
+		else if (exp.getErrorCodeType() == ErrorCodeType::WIN32API)
+			return HRESULT_FROM_WIN32(exp.getErrorCodeAsWinAPI());
 		else
 			return E_FAIL;
 	}
+#endif
 }

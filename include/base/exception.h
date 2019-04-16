@@ -1,10 +1,13 @@
 #pragma once
 #include <stdexcept>
+#include <stddef.h>
 
+#ifdef WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <bcrypt.h>
+#endif
 
 namespace Base {
 	enum class ErrorCodeType
@@ -18,9 +21,11 @@ namespace Base {
 		explicit FatalError(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType);
 		explicit FatalError(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType);
 		int64_t getErrorCode() const;
+#ifdef WIN32
 		DWORD getErrorCodeAsWinAPI() const;
 		HRESULT getErrorCodeAsHRESULT() const;
 		NTSTATUS getErrorCodeAsNTSTATUS() const;
+#endif
 		errno_t getErrorCodeAsCRT() const;
 		ErrorCodeType getErrorCodeType() const;
 	private:
@@ -34,9 +39,11 @@ namespace Base {
 		explicit RuntimeException(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType);
 		explicit RuntimeException(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType);
 		int64_t getErrorCode() const;
+#ifdef WIN32
 		DWORD getErrorCodeAsWinAPI() const;
 		HRESULT getErrorCodeAsHRESULT() const;
 		NTSTATUS getErrorCodeAsNTSTATUS() const;
+#endif
 		errno_t getErrorCodeAsCRT() const;
 		ErrorCodeType getErrorCodeType() const;
 	private:
@@ -44,24 +51,13 @@ namespace Base {
 		ErrorCodeType errorCodeType;
 	};
 
-	class NetworkAddressInUseException : public RuntimeException
-	{
-	public:
-		NetworkAddressInUseException(const std::string& _Message)
-			: RuntimeException(_Message, WSAEADDRINUSE, ErrorCodeType::WIN32API)
-		{
-		}
-
-		NetworkAddressInUseException(const char* _Message)
-			: RuntimeException(_Message, WSAEADDRINUSE, ErrorCodeType::WIN32API)
-		{
-		}
-	};
-
-	HRESULT getHRESULTFromExceptionType(const FatalError &exp);
-	HRESULT getHRESULTFromExceptionType(const RuntimeException &exp);
+#ifdef WIN32
+    HRESULT getHRESULTFromException(const FatalError&exp);
+	HRESULT getHRESULTFromException(const RuntimeException&exp);
+#endif
 }
 
+#ifdef WIN32
 #define RETURN_HRESULT_ON_CAUGHT_EXCEPTION_BEGIN \
 try \
 {
@@ -84,3 +80,4 @@ catch (...) \
 { \
 return E_FAIL; \
 }
+#endif

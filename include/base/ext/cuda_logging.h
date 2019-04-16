@@ -2,7 +2,7 @@
 
 #include <base/logging.h>
 
-#include <cuda.h>
+#include <cuda_runtime.h>
 
 #define ENSURE_CUDA(exp) \
 	if (cudaError_t _rc = (exp)) \
