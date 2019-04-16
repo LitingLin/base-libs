@@ -10,6 +10,8 @@
 #include <dirent.h>
 #endif
 #include <vector>
+#include <stdio.h>
+
 namespace Base {
 #ifdef _WIN32
 	bool isPathExists(const std::wstring& path);
@@ -18,7 +20,8 @@ namespace Base {
 	std::wstring getApplicationPath();
 	std::wstring getTempPath();
 #else
-
+    bool isPathExists(const std::string& path);
+    bool isFileExists(const std::string& Path)
 #endif
 
 	std::string getParentPath(const std::string& path);
@@ -94,21 +97,21 @@ namespace Base {
 		// OPEN_ALWAYS     ===| does this |===>    Opens               Creates
 		// OPEN_EXISTING      +-----------+        Opens                Fails
 		// TRUNCATE_EXISTING        |            Truncates              Fails
-		enum class Mode : uint32_t
+		enum Mode : uint32_t
 		{
-			read = 0x00010000UL,
-			write = 0x00100000UL,
-			both = read | write,
-			create_always = 0x00000001UL,
-			create_new = 0x00000010UL,
-			open_existing = 0, // default
-			open_always = 0x00000100UL,
-			truncate_existing = 0x00001000UL
+			read                 = 0x00010000UL,
+			write                = 0x00100000UL,
+			rdwr                 = read | write,
+			create_always        = 0x00000001UL,
+			create_new           = 0x00000010UL,
+			open_existing        = 0x00000000UL, // default
+			open_always          = 0x00000100UL,
+			truncate_existing    = 0x00001000UL
 		};
 #ifdef _WIN32
 		File(const std::wstring &path, Mode mode = Mode::read);
 #else
-		File(const std::string& path, Mode mode = Mode::read);
+		File(const std::string& path, Mode mode = Mode(Mode::read | Mode::open_existing));
 #endif
 		File(const File &path) = delete;
 		File(File &&path) noexcept;
@@ -117,12 +120,18 @@ namespace Base {
 		uint64_t read(unsigned char *buffer, uint64_t offset, uint64_t size) const;
 		uint64_t write(const unsigned char *buffer, uint64_t offset, uint64_t size);
 		uint64_t getLastWriteTime() const;
+#ifdef _WIN32
 		HANDLE getHANDLE();
-	private:
-		HANDLE _fileHandle;
-	};
+#else
 
-	File::Mode operator~(File::Mode value);
-	File::Mode operator&(File::Mode left, File::Mode right);
-	File::Mode operator|(File::Mode left, File::Mode right);
+#endif
+	private:
+        FILE *_file;
+        int _fd;
+#ifdef _WIN32
+		HANDLE _fileHandle;
+#else
+
+#endif
+	};
 }
