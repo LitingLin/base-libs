@@ -3,91 +3,91 @@
 namespace Base
 {
 	FatalError::FatalError(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), errorCode(errorCode), errorCodeType(errorCodeType)
+		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
 	FatalError::FatalError(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), errorCode(errorCode), errorCodeType(errorCodeType)
+		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
 	int64_t FatalError::getErrorCode() const
 	{
-		return errorCode;
+		return _errorCode;
 	}
 
-#ifdef WIN32
+	int FatalError::getErrorCodeAsCRTErrno() const
+	{
+		return (int)_errorCode;
+	}
+
+#ifdef _WIN32
 	DWORD FatalError::getErrorCodeAsWinAPI() const
 	{
-		return (DWORD)errorCode;
+		return (DWORD)_errorCode;
 	}
 
 	HRESULT FatalError::getErrorCodeAsHRESULT() const
 	{
-		return (HRESULT)errorCode;
+		return (HRESULT)_errorCode;
 	}
 
 	NTSTATUS FatalError::getErrorCodeAsNTSTATUS() const
 	{
-		return (NTSTATUS)errorCode;
+		return (NTSTATUS)_errorCode;
 	}
 #endif
 
-	errno_t FatalError::getErrorCodeAsCRT() const
-	{
-		return (errno_t)errorCode;
-	}
-
 	ErrorCodeType FatalError::getErrorCodeType() const
 	{
-		return errorCodeType;
+		return _errorCodeType;
 	}
 
 
 	RuntimeException::RuntimeException(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), errorCode(errorCode), errorCodeType(errorCodeType)
+		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
 	RuntimeException::RuntimeException(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), errorCode(errorCode), errorCodeType(errorCodeType)
+		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
 	int64_t RuntimeException::getErrorCode() const
 	{
-		return errorCode;
+		return _errorCode;
+	}
+	
+	int RuntimeException::getErrorCodeAsCRTErrno() const
+	{
+		return (int)_errorCode;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	DWORD RuntimeException::getErrorCodeAsWinAPI() const
 	{
-		return (DWORD)errorCode;
+		return (DWORD)_errorCode;
 	}
 
 	HRESULT RuntimeException::getErrorCodeAsHRESULT() const
 	{
-		return (HRESULT)errorCode;
+		return (HRESULT)_errorCode;
 	}
 
 	NTSTATUS RuntimeException::getErrorCodeAsNTSTATUS() const
 	{
-		return (NTSTATUS)errorCode;
+		return (NTSTATUS)_errorCode;
 	}
 #endif
 
-	errno_t RuntimeException::getErrorCodeAsCRT() const
-	{
-		return (errno_t)errorCode;
-	}
-
 	ErrorCodeType RuntimeException::getErrorCodeType() const
 	{
-		return errorCodeType;
+		return _errorCodeType;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
     HRESULT getHRESULTFromException(const RuntimeException& exp)
 	{
 		if (exp.getErrorCodeType() == ErrorCodeType::HRESULT)

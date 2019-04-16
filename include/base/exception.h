@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <stddef.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -18,46 +18,46 @@ namespace Base {
 	class FatalError : public std::runtime_error
 	{
 	public:
-		explicit FatalError(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType);
-		explicit FatalError(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType);
+		explicit FatalError(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
+		explicit FatalError(const char* message, int64_t errorCode, ErrorCodeType errorCodeType);
 		int64_t getErrorCode() const;
-#ifdef WIN32
+		int getErrorCodeAsCRTErrno() const;
+#ifdef _WIN32
 		DWORD getErrorCodeAsWinAPI() const;
 		HRESULT getErrorCodeAsHRESULT() const;
 		NTSTATUS getErrorCodeAsNTSTATUS() const;
 #endif
-		errno_t getErrorCodeAsCRT() const;
 		ErrorCodeType getErrorCodeType() const;
 	private:
-		int64_t errorCode;
-		ErrorCodeType errorCodeType;
+		int64_t _errorCode;
+		ErrorCodeType _errorCodeType;
 	};
 
 	class RuntimeException : public std::runtime_error
 	{
 	public:
-		explicit RuntimeException(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType);
-		explicit RuntimeException(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType);
+		explicit RuntimeException(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
+		explicit RuntimeException(const char* message, int64_t errorCode, ErrorCodeType errorCodeType);
 		int64_t getErrorCode() const;
-#ifdef WIN32
+		int getErrorCodeAsCRTErrno() const;
+#ifdef _WIN32
 		DWORD getErrorCodeAsWinAPI() const;
 		HRESULT getErrorCodeAsHRESULT() const;
 		NTSTATUS getErrorCodeAsNTSTATUS() const;
 #endif
-		errno_t getErrorCodeAsCRT() const;
 		ErrorCodeType getErrorCodeType() const;
 	private:
-		int64_t errorCode;
-		ErrorCodeType errorCodeType;
+		int64_t _errorCode;
+		ErrorCodeType _errorCodeType;
 	};
 
-#ifdef WIN32
-    HRESULT getHRESULTFromException(const FatalError&exp);
-	HRESULT getHRESULTFromException(const RuntimeException&exp);
+#ifdef _WIN32
+    HRESULT getHRESULTFromException(const FatalError& exp);
+	HRESULT getHRESULTFromException(const RuntimeException& exp);
 #endif
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 #define RETURN_HRESULT_ON_CAUGHT_EXCEPTION_BEGIN \
 try \
 {

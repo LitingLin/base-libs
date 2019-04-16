@@ -35,7 +35,7 @@ namespace Base
 		std::wstring path(pathBuf.begin(), pathBuf.end());
 		return path;
 	}
-
+	
 	std::wstring getWorkDirectory()
 	{
 		DWORD current_directory_size = GetCurrentDirectory(0, nullptr);
@@ -58,7 +58,8 @@ namespace Base
 		return std::wstring(buffer);
 	}
 
-	std::wstring getFileName(const std::wstring& path)
+	template <typename CharType> inline
+	std::basic_string<CharType> getFileNameHelper(const std::basic_string<CharType>& path)
 	{
 		size_t backslashpos = path.find_last_of(L'\\');
 		size_t slashpos = path.find_last_of(L'/');
@@ -82,10 +83,20 @@ namespace Base
 		else
 			pos++;
 		return path.substr(pos, path.size() - pos);
-
 	}
 
-	bool isURL(const std::wstring& string)
+	std::wstring getFileName(const std::wstring& path)
+	{
+		return getFileNameHelper(path);
+	}
+
+	std::string getFileName(const std::string& path)
+	{
+		return getFileNameHelper(path);
+	}
+
+	template <typename CharType> inline
+	bool isURIHelper(const std::basic_string<CharType>& string)
 	{
 		size_t slash_pos = string.find_first_of(L":");
 		if (slash_pos != string.npos && slash_pos < string.size() - 2 && string[slash_pos + 1] == L'/' && string[slash_pos + 2] == L'/')
@@ -94,14 +105,30 @@ namespace Base
 			return false;
 	}
 
-	bool isDirectory(const std::wstring& string)
+	bool isURI(const std::wstring& string)
 	{
-		return GetFileAttributes(string.c_str()) & FILE_ATTRIBUTE_DIRECTORY;
+		return isURIHelper(string);
 	}
 
-	std::wstring getFullPath(const std::wstring& path)
+	bool isURI(const std::string& string)
 	{
-		if (isURL(path))
+		return isURIHelper(string);
+	}
+
+	bool isDirectory(const std::wstring& string)
+	{
+		return GetFileAttributesW(string.c_str()) & FILE_ATTRIBUTE_DIRECTORY;
+	}
+
+	bool isDirectory(const std::string& string)
+	{
+		return GetFileAttributesA(string.c_str()) & FILE_ATTRIBUTE_DIRECTORY;
+	}
+
+	template <typename CharType> inline
+	std::basic_string<CharType> getFullPathHelper(const std::basic_string<CharType>& path)
+	{
+		if (isURI(path))
 			return path;
 		std::wstring buffer;
 		std::wstring res;
@@ -122,7 +149,18 @@ namespace Base
 		return res;
 	}
 
-	std::wstring appendPath(const std::wstring& path, const std::wstring &fileName)
+	std::string getFullPath(const std::string& path)
+	{
+		return getFullPathHelper(path);
+	}
+
+	std::wstring getFullPath(const std::wstring& path)
+	{
+		return getFullPathHelper(path);
+	}
+	
+	template <typename CharType> inline
+	std::basic_string<CharType> appendPathHelper(const std::basic_string<CharType>& path, const std::basic_string<CharType>& fileName)
 	{
 		if (path[path.size() - 1] == L'/' || path[path.size() - 1] == L'\\')
 			return path + fileName;
@@ -130,7 +168,18 @@ namespace Base
 			return path + L'\\' + fileName;
 	}
 
-	std::wstring getFileExtension(const std::wstring& path)
+	std::string appendPath(const std::string& path, const std::string& fileName)
+	{
+		return appendPathHelper(path, fileName);
+	}
+
+	std::wstring appendPath(const std::wstring& path, const std::wstring &fileName)
+	{
+		return appendPathHelper(path, fileName);
+	}
+
+	template <typename CharType> inline
+	std::basic_string<CharType> getFileExtensionHelper(const std::basic_string<CharType>& path)
 	{
 		size_t dot_pos = path.find_last_of(L'.');
 		if (dot_pos == path.npos || path.find(L'/', dot_pos + 1) != path.npos || path.find(L'\\', dot_pos + 1) != path.npos)
@@ -138,7 +187,18 @@ namespace Base
 		return path.substr(dot_pos + 1);
 	}
 
-	std::wstring getCanonicalPath(const std::wstring& path)
+	std::string getFileExtension(const std::string& path)
+	{
+		return getFileExtensionHelper(path);
+	}
+
+	std::wstring getFileExtension(const std::wstring& path)
+	{
+		return getFileExtensionHelper(path);
+	}
+
+	template <typename CharType> inline
+	std::basic_string<CharType> getCanonicalPathHelper(const std::basic_string<CharType>& path)
 	{
 		std::wstring buffer;
 		buffer.resize(path.size());
@@ -196,6 +256,17 @@ namespace Base
 		return buffer.substr(0, buffer_ind);
 	}
 
+	std::string getCanonicalPath(const std::string& path)
+	{
+		return getCanonicalPathHelper(path);
+	}
+
+	std::wstring getCanonicalPath(const std::wstring& path)
+	{
+		return getCanonicalPathHelper(path);
+	}
+
+#ifdef _WIN32
 	DirectoryIterator::DirectoryIterator(const std::wstring& path)
 		: _handle(nullptr), _path(path)
 	{
@@ -298,18 +369,8 @@ namespace Base
 		return false;
 	}
 
-	File::Mode operator&(File::Mode left, File::Mode right)
-	{
-		return File::Mode((uint32_t)left & (uint32_t)right);
-	}
-
-	File::Mode operator|(File::Mode left, File::Mode right)
-	{
-		return File::Mode((uint32_t)left | (uint32_t)right);
-	}
-
-	bool randomPickFile(DirectoryIterator& direcotryIterator, std::wstring& fileName, uint64_t *lastWriteTimePtr,
-		std::vector<std::wstring> *fileNamesPtr, std::vector<uint64_t> *lastWriteTimesPtr, size_t *indexPtr)
+	bool randomPickFile(DirectoryIterator& direcotryIterator, std::wstring& fileName, uint64_t* lastWriteTimePtr,
+		std::vector<std::wstring>* fileNamesPtr, std::vector<uint64_t>* lastWriteTimesPtr, size_t* indexPtr)
 	{
 		direcotryIterator.reset();
 		std::vector<std::wstring> fileNames;
@@ -328,6 +389,7 @@ namespace Base
 		if (fileNames.empty())
 			return false;
 
+		// TODO: move out of function
 		std::random_device rd;  //Will be used to obtain a seed for the random number engine
 		std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 		std::uniform_int_distribution<size_t> dis(0, fileNames.size() - 1);
@@ -335,17 +397,17 @@ namespace Base
 		fileName = fileNames[fileIndex];
 
 		if (lastWriteTimePtr)
-			*lastWriteTimePtr = lastWriteTimes[fileIndex];
+			* lastWriteTimePtr = lastWriteTimes[fileIndex];
 		if (fileNamesPtr)
-			*fileNamesPtr = fileNames;
+			* fileNamesPtr = fileNames;
 		if (lastWriteTimesPtr)
-			*lastWriteTimesPtr = lastWriteTimes;
+			* lastWriteTimesPtr = lastWriteTimes;
 		if (indexPtr)
-			*indexPtr = fileIndex;
+			* indexPtr = fileIndex;
 		return true;
 	}
 
-	bool pickNextFile(DirectoryIterator& direcotryIterator, std::wstring& fileName, uint64_t *lastWriteTimePtr)
+	bool pickNextFile(DirectoryIterator & direcotryIterator, std::wstring & fileName, uint64_t * lastWriteTimePtr)
 	{
 		bool isDirectory;
 		std::wstring tempFileName;
@@ -370,9 +432,26 @@ namespace Base
 		{
 			fileName = tempFileName;
 			if (lastWriteTimePtr)
-				*lastWriteTimePtr = lastWriteTime;
+				* lastWriteTimePtr = lastWriteTime;
 			return true;
 		}
+	}
+
+#endif
+
+	File::Mode operator~(File::Mode value)
+	{
+		return File::Mode(~(uint32_t)value);
+	}
+
+	File::Mode operator&(File::Mode left, File::Mode right)
+	{
+		return File::Mode((uint32_t)left & (uint32_t)right);
+	}
+
+	File::Mode operator|(File::Mode left, File::Mode right)
+	{
+		return File::Mode((uint32_t)left | (uint32_t)right);
 	}
 
 	File::File(const std::wstring& path, Mode mode)
@@ -481,7 +560,8 @@ namespace Base
 		return _fileHandle;
 	}
 
-	std::wstring getParentPath(const std::wstring& path)
+	template <typename CharType> inline
+	std::basic_string<CharType> getParentPathHelper(const std::basic_string<CharType>& path)
 	{
 		size_t end_pos = path.size();
 
@@ -515,5 +595,15 @@ namespace Base
 		}
 
 		return path.substr(0, end_pos);
+	}
+
+	std::string getParentPath(const std::string& path)
+	{
+		return getParentPathHelper<char>(path);
+	}
+
+	std::wstring getParentPath(const std::wstring& path)
+	{
+		return getParentPathHelper<wchar_t>(path);
 	}
 }

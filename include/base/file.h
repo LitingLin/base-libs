@@ -2,33 +2,44 @@
 
 #include <string>
 #include <stdint.h>
-#ifdef WIN32
+#ifdef _WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-typedef std::wstring StringType;
 #else
 #include <dirent.h>
-typedef std::string StringType;
 #endif
 #include <vector>
 namespace Base {
-	bool isPathExists(const StringType& path);
-    StringType getWorkDirectory();
-    StringType getModuleInstanceFullPath(HINSTANCE instance);
-    StringType getApplicationPath();
-    StringType getTempPath();
-    StringType getParentPath(const std::wstring &path);
-    StringType getFileName(const std::wstring &path);
+#ifdef _WIN32
+	bool isPathExists(const std::wstring& path);
+	std::wstring getWorkDirectory();
+	std::wstring getModuleInstanceFullPath(HINSTANCE instance);
+	std::wstring getApplicationPath();
+	std::wstring getTempPath();
+#else
 
-	bool isURL(const StringType &string);
-	bool isDirectory(const StringType &string);
-    StringType getFullPath(const StringType &path);
-    StringType appendPath(const StringType &path, const StringType &fileName);
+#endif
 
-    StringType getFileExtension(const StringType &path);
-    StringType getCanonicalPath(const StringType &path);
+	std::string getParentPath(const std::string& path);
+	std::wstring getParentPath(const std::wstring& path);
+	std::string getFileName(const std::string& path);
+	std::wstring getFileName(const std::wstring& path);
+	bool isURI(const std::string& string);
+	bool isURI(const std::wstring&string);
+	bool isDirectory(const std::string& string);
+	bool isDirectory(const std::wstring&string);
+	std::string getFullPath(const std::string& path);
+	std::wstring getFullPath(const std::wstring&path);
+	std::string appendPath(const std::string&path, const std::string&fileName);
+	std::wstring appendPath(const std::wstring& path, const std::wstring& fileName);
 
+	std::string getFileExtension(const std::string&path);
+	std::wstring getFileExtension(const std::wstring& path);
+	std::string getCanonicalPath(const std::string&path);
+	std::wstring getCanonicalPath(const std::wstring& path);
+
+#ifdef _WIN32
 	class DirectoryIterator
 	{
 	public:
@@ -37,11 +48,7 @@ namespace Base {
 		bool next(std::wstring &fileName, bool &isDirectory, uint64_t &lastFileWriteTime);
 		void reset();
 	private:
-#ifdef WIN32
 		HANDLE _handle;
-#else
-
-#endif
 		std::wstring _path;
 	};
 
@@ -70,8 +77,9 @@ namespace Base {
 		std::wstring _path;
 	};
 
-	bool getDirectoryFileLists(const std::wstring &path, std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes);
-	bool getRandomShuffledDirectoryFileLists(const std::wstring &path, std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes);
+	bool getDirectoryFileLists(const std::wstring& path, std::vector<std::wstring>& fileNames, std::vector<uint64_t>& lastWriteTimes);
+	bool getRandomShuffledDirectoryFileLists(const std::wstring& path, std::vector<std::wstring>& fileNames, std::vector<uint64_t>& lastWriteTimes);
+#endif
 
 	extern unsigned char UTF16LE_BOM[2];
 
@@ -97,7 +105,11 @@ namespace Base {
 			open_always = 0x00000100UL,
 			truncate_existing = 0x00001000UL
 		};
+#ifdef _WIN32
 		File(const std::wstring &path, Mode mode = Mode::read);
+#else
+		File(const std::string& path, Mode mode = Mode::read);
+#endif
 		File(const File &path) = delete;
 		File(File &&path) noexcept;
 		~File();
@@ -110,6 +122,7 @@ namespace Base {
 		HANDLE _fileHandle;
 	};
 
+	File::Mode operator~(File::Mode value);
 	File::Mode operator&(File::Mode left, File::Mode right);
 	File::Mode operator|(File::Mode left, File::Mode right);
 }
