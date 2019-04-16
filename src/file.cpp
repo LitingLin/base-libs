@@ -5,10 +5,18 @@
 
 namespace Base
 {
+#ifdef WIN32
 	bool isPathExists(const std::wstring& path)
 	{
 		return GetFileAttributes(path.c_str()) != INVALID_FILE_ATTRIBUTES;
 	}
+#else
+    bool isPathExists(const std::string& path)
+    {
+	    DIR *dir = opendir(path.c_str());
+
+    }
+#endif
 
 	unsigned char UTF16LE_BOM[2] = { 0xFF,0xFE };
 

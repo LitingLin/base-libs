@@ -9,14 +9,17 @@
 #include <memory>
 #include <sstream>
 
+#ifdef WIN32
 #define SPDLOG_WCHAR_FILENAMES
+#endif
 #include <spdlog/spdlog.h>
 
 extern std::shared_ptr<spdlog::logger> logger;
 namespace Base
 {
-
 	std::string getStackTrace();
+
+#ifdef WIN32
 	class Win32ErrorCodeToString
 	{
 	public:
@@ -35,7 +38,8 @@ namespace Base
 	std::string getHRESULTErrorString(HRESULT hr);
 	std::wstring getNtStatusErrorWString(NTSTATUS ntstatus);
 	std::string getNtStatusErrorString(NTSTATUS ntStatus);
-	std::string getCRTErrorString(errno_t errnum);
+#endif
+	std::string getCRTErrorString(int errnum);
 
 	class FatalErrorLogging
 	{
@@ -84,8 +88,6 @@ namespace Base
 		else
 			return std::make_unique<std::pair<T1, T2>>(a, b);
 	}
-	HRESULT getHRESULTFromRuntimeException(const RuntimeException&exp);
-	HRESULT getHRESULTFromFatalError(const FatalError&exp);
 }
 
 #define LEFT_OPERAND_RC \

@@ -116,26 +116,6 @@ namespace Base
 		return str_stream;
 	}
 
-	HRESULT getHRESULTFromRuntimeException(const RuntimeException& exp)
-	{
-		if (exp.getErrorCodeType() == ErrorCodeType::HRESULT)
-			return exp.getErrorCodeAsHRESULT();
-		else if (exp.getErrorCodeType() == ErrorCodeType::WIN32API)
-			return HRESULT_FROM_WIN32(exp.getErrorCodeAsWinAPI());
-		else
-			return E_FAIL;
-	}
-
-	HRESULT getHRESULTFromFatalError(const FatalError& exp)
-	{
-		if (exp.getErrorCodeType() == ErrorCodeType::HRESULT)
-			return exp.getErrorCodeAsHRESULT();
-		else if (exp.getErrorCodeType() == ErrorCodeType::WIN32API)
-			return HRESULT_FROM_WIN32(exp.getErrorCodeAsWinAPI());
-		else
-			return E_FAIL;
-	}
-
 	Win32ErrorCodeToString::Win32ErrorCodeToString(unsigned long errorCode, ...)
 		: str(nullptr)
 	{

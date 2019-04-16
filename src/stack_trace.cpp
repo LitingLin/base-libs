@@ -1,8 +1,10 @@
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 #include <Dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
+#endif
 #include <string>
 #include <limits>
 #include <mutex>
