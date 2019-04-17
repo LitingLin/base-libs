@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <Dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
+#else
+#include <execinfo.h>
 #endif
 #include <string>
 #include <limits>
@@ -14,9 +16,9 @@
 namespace Base
 {
 	std::mutex stack_trace_locker;
-	HANDLE hProcess = GetCurrentProcess();
 	enum class SymbolInfoState{ Uninitialized, Initialized, Failed};
-
+#ifdef _WIN32
+    HANDLE hProcess = GetCurrentProcess();
 	std::string getStackTrace()
 	{
 		std::string message;
@@ -78,4 +80,30 @@ namespace Base
 
 		return message;
 	}
+#else
+    std::string getStackTrace()
+    {
+	    int max_frames = std::numeric_limits<uint16_t>::max();
+	    std::unique_ptr<void*, std::function<void(void**)>> stacks((void**)malloc(sizeof(void*) * max_frames), [](void** stacks) { if(stacks) free(stacks); });
+	    if (!stacks)
+            return "malloc() failed during capturing call stack.";
+
+        int frames = backtrace(stacks.get(), max_frames);
+        std::unique_ptr<char *, std::function<void(char **)>> symbols(backtrace_symbols(stacks.get(), frames), [](char **symbols) { if (symbols) free(symbols);});
+        if (!symbols)
+            return "malloc() failed during capturing call stack.";
+
+        std::string message;
+
+        const unsigned address_buffer_length = sizeof(ptrdiff_t) * 2 + 1;
+        char buffer[address_buffer_length];
+
+        for (int i = 1;i<frames;++i)
+        {
+            snprintf(buffer, address_buffer_length, "%llx", stacks.get()[i]);
+            message += std::to_string(i - 1) + "\t0x" + buffer + '\t' + symbols.get()[i] + '\n';
+        }
+        return message;
+    }
+#endif
 }

@@ -1,13 +1,15 @@
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 #include <Objbase.h>
+#pragma comment(lib, "Rpcrt4.lib")
+#else
+#endif
 #include <string>
 
 #include <base/logging.h>
 #include <random>
-
-#pragma comment(lib, "Rpcrt4.lib")
 
 bool operator<(const GUID& left, const GUID& right)
 {
@@ -64,11 +66,11 @@ namespace Base
 		return buf_[0] == 0 && memcmp(buf_, buf_ + 1, size - 1) == 0;
 	}
 
+#ifdef _WIN32
 	void generateGUID(GUID *guid)
 	{
 		UuidCreate(guid);
 	}
-
 	void generateGUID(wchar_t *str, unsigned str_size)
 	{
 		GUID guid;
@@ -76,6 +78,46 @@ namespace Base
 		GUIDToString(&guid, str, str_size);
 	}
 
+    std::wstring generateGUID()
+    {
+        std::wstring guidString;
+        guidString.resize(GUID_STRING_SIZE);
+        GUID guid;
+        UuidCreate(&guid);
+        StringFromGUID2(guid, (wchar_t*)guidString.data(), GUID_STRING_SIZE);
+
+        return guidString;
+    }
+	void GUIDToString(const GUID *guid, wchar_t *str, unsigned str_size)
+	{
+		ENSURE_GE(str_size, 39U);
+		ENSURE_EQ(StringFromGUID2(*guid, str, 39), 39);
+	}
+#else
+    void generateGUID(GUID *guid)
+    {
+        int fd = open("/dev/urandom", O_RDONLY);
+        ENSURE_NE_CRTAPI(fd, -1);
+        ON_SCOPE_EXIT(close(fd));
+        int bytesRead = read(fd, guid, 16);
+        ENSURE_NE_CRTAPI(bytesRead, -1);
+        ENSURE_EQ(bytesRead, 16);
+    }
+    void generateGUID(char *str, unsigned str_size)
+    {
+	    GUID guid;
+	    generateGUID(&guid);
+	    GUIDToString(&guid, str, str_size);
+    }
+
+    void GUIDToString(const GUID *guid, char *str, unsigned str_size)
+    {
+        ENSURE_GE(str_size, 39U);
+        str[0] = '{';
+        
+        str[38] = '\0';
+    }
+#endif
 	std::wstring generateGUID()
 	{
 		std::wstring guidString;
@@ -87,11 +129,6 @@ namespace Base
 		return guidString;
 	}
 
-	void GUIDToString(const GUID *guid, wchar_t *str, unsigned str_size)
-	{
-		ENSURE_GE(str_size, 39U);
-		ENSURE_EQ(StringFromGUID2(*guid, str, 39), 39);
-	}
 
 	bool isRunningOn64bitSystem()
 	{
