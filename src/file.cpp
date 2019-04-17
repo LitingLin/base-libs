@@ -617,8 +617,21 @@ namespace Base
 	        flag |= O_TRUNC;
 	    _fd = open(path.c_str(), flag);
 	    CHECK_NE_CRTAPI(_fd, -1) << "open() failed with path: " << path << ", flag: " << flag;
+	    const char *fdopen_mode = nullptr;
+	    if (mode & Mode::rdwr)
+	        fdopen_mode = "r+";
+	    else if (mode & Mode::read)
+	        fdopen_mode = "r";
+	    else if (mode & Mode::write)
+	        fdopen_mode = "w";
+        _file = fdopen(_fd, fdopen_mode);
 
     }
+
+    File::~File() {
+        fclose(_file);
+    }
+
 #endif
 
 	template <typename CharType> inline

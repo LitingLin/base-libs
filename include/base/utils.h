@@ -4,17 +4,24 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <Rpc.h>
+#else
+
+typedef struct _GUID {
+    union {
+        struct {
+            unsigned long Data1;
+            unsigned short Data2;
+            unsigned short Data3;
+            unsigned char Data4[8];
+        };
+        char asArray[16];
+    };
+} GUID;
+
 #endif
 #include <string>
 #include <limits>
 #include <functional>
-
-typedef struct _GUID {
-    unsigned long  Data1;
-    unsigned short Data2;
-    unsigned short Data3;
-    unsigned char  Data4[ 8 ];
-} GUID;
 
 template <typename F>
 struct ScopeExit {
@@ -44,17 +51,20 @@ namespace Base
 	//std::string toLowerCase(const std::string &str);
 	std::wstring toLowerCase(const std::wstring &str);
 	void GUIDToString(const GUID *guid, wchar_t *str, unsigned str_size);
-#else
-#endif
-
-	bool isMemoryZero(void *buf, const size_t size);
-	const uint8_t GUID_STRING_SIZE = 39;
-	void generateGUID(GUID *guid);
 	void generateGUID(wchar_t *str, unsigned str_size);
 	std::wstring generateGUID();
 	bool StringToGUID(const wchar_t *str, unsigned str_size, GUID *guid);
-	void GUIDToString(const GUID *guid, char *str, unsigned str_size);
 	bool isRunningOn64bitSystem();
+#else
+#endif
+
+	bool isMemoryZero(void *buf, size_t size);
+	const uint8_t GUID_STRING_SIZE = 39;
+	void generateGUID(GUID *guid);
+    void generateGUID(char *str, unsigned str_size);
+    std::string generateGUID();
+	void GUIDToString(const GUID *guid, char *str, unsigned str_size);
+    bool StringToGUID(const char *str, unsigned str_size, GUID *guid);
 
 	uint8_t generateRandomUint8(uint8_t from = std::numeric_limits<uint8_t>::min(), uint8_t to = std::numeric_limits<uint8_t>::max());
 	uint16_t generateRandomUint16(uint16_t from = std::numeric_limits<uint16_t>::min(), uint16_t to = std::numeric_limits<uint16_t>::max());

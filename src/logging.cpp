@@ -1,6 +1,8 @@
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <winsock2.h>
+#endif
 #include <stdarg.h>
 #include <string.h>
 
@@ -115,7 +117,7 @@ namespace Base
 	{
 		return str_stream;
 	}
-
+#ifdef _WIN32
 	Win32ErrorCodeToString::Win32ErrorCodeToString(unsigned long errorCode, ...)
 		: str(nullptr)
 	{
@@ -319,8 +321,7 @@ namespace Base
 	{
 		return UTF16ToUTF8(getNtStatusErrorWString(ntstatus));
 	}
-
-	std::string getCRTErrorString(errno_t errnum)
+	std::string getCRTErrorString(int errnum)
 	{
 		char buffer[256];
 		std::string errString;
@@ -329,4 +330,10 @@ namespace Base
 		else
 			return std::string();
 	}
+#endif
+
+    std::string getCRTErrorString(int errnum)
+    {
+	    return std::string(strerror(errnum));
+    }
 }

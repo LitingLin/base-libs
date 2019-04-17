@@ -18,7 +18,15 @@ bool operator<(const GUID& left, const GUID& right)
 
 namespace Base
 {
-	std::wstring UTF8ToUTF16(const std::string &str)
+	bool isMemoryZero(void *buf, size_t size)
+	{
+		CHECK(size);
+		char *buf_ = (char*)buf;
+		return buf_[0] == 0 && memcmp(buf_, buf_ + 1, size - 1) == 0;
+	}
+
+#ifdef _WIN32
+    std::wstring UTF8ToUTF16(const std::string &str)
 	{
 		if (str.empty())
 			return std::wstring();
@@ -49,7 +57,6 @@ namespace Base
 		CHECK_NE_WIN32API(WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str_size, &localMultiByteString[0], size + 1, NULL, NULL), 0);
 		return localMultiByteString;
 	}
-
 	std::wstring toLowerCase(const std::wstring& str)
 	{
 		std::wstring lowercaseString = str;
@@ -58,15 +65,6 @@ namespace Base
 
 		return lowercaseString;
 	}
-
-	bool isMemoryZero(void *buf, const size_t size)
-	{
-		CHECK(size);
-		char *buf_ = (char*)buf;
-		return buf_[0] == 0 && memcmp(buf_, buf_ + 1, size - 1) == 0;
-	}
-
-#ifdef _WIN32
 	void generateGUID(GUID *guid)
 	{
 		UuidCreate(guid);
@@ -93,31 +91,6 @@ namespace Base
 		ENSURE_GE(str_size, 39U);
 		ENSURE_EQ(StringFromGUID2(*guid, str, 39), 39);
 	}
-#else
-    void generateGUID(GUID *guid)
-    {
-        int fd = open("/dev/urandom", O_RDONLY);
-        ENSURE_NE_CRTAPI(fd, -1);
-        ON_SCOPE_EXIT(close(fd));
-        int bytesRead = read(fd, guid, 16);
-        ENSURE_NE_CRTAPI(bytesRead, -1);
-        ENSURE_EQ(bytesRead, 16);
-    }
-    void generateGUID(char *str, unsigned str_size)
-    {
-	    GUID guid;
-	    generateGUID(&guid);
-	    GUIDToString(&guid, str, str_size);
-    }
-
-    void GUIDToString(const GUID *guid, char *str, unsigned str_size)
-    {
-        ENSURE_GE(str_size, 39U);
-        str[0] = '{';
-        
-        str[38] = '\0';
-    }
-#endif
 	std::wstring generateGUID()
 	{
 		std::wstring guidString;
@@ -128,8 +101,6 @@ namespace Base
 
 		return guidString;
 	}
-
-
 	bool isRunningOn64bitSystem()
 	{
 #ifdef _M_X64
@@ -151,6 +122,167 @@ namespace Base
 		else
 			return false;
 	}
+#else
+    void generateGUID(GUID *guid)
+    {
+        int fd = open("/dev/urandom", O_RDONLY);
+        ENSURE_NE_CRTAPI(fd, -1);
+        ON_SCOPE_EXIT(close(fd));
+        int bytesRead = read(fd, guid, 16);
+        ENSURE_NE_CRTAPI(bytesRead, -1);
+        ENSURE_EQ(bytesRead, 16);
+    }
+    void generateGUID(char *str, unsigned str_size)
+    {
+	    GUID guid;
+	    generateGUID(&guid);
+	    GUIDToString(&guid, str, str_size);
+    }
+    inline char toHex(uint32_t value)
+    {
+	    if (value < 10) return '0' + value;
+	    else return 'A' + value - 10;
+    }
+    void uint8ToHexString(uint8_t value, char *str)
+    {
+	    uint32_t v = value & 0x0FU;
+	    str[0] = toHex(v);
+	    v = value & 0xF0U;
+	    v >>= 4U;
+        str[1] = toHex(v);
+    }
+    void uint64ToHexString(uint64_t value, char *str)
+    {
+        uint64_t mask = 0x000000000000000FU;
+        for (uint32_t i=0;i<16;++i)
+        {
+            str[i] = toHex((value & mask) >> (4 * i));
+            mask <<= 4U;
+        }
+    }
+    void uint32ToHexString(uint32_t value, char *str)
+    {
+        uint32_t mask = 0x0000000FU;
+        for (uint32_t i=0;i<8;++i)
+        {
+            str[i] = toHex((value & mask) >> (4 * i));
+            mask <<= 4U;
+        }
+    }
+    void uint16ToHexString(uint16_t value, char *str)
+    {
+        uint32_t mask = 0x000FU;
+        for (uint32_t i=0;i<4;++i)
+        {
+            str[i] = toHex((value & mask) >> (4 * i));
+            mask <<= 4U;
+        }
+    }
+    void GUIDToString(const GUID *guid, char *str, unsigned str_size)
+    {
+        ENSURE_GE(str_size, 39U);
+        str[0] = '{';
+        uint32ToHexString(guid->Data1, str+1);
+        str[9] = '-';
+        uint16ToHexString(guid->Data2, str+10);
+        str[14] = '-';
+        uint16ToHexString(guid->Data3, str+15);
+        str[19] = '-';
+        uint16ToHexString(*(uint16_t*)guid->Data4, str + 20);
+        str[24] = '-';
+        uint16ToHexString(*(uint16_t*)(guid->Data4 + 2), str + 25);
+        uint32ToHexString(*(uint32_t*)(guid->Data4+4),str+29);
+        str[37] = '}';
+        str[38] = '\0';
+    }
+    uint32_t parseHex(char str)
+    {
+        static_assert('a' > 'A' && 'A' > '0', "");
+        if (str >= 'a')
+            return 10 + str - 'a';
+        else if (str >= 'A')
+            return 10 + str - 'A';
+        else if (str >= '0')
+            return str - '0';
+    }
+    uint32_t hexStringToUint32(const char *str)
+    {
+	    uint32_t v = 0;
+        v |= (parseHex(str[0]) << 28U);
+        v |= (parseHex(str[1]) << 24U);
+        v |= (parseHex(str[2]) << 20U);
+        v |= (parseHex(str[3]) << 16U);
+        v |= (parseHex(str[4]) << 12U);
+        v |= (parseHex(str[5]) << 8U);
+        v |= (parseHex(str[6]) << 4U);
+        v |= (parseHex(str[7]));
+        return v;
+    }
+    uint16_t hexStringToUint16(const char *str)
+    {
+        uint16_t v = 0;
+        v |= (parseHex(str[0]) << 12U);
+        v |= (parseHex(str[1]) << 8U);
+        v |= (parseHex(str[2]) << 4U);
+        v |= (parseHex(str[3]));
+        return v;
+    }
+    uint8_t hexStringToUint8(const char *str)
+    {
+	    uint8_t v = 0;
+	    v |= (parseHex(str[0]) << 4U);
+	    v |= (parseHex(str[1]));
+        return v;
+    }
+
+    bool isValidHexCharValue(char hex)
+    {
+        return (hex >= '0' && hex <= '9') || (hex >= 'A' && hex <= 'F') || (hex >= 'a' && hex <= 'f');
+    }
+
+    bool StringToGUID(const char *str, unsigned str_size, GUID *guid)
+    {
+        ENSURE_GE(str_size, 39U);
+	    if (str[0]!='{')
+	        return false;
+        for (int i=1;i<9;++i)
+            if (!isValidHexCharValue(str[i]))
+                return false;
+        if (str[9]!='-')
+            return false;
+        for (int i=10;i<14;++i)
+            if (!isValidHexCharValue(str[i]))
+                return false;
+        if (str[14]!='-')
+            return false;
+        for (int i=15;i<19;++i)
+            if (!isValidHexCharValue(str[i]))
+                return false;
+        if (str[19]!='-')
+            return false;
+        for (int i=20;i<24;++i)
+            if (!isValidHexCharValue(str[i]))
+                return false;
+        if (str[24]!='-')
+            return false;
+        for (int i=25;i<37;++i)
+            if (!isValidHexCharValue(str[i]))
+                return false;
+        if (str[37]!='}')
+            return false;
+
+        *(uint32_t*)(guid->asArray) = hexStringToUint32(str + 1);
+        *(uint16_t*)(guid->asArray + 4) = hexStringToUint16(str + 10);
+        *(uint16_t*)(guid->asArray + 6) = hexStringToUint16(str + 15);
+        *(uint16_t*)(guid->asArray + 8) = hexStringToUint16(str + 20);
+        *(uint16_t*)(guid->asArray + 10) = hexStringToUint16(str + 25);
+        *(uint32_t*)(guid->asArray + 12) = hexStringToUint32(str + 29);
+
+        return true;
+    }
+#endif
+
+
 
 	uint8_t generateRandomUint8(uint8_t from, uint8_t to)
 	{
