@@ -2,6 +2,7 @@
 
 #include "exception.h"
 #include "utils.h"
+#include <base/preprocessor.h>
 
 #include <locale>
 #include <functional>
@@ -9,7 +10,7 @@
 #include <memory>
 #include <sstream>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define SPDLOG_WCHAR_FILENAMES
 #endif
 #include <spdlog/spdlog.h>
@@ -41,44 +42,50 @@ namespace Base
 #endif
 	std::string getCRTErrorString(int errnum);
 
-	class FatalErrorLogging
+	class _ExceptionHandlerExecutor
 	{
 	public:
-		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function);
-		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp);
-		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2);
+		_ExceptionHandlerExecutor(std::function<void(void)> function);
+	};
+
+	class _BaseLogging : public _ExceptionHandlerExecutor
+	{
+	public:
+		_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
+		std::ostringstream& stream();
+	protected:
+		int64_t errorcode;
+		ErrorCodeType errorCodeType;
+		std::ostringstream str_stream;
+	};
+
+	class FatalErrorLogging : public _BaseLogging
+	{
+	public:
+		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
 		~FatalErrorLogging() noexcept(false);
-		std::ostringstream& stream();
-	private:
-		int64_t errorcode;
-		ErrorCodeType errorCodeType;
-		std::ostringstream str_stream;
 	};
 
-	class RuntimeExceptionLogging
+	class RuntimeExceptionLogging : public _BaseLogging
 	{
 	public:
-		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function);
-		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp);
-		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2);
+		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
 		~RuntimeExceptionLogging() noexcept(false);
-		std::ostringstream& stream();
-	private:
-		int64_t errorcode;
-		ErrorCodeType errorCodeType;
-		std::ostringstream str_stream;
 	};
 
-	class EventLogging
+	class EventLogging : public _BaseLogging
 	{
 	public:
-		EventLogging(const char* file, int line, const char* function);
-		EventLogging(const char* file, int line, const char* function, const char* exp);
-		EventLogging(const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2);
+		EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
 		~EventLogging() noexcept(false);
-		std::ostringstream& stream();
-	private:
-		std::ostringstream str_stream;
 	};
 
 	template <typename T1, typename T2, typename Op>
@@ -88,31 +95,94 @@ namespace Base
 		else
 			return std::make_unique<std::pair<T1, T2>>(a, b);
 	}
+	struct _StreamTypeVoidify
+	{
+		void operator&(std::ostream&) {}
+	};
 }
 
 #define LEFT_OPERAND_RC \
-	_rc->first
+	_rc_->first
 #define RIGHT_OPERAND_RC \
-	_rc->second
+	_rc_->second
+
+#define _LOG_GENERIC(loggingClass, errorCodeType, errorCode, handler) \
+loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).stream()
+
+#define _LOG_CONDITIONED_GENERIC(condition, loggingClass, errorCodeType, errorCode, handler) \
+!(condition) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #condition).stream()
+
+#define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
+!(auto _rc_ = Base::check_impl((leftExp), (rightExp), functional_op)) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
+
+#define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to<>(), loggingClass, errorCodeType, errorCode, handler)
+
+#define _LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, != , std::not_equal_to<>(), loggingClass, errorCodeType, errorCode, handler)
+
+#define _LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, >= , std::greater_equal<>(), loggingClass, errorCodeType, errorCode, handler)
+
+#define _LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, > , std::greater<>(), loggingClass, errorCodeType, errorCode, handler)
+
+#define _LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, <= , std::less_equal<>(), loggingClass, errorCodeType, errorCode, handler)
+
+#define _LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, < , std::less<>(), loggingClass, errorCodeType, errorCode, handler)
+
+#define FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_FATAL_EEROR, __VA_ARGS__)
+#define _FATAL_ERROR_1(errorCode) \
+_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::USERDEFINED, errorCode, nullptr)
 
 // Let it crash, don't catch
-#define FATAL_ERROR \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__).stream()
+#define _FATAL_ERROR_0() \
+_FATAL_ERROR_1(-1)
 
-#define FATAL_ERROR_WITH_CODE(errorcode) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, errorcode, __FILE__, __LINE__, __func__).stream()
+#define FATAL_ERROR_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_FATAL_EEROR_HANDLER, __VA_ARGS__)
+#define _FATAL_EEROR_HANDLER_2(errorCode, handler) \
+_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::USERDEFINED, errorCode, handler)
+#define _FATAL_EEROR_HANDLER_1(handler) \
+_FATAL_EEROR_HANDLER_2(-1, handler)
 
-#define ENSURE(val) \
-	if (!(val)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__, #val).stream()
+#define ENSURE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_GENERIC(condition, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_WITH_HANDLER_3(condition, errorCode, handler) \
+_ENSURE_WITH_HANDLER_4(condition, Base::ErrorCodeType::USERDEFINED, errorCode, handler)
+#define _ENSURE_WITH_HANDLER_2(condition, handler) \
+_ENSURE_WITH_HANDLER_3(condition, -1, handler)
 
-#define ENSURE_WITH_CODE(val, errorcode) \
-	if (!(val)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, errorcode, __FILE__, __LINE__, __func__, #val).stream()
+#define ENSURE(...) _PP_MACRO_OVERLOAD(_ENSURE, __VA_ARGS__)
+#define _ENSURE_3(condition, errorCodeType, errorCode) \
+_ENSURE_WITH_HANDLER_4(condition, errorCodeType, errorCode, nullptr)
+#define _ENSURE_2(condition, errorCode) \
+_ENSURE_3(condition, Base::ErrorCodeType::USERDEFINED, errorCode)
+#define _ENSURE_1(condition) \
+_ENSURE_2(condition, -1)
 
-#define ENSURE_WIN32API(val) \
-	if (!(val)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::WIN32API, GetLastError(), __FILE__, __LINE__, __func__, #val).stream() << Base::getWin32LastErrorString()
+#define ENSURE_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_EQ_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::USERDEFINED, errorCode, handler)
+#define _ENSURE_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_ENSURE_EQ_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define ENSURE_EQ(...) _PP_MACRO_OVERLOAD(_ENSURE_EQ, __VA_ARGS__)
+#define _ENSURE_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
+_ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _ENSURE_EQ_3(leftExp, rightExp, errorCode) \
+_ENSURE_EQ_4(leftExp, rightExp, Base::ErrorCodeType::USERDEFINED, errorCode)
+#define _ENSURE_EQ_2(leftExp, rightExp) \
+_ENSURE_EQ_3(leftExp, rightExp, -1)
+
+#define ENSURE_WIN32API(condition) \
+_ENSURE_3(condition, Base::ErrorCodeType::WIN32API, GetLastError()) << Base::getWin32LastErrorString()
+
+#define ENSURE_HR(condition)
 
 #define ENSURE_HR(exp) \
 	if (HRESULT _hr = (exp)) if (_hr < 0) \

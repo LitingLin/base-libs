@@ -122,6 +122,7 @@ namespace Base
 	    const static CharType backSlash;
         const static CharType slash;
         const static CharType colon;
+        const static CharType dot;
     };
 
 	template <>
@@ -136,8 +137,12 @@ namespace Base
     const char StaticCharValue<char>::colon = ':';
     template <>
     const wchar_t StaticCharValue<wchar_t>::colon = L':';
+    template <>
+    const char StaticCharValue<char>::dot = '.';
+    template <>
+    const wchar_t StaticCharValue<wchar_t>::dot = L'.';
 
-
+#ifdef _WIN32
 	template <typename CharType> inline
 	std::basic_string<CharType> getFileNameHelper(const std::basic_string<CharType>& path)
 	{
@@ -164,6 +169,20 @@ namespace Base
 			pos++;
 		return path.substr(pos, path.size() - pos);
 	}
+#else
+
+    template <typename CharType> inline
+    std::basic_string<CharType> getFileNameHelper(const std::basic_string<CharType>& path)
+    {
+        size_t slashpos = path.find_last_of(StaticCharValue<CharType>::slash);
+        if (slashpos == path.npos)
+            slashpos = 0;
+        else
+            slashpos++;
+        return path.substr(slashpos, path.size() - slashpos);
+    }
+
+#endif
 
 	std::wstring getFileName(const std::wstring& path)
 	{
@@ -194,14 +213,25 @@ namespace Base
 		return isURIHelper(string);
 	}
 
+#ifdef _WIN32
 	template <typename CharType> inline
 	std::basic_string<CharType> appendPathHelper(const std::basic_string<CharType>& path, const std::basic_string<CharType>& fileName)
 	{
-		if (path[path.size() - 1] == L'/' || path[path.size() - 1] == L'\\')
+		if (path[path.size() - 1] == StaticCharValue<CharType>::slash || path[path.size() - 1] == StaticCharValue<CharType>::backSlash)
 			return path + fileName;
 		else
-			return path + L'\\' + fileName;
+			return path + StaticCharValue<CharType>::backSlash + fileName;
 	}
+#else
+    template <typename CharType> inline
+    std::basic_string<CharType> appendPathHelper(const std::basic_string<CharType>& path, const std::basic_string<CharType>& fileName)
+    {
+        if (path[path.size() - 1] == StaticCharValue<CharType>::slash)
+            return path + fileName;
+        else
+            return path + StaticCharValue<CharType>::slash + fileName;
+    }
+#endif
 
 	std::string appendPath(const std::string& path, const std::string& fileName)
 	{
@@ -213,14 +243,25 @@ namespace Base
 		return appendPathHelper(path, fileName);
 	}
 
+#ifdef _WIN32
 	template <typename CharType> inline
 	std::basic_string<CharType> getFileExtensionHelper(const std::basic_string<CharType>& path)
 	{
-		size_t dot_pos = path.find_last_of(L'.');
-		if (dot_pos == path.npos || path.find(L'/', dot_pos + 1) != path.npos || path.find(L'\\', dot_pos + 1) != path.npos)
+		size_t dot_pos = path.find_last_of(StaticCharValue<CharType>::dot);
+		if (dot_pos == path.npos || path.find(StaticCharValue<CharType>::slash, dot_pos + 1) != path.npos || path.find(StaticCharValue<CharType>::backSlash, dot_pos + 1) != path.npos)
 			return std::basic_string<CharType>();
 		return path.substr(dot_pos + 1);
 	}
+#else
+    template <typename CharType> inline
+    std::basic_string<CharType> getFileExtensionHelper(const std::basic_string<CharType>& path)
+    {
+        size_t dot_pos = path.find_last_of(StaticCharValue<CharType>::dot);
+        if (dot_pos == path.npos || path.find(StaticCharValue<CharType>::slash, dot_pos + 1) != path.npos)
+            return std::basic_string<CharType>();
+        return path.substr(dot_pos + 1);
+    }
+#endif
 
 	std::string getFileExtension(const std::string& path)
 	{
@@ -232,6 +273,7 @@ namespace Base
 		return getFileExtensionHelper(path);
 	}
 
+#ifdef _WIN32
 	template <typename CharType> inline
 	std::basic_string<CharType> getCanonicalPathHelper(const std::basic_string<CharType>& path)
 	{
@@ -242,37 +284,37 @@ namespace Base
 
 		for (size_t i = 0; i < path.size(); ++i)
 		{
-			if (path[i] == L'\\')
+			if (path[i] == StaticCharValue<CharType>::backSlash)
 			{
-				if (buffer_ind != 0 && buffer[buffer_ind - 1] == L'\\')
+				if (buffer_ind != 0 && buffer[buffer_ind - 1] == StaticCharValue<CharType>::backSlash)
 					continue;
 				else {
-					buffer[buffer_ind] = L'\\';
+					buffer[buffer_ind] = StaticCharValue<CharType>::backSlash;
 					buffer_ind++;
 				}
 			}
-			else if (path[i] == L'/')
+			else if (path[i] == StaticCharValue<CharType>::slash)
 			{
-				if (buffer_ind != 0 && buffer[buffer_ind - 1] == L'\\')
+				if (buffer_ind != 0 && buffer[buffer_ind - 1] == StaticCharValue<CharType>::backSlash)
 					continue;
 				else {
-					buffer[buffer_ind] = L'\\';
+					buffer[buffer_ind] = StaticCharValue<CharType>::backSlash;
 					buffer_ind++;
 				}
 			}
-			else if (path[i] == L'.')
+			else if (path[i] == StaticCharValue<CharType>::dot)
 			{
-				if (i + 1 < path.size() && path[i + 1] == L'.' && (i + 2 == path.size() || path[i + 2] == L'\\' || path[i + 2] == L'/') && i >= 1 && (path[i - 1] == L'\\' || path[i - 1] == L'/'))
+				if (i + 1 < path.size() && path[i + 1] == StaticCharValue<CharType>::dot && (i + 2 == path.size() || path[i + 2] == StaticCharValue<CharType>::backSlash || path[i + 2] == StaticCharValue<CharType>::slash) && i >= 1 && (path[i - 1] == StaticCharValue<CharType>::backSlash || path[i - 1] == StaticCharValue<CharType>::slash))
 				{
 					i++;
 					if (buffer_ind < 2)
 						continue;
-					size_t slash_pos = buffer.find_last_of(L'\\', buffer_ind - 2);
+					size_t slash_pos = buffer.find_last_of(StaticCharValue<CharType>::backSlash, buffer_ind - 2);
 					if (slash_pos == buffer.npos)
 						continue;
 					buffer_ind = slash_pos;
 				}
-				else if (i >= 1 && (path[i - 1] == L'\\' || path[i - 1] == L'/') && (i + 1 == path.size() || path[i + 1] == L'\\' || path[i + 1] == L'/'))
+				else if (i >= 1 && (path[i - 1] == StaticCharValue<CharType>::backSlash || path[i - 1] == StaticCharValue<CharType>::slash) && (i + 1 == path.size() || path[i + 1] == StaticCharValue<CharType>::backSlash || path[i + 1] == StaticCharValue<CharType>::slash))
 				{
 					continue;
 				}
@@ -290,6 +332,60 @@ namespace Base
 		}
 		return buffer.substr(0, buffer_ind);
 	}
+#else
+    template <typename CharType> inline
+    std::basic_string<CharType> getCanonicalPathHelper(const std::basic_string<CharType>& path)
+    {
+        std::basic_string<CharType> buffer;
+        buffer.resize(path.size());
+
+        size_t buffer_ind = 0;
+
+        for (size_t i = 0; i < path.size(); ++i)
+        {
+            if (path[i] == StaticCharValue<CharType>::slash)
+            {
+                if (buffer_ind != 0 && buffer[buffer_ind - 1] == StaticCharValue<CharType>::slash)
+                    continue;
+                else {
+                    buffer[buffer_ind] = StaticCharValue<CharType>::slash;
+                    buffer_ind++;
+                }
+            }
+            else if (path[i] == StaticCharValue<CharType>::dot)
+            {
+                if (i + 1 < path.size() && path[i + 1] == StaticCharValue<CharType>::dot &&
+                (i + 2 == path.size() || path[i + 2] == StaticCharValue<CharType>::slash) && i >= 1 &&
+                path[i - 1] == StaticCharValue<CharType>::slash)
+                {
+                    i++;
+                    if (buffer_ind < 2)
+                        continue;
+                    size_t slash_pos = buffer.find_last_of(StaticCharValue<CharType>::slash, buffer_ind - 2);
+                    if (slash_pos == buffer.npos)
+                        continue;
+                    buffer_ind = slash_pos;
+                }
+                else if (i >= 1 && path[i - 1] == StaticCharValue<CharType>::slash &&
+                (i + 1 == path.size() || path[i + 1] == StaticCharValue<CharType>::slash))
+                {
+                    continue;
+                }
+                else
+                {
+                    buffer[buffer_ind] = path[i];
+                    buffer_ind++;
+                }
+            }
+            else
+            {
+                buffer[buffer_ind] = path[i];
+                buffer_ind++;
+            }
+        }
+        return buffer.substr(0, buffer_ind);
+    }
+#endif
 
 	std::string getCanonicalPath(const std::string& path)
 	{
@@ -634,6 +730,7 @@ namespace Base
 
 #endif
 
+#ifdef _WIN32
 	template <typename CharType> inline
 	std::basic_string<CharType> getParentPathHelper(const std::basic_string<CharType>& path)
 	{
@@ -643,14 +740,14 @@ namespace Base
 		{
 			if (!end_pos)
 				return std::basic_string<CharType>();
-			if (path[end_pos - 1] == L'/' || path[end_pos - 1] == L'\\')
+			if (path[end_pos - 1] == StaticCharValue<CharType>::slash || path[end_pos - 1] == StaticCharValue<CharType>::backSlash)
 				--end_pos;
 			else
 				break;
 		}
 
-		auto last_slash_pos = path.find_last_of(L'/', end_pos - 1);
-		auto last_back_slash_pos = path.find_last_of(L'\\', end_pos - 1);
+		auto last_slash_pos = path.find_last_of(StaticCharValue<CharType>::slash, end_pos - 1);
+		auto last_back_slash_pos = path.find_last_of(StaticCharValue<CharType>::backSlash, end_pos - 1);
 		if (last_slash_pos == path.npos)
 			last_slash_pos = last_back_slash_pos;
 		else if (last_back_slash_pos != path.npos && last_back_slash_pos > last_slash_pos)
@@ -662,7 +759,7 @@ namespace Base
 		{
 			if (!end_pos)
 				return std::basic_string<CharType>();
-			if (path[end_pos - 1] == L'/' || path[end_pos - 1] == L'\\')
+			if (path[end_pos - 1] == StaticCharValue<CharType>::slash || path[end_pos - 1] == StaticCharValue<CharType>::backSlash)
 				--end_pos;
 			else
 				break;
@@ -670,6 +767,45 @@ namespace Base
 
 		return path.substr(0, end_pos);
 	}
+#else
+    template <typename CharType> inline
+    std::basic_string<CharType> getParentPathHelper(const std::basic_string<CharType>& path)
+    {
+        size_t end_pos = path.size();
+
+        while (true)
+        {
+            if (!end_pos)
+                return std::basic_string<CharType>();
+            if (path[end_pos - 1] == StaticCharValue<CharType>::slash)
+                --end_pos;
+            else
+                break;
+        }
+
+        auto last_slash_pos = path.find_last_of(StaticCharValue<CharType>::slash, end_pos - 1);
+        auto last_back_slash_pos = path.find_last_of(StaticCharValue<CharType>::backSlash, end_pos - 1);
+        if (last_slash_pos == path.npos)
+            last_slash_pos = last_back_slash_pos;
+        else if (last_back_slash_pos != path.npos && last_back_slash_pos > last_slash_pos)
+            last_slash_pos = last_back_slash_pos;
+        if (end_pos > last_slash_pos)
+            end_pos = last_slash_pos;
+
+        while (true)
+        {
+            if (!end_pos)
+                return std::basic_string<CharType>();
+            if (path[end_pos - 1] == StaticCharValue<CharType>::slash || path[end_pos - 1] == StaticCharValue<CharType>::backSlash)
+                --end_pos;
+            else
+                break;
+        }
+
+        return path.substr(0, end_pos);
+    }
+#endif
+
 
 	std::string getParentPath(const std::string& path)
 	{

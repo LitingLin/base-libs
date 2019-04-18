@@ -5,41 +5,41 @@ set(CMAKE_CXX_STANDARD 14)
 
 if(WIN32)
     set(SRC_FILES
-            "src/com.cpp"
-            "src/d2d_window.cpp"
-            "src/debugoutput_logger_sink.cpp"
-            "src/dump_generator.cpp"
-            "src/encryption.cpp"
-            "src/event.cpp"
-            "src/exception.cpp"
-            "src/file.cpp"
-            "src/fragmented_udp.cpp"
-            "src/image_decoder.cpp"
-            "src/lock_guard.cpp"
-            "src/logging.cpp"
-            "src/memory_mapped_io.cpp"
-            "src/message_box.cpp"
-            "src/mutex.cpp"
-            "src/native_event_looper.cpp"
-            "src/network.cpp"
-            "src/process.cpp"
-            "src/registry.cpp"
-            "src/security_attributes.cpp"
-            "src/shared_memory.cpp"
-            "src/stack_track.cpp"
-            "src/sync.cpp"
-            "src/thread.cpp"
-            "src/time.cpp"
-            "src/timer.cpp"
-            "src/utils.cpp")
+            "${CMAKE_CURRENT_LIST_DIR}/src/com.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/d2d_window.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/debugoutput_logger_sink.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/dump_generator.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/encryption.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/event.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/exception.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/file.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/fragmented_udp.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/image_decoder.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/lock_guard.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/logging.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/memory_mapped_io.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/message_box.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/mutex.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/native_event_looper.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/network.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/process.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/registry.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/security_attributes.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/shared_memory.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/stack_track.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/sync.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/thread.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/time.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/timer.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp")
 else()
     set(SRC_FILES
-            "src/exception.cpp"
-            "src/file.cpp"
-            "src/logging.cpp"
-            "src/memory_mapped_io.cpp"
-            "src/stack_trace.cpp"
-            "src/utils.cpp")
+            "${CMAKE_CURRENT_LIST_DIR}/src/exception.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/file.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/logging.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/memory_mapped_io.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/stack_trace.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp")
 endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(cereal)
@@ -69,3 +69,5 @@ endif()
 if(NOT SPDLOG_FOUND)
     install(DIRECTORY ${SPDLOG_INCLUDE_DIRS} DESTINATION "include")
 endif()
+
+add_subdirectory(test)

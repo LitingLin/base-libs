@@ -22,23 +22,46 @@ namespace Base
 		return base_file_name;
 	}
 
-	FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function)
-		: errorcode(errorcode), errorCodeType(errorCodeType)
+	_ExceptionHandlerExecutor::_ExceptionHandlerExecutor(std::function<void(void)> function)
+	{
+		try {
+			if (function) function();
+		}
+		catch (std::exception & e) {
+			logger->warn("Exception occured during executing exception handler. Message:{}", e.what());
+		}
+		catch (...) {
+			logger->warn("Exception occured during executing exception handler.");
+		}
+	}
+
+	_BaseLogging::_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
+		: _ExceptionHandlerExecutor(handler), errorcode(errorcode), errorCodeType(errorCodeType)
 	{
 		str_stream << '[' << get_base_file_name(file) << ':' << line << ' ' << function << "] ";
 	}
-
-	FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp)
-		: FatalErrorLogging(errorCodeType, errorcode, file, line, function)
+	_BaseLogging::_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function)
 	{
 		str_stream << "Check failed: " << exp << ' ';
 	}
-
-	FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2)
-		: FatalErrorLogging(errorCodeType, errorcode, file, line, function)
+	_BaseLogging::_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function)
 	{
-		str_stream << "Check failed: " << exp1 << ' ' << op << ' ' << exp2 << ' ';
+		str_stream << "Check failed: " << leftExp << ' ' << op << ' ' << rightExp << ' ';
 	}
+
+	std::ostringstream& _BaseLogging::stream()
+	{
+		return str_stream;
+	}
+
+	FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function) {}
+	FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, exp) {}
+	FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, leftExp, op, rightExp) {}
 
 	FatalErrorLogging::~FatalErrorLogging() noexcept(false)
 	{
@@ -53,70 +76,35 @@ namespace Base
 		}
 	}
 
-	std::ostringstream& FatalErrorLogging::stream()
-	{
-		return str_stream;
-	}
-
-	RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function)
-		: errorcode(errorcode), errorCodeType(errorCodeType)
-	{
-		str_stream << '[' << get_base_file_name(file) << ':' << line << ' ' << function << "] ";
-	}
-
-	RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp)
-		: RuntimeExceptionLogging(errorCodeType, errorcode, file, line, function)
-	{
-		str_stream << "Check failed: " << exp << ' ';
-	}
-
-	RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2)
-		: RuntimeExceptionLogging(errorCodeType, errorcode, file, line, function)
-	{
-		str_stream << "Check failed: " << exp1 << ' ' << op << ' ' << exp2 << ' ';
-	}
+	RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function) {}
+	RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, exp) {}
+	RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, leftExp, op, rightExp) {}
 
 	RuntimeExceptionLogging::~RuntimeExceptionLogging() noexcept(false)
 	{
 		if (std::uncaught_exception())
-			logger->error("runtime exception occured during exception handling. Message: {}", str_stream.str());
+			logger->error("Runtime exception occured during exception handling. Message: {}", str_stream.str());
 		else {
 			logger->warn(str_stream.str());
 			throw RuntimeException(str_stream.str(), errorcode, errorCodeType);
 		}
 	}
-
-	std::ostringstream& RuntimeExceptionLogging::stream()
-	{
-		return str_stream;
-	}
-
-	EventLogging::EventLogging(const char* file, int line, const char* function)
-	{
-		str_stream << '[' << get_base_file_name(file) << ':' << line << ' ' << function << "] ";
-	}
-
-	EventLogging::EventLogging(const char* file, int line, const char* function, const char* exp)
-		: EventLogging(file, line, function)
-	{
-		str_stream << "Check failed: " << exp << ' ';
-	}
-
-	EventLogging::EventLogging(const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2)
-		: EventLogging(file, line, function)
-	{
-		str_stream << "Check failed: " << exp1 << ' ' << op << ' ' << exp2 << ' ';
-	}
+	
+	EventLogging::EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function) {}
+	EventLogging::EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, exp) {}
+	EventLogging::EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
+		: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, leftExp, op, rightExp) {}
 
 	EventLogging::~EventLogging() noexcept(false)
 	{
 		logger->info(str_stream.str());
 	}
 
-	std::ostringstream& EventLogging::stream()
-	{
-		return str_stream;
-	}
 #ifdef _WIN32
 	Win32ErrorCodeToString::Win32ErrorCodeToString(unsigned long errorCode, ...)
 		: str(nullptr)

@@ -29,6 +29,7 @@
     <ClInclude Include="..\include\base\mutex.h" />
     <ClInclude Include="..\include\base\native_event_looper.h" />
     <ClInclude Include="..\include\base\network.h" />
+    <ClInclude Include="..\include\base\preprocessor.h" />
     <ClInclude Include="..\include\base\process.h" />
     <ClInclude Include="..\include\base\registry.h" />
     <ClInclude Include="..\include\base\rw_spin_lock.h" />

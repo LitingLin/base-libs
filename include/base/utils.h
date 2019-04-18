@@ -56,15 +56,15 @@ namespace Base
 	bool StringToGUID(const wchar_t *str, unsigned str_size, GUID *guid);
 	bool isRunningOn64bitSystem();
 #else
+	std::string generateGUID();
+	void generateGUID(char* str, unsigned str_size);
+	void GUIDToString(const GUID* guid, char* str, unsigned str_size);
+	bool StringToGUID(const char* str, unsigned str_size, GUID* guid);
 #endif
 
 	bool isMemoryZero(void *buf, size_t size);
 	const uint8_t GUID_STRING_SIZE = 39;
 	void generateGUID(GUID *guid);
-    void generateGUID(char *str, unsigned str_size);
-    std::string generateGUID();
-	void GUIDToString(const GUID *guid, char *str, unsigned str_size);
-    bool StringToGUID(const char *str, unsigned str_size, GUID *guid);
 
 	uint8_t generateRandomUint8(uint8_t from = std::numeric_limits<uint8_t>::min(), uint8_t to = std::numeric_limits<uint8_t>::max());
 	uint16_t generateRandomUint16(uint16_t from = std::numeric_limits<uint16_t>::min(), uint16_t to = std::numeric_limits<uint16_t>::max());

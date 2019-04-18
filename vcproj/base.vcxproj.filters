@@ -105,6 +105,9 @@
     <ClInclude Include="..\include\base\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\base\preprocessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dump_generator.cpp">
