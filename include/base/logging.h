@@ -95,28 +95,29 @@ namespace Base
 		else
 			return std::make_unique<std::pair<T1, T2>>(a, b);
 	}
-	template <typename T1, typename T2, typename Operator>
+	template <typename Type, template <class Type2 = Type> class Operator>
 	struct _Comparator
 	{
-		_Comparator(const T1& first, const T2& second)
+		_Comparator(const Type& first, const Type& second)
 			: first(first), second(second) {}
 		operator bool()
 		{
-			return Operator(first, second);
+			Operator<> op;
+			return op(first, second);
 		}
-		T1 first;
-		T2 second;
+		Type first;
+		Type second;
 	};
 	struct _StreamTypeVoidify
 	{
-		void operator&(std::ostream&) {}
+		void operator&(std::ostream&) const {}
 	};
 }
 
 #define LEFT_OPERAND_RC \
-	_rc_->first
+	_rc_.first
 #define RIGHT_OPERAND_RC \
-	_rc_->second
+	_rc_.second
 
 #define _LOG_GENERIC(loggingClass, errorCodeType, errorCode, handler) \
 loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).stream()
@@ -125,25 +126,25 @@ loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).st
 !(condition) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #condition).stream()
 
 #define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
-!(auto _rc_ = Base::check_impl((leftExp), (rightExp), functional_op)) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
+(auto _rc_ = _Comparator<decltype(leftExp), functional_op>((leftExp), (rightExp))) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
 
 #define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to<>(), loggingClass, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to<>, loggingClass, errorCodeType, errorCode, handler)
 
 #define _LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, != , std::not_equal_to<>(), loggingClass, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, != , std::not_equal_to<>, loggingClass, errorCodeType, errorCode, handler)
 
 #define _LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, >= , std::greater_equal<>(), loggingClass, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, >= , std::greater_equal<>, loggingClass, errorCodeType, errorCode, handler)
 
 #define _LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, > , std::greater<>(), loggingClass, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, > , std::greater<>, loggingClass, errorCodeType, errorCode, handler)
 
 #define _LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, <= , std::less_equal<>(), loggingClass, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, <= , std::less_equal<>, loggingClass, errorCodeType, errorCode, handler)
 
 #define _LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, < , std::less<>(), loggingClass, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, < , std::less<>, loggingClass, errorCodeType, errorCode, handler)
 
 #define FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_FATAL_EEROR, __VA_ARGS__)
 #define _FATAL_ERROR_1(errorCode) \
@@ -153,10 +154,10 @@ _LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::USERDEFINED, errorCod
 #define _FATAL_ERROR_0() \
 _FATAL_ERROR_1(-1)
 
-#define FATAL_ERROR_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_FATAL_EEROR_HANDLER, __VA_ARGS__)
-#define _FATAL_EEROR_HANDLER_2(errorCode, handler) \
+#define FATAL_ERROR_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_FATAL_ERROR_HANDLER, __VA_ARGS__)
+#define _FATAL_ERROR_HANDLER_2(errorCode, handler) \
 _LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::USERDEFINED, errorCode, handler)
-#define _FATAL_EEROR_HANDLER_1(handler) \
+#define _FATAL_ERROR_HANDLER_1(handler) \
 _FATAL_EEROR_HANDLER_2(-1, handler)
 
 #define ENSURE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_WITH_HANDLER, __VA_ARGS__)
@@ -301,11 +302,9 @@ _ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::WIN32API, GetL
 ENSURE_LT_WIN32API_WITH_HANDLER(leftExp, rightExp, nullptr)
 
 #define ENSURE_HR_WITH_HANDLER(condition, handler) \
-_ENSURE_GE_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::HRESULT, )
-
-#define ENSURE_HR(exp) \
-	if (HRESULT _hr = (exp)) if (_hr < 0) \
-Base::FatalErrorLogging(Base::ErrorCodeType::HRESULT, _hr, __FILE__, __LINE__, __func__, #exp).stream() << Base::getHRESULTErrorString(_hr)
+_ENSURE_GE_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::HRESULT, LEFT_OPERAND_RC, handler) << Base::getHRESULTErrorString(LEFT_OPERAND_RC)
+#define ENSURE_HR(condition) \
+ENSURE_HR_WITH_HANDLER(condition, nullptr);
 
 #define ENSURE_NTSTATUS(val) \
 	if (NTSTATUS _status = (val)) if (_status < 0) \
