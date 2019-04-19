@@ -95,6 +95,18 @@ namespace Base
 		else
 			return std::make_unique<std::pair<T1, T2>>(a, b);
 	}
+	template <typename T1, typename T2, typename Operator>
+	struct _Comparator
+	{
+		_Comparator(const T1& first, const T2& second)
+			: first(first), second(second) {}
+		operator bool()
+		{
+			return Operator(first, second);
+		}
+		T1 first;
+		T2 second;
+	};
 	struct _StreamTypeVoidify
 	{
 		void operator&(std::ostream&) {}
