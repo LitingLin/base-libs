@@ -114,10 +114,13 @@ namespace Base
 	};
 }
 
+#define _COMPARATOR_NAME2(PREFIX, LINENUMBER) _PP_CAT(PREFIX, LINENUMBER)
+#define _COMPARATOR_NAME _COMPARATOR_NAME2(COMPARATOR_, __LINE__)
+
 #define LEFT_OPERAND_RC \
-	_rc_.first
+	_COMPARATOR_NAME.first
 #define RIGHT_OPERAND_RC \
-	_rc_.second
+	_COMPARATOR_NAME.second
 
 #define _LOG_GENERIC(loggingClass, errorCodeType, errorCode, handler) \
 loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).stream()
@@ -126,7 +129,8 @@ loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).st
 !(condition) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #condition).stream()
 
 #define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
-(auto _rc_ = _Comparator<decltype(leftExp), functional_op>((leftExp), (rightExp))) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
+_Comparator<decltype(leftExp), functional_op>_COMPARATOR_NAME((leftExp), (rightExp)); \
+(_COMPARATOR_NAME) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
 
 #define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
 _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to<>, loggingClass, errorCodeType, errorCode, handler)
