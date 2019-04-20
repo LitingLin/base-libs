@@ -110,12 +110,12 @@ namespace Base {
 			create_new,
 			open_always,
 			open_existing,
-			truncate_exising
+			truncate_existing
 		};
 #ifdef _WIN32
-		File(const std::wstring &path, DesiredAccess desired_access = DesiredAccess::read, CreationDisposition creationDisposition = CreationDisposition::open_existing);
+		File(const std::wstring &path, DesiredAccess desiredAccess = DesiredAccess::read, CreationDisposition creationDisposition = CreationDisposition::open_existing);
 #else
-		File(const std::string& path, DesiredAccess desired_access = DesiredAccess::read, CreationDisposition creationDisposition = CreationDisposition::open_existing));
+		File(const std::string& path, DesiredAccess desiredAccess = DesiredAccess::read, CreationDisposition creationDisposition = CreationDisposition::open_existing));
 #endif
 		File(const File &path) = delete;
 		File(File &&path) noexcept;
@@ -130,12 +130,11 @@ namespace Base {
 
 #endif
 	private:
-        FILE *_file;
-        int _fd;
 #ifdef _WIN32
 		HANDLE _fileHandle;
 #else
-
+		FILE* _file;
+		int _fd;
 #endif
 	};
 }

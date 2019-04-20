@@ -570,40 +570,49 @@ namespace Base
 
 #endif
 
-	File::Mode operator~(File::Mode value)
-	{
-		return File::Mode(~(uint32_t)value);
-	}
-
-	File::Mode operator&(File::Mode left, File::Mode right)
-	{
-		return File::Mode((uint32_t)left & (uint32_t)right);
-	}
-
-	File::Mode operator|(File::Mode left, File::Mode right)
-	{
-		return File::Mode((uint32_t)left | (uint32_t)right);
-	}
-
 #ifdef _WIN32
-	File::File(const std::wstring& path, Mode mode)
+	File::File(const std::wstring& path, DesiredAccess desiredAccess, CreationDisposition creationDisposition)
 	{
-		uint32_t desiredAccess = 0;
-		if (uint32_t(mode & Mode::read))
-			desiredAccess |= GENERIC_READ;
-		else if (uint32_t(mode & Mode::write))
-			desiredAccess |= GENERIC_WRITE;
-		uint32_t creationDisposition = OPEN_EXISTING;
-		if (uint32_t(mode & Mode::create_always))
-			creationDisposition = CREATE_ALWAYS;
-		else if (uint32_t(mode & Mode::create_new))
-			creationDisposition |= CREATE_NEW;
-		else if (uint32_t(mode & Mode::open_always))
-			creationDisposition = OPEN_ALWAYS;
-		else if (uint32_t(mode & Mode::truncate_existing))
-			creationDisposition = TRUNCATE_EXISTING;
-		_fileHandle = CreateFile(path.c_str(), desiredAccess, FILE_SHARE_READ, NULL, creationDisposition, FILE_ATTRIBUTE_NORMAL, NULL);
-		CHECK_NE_WIN32API(_fileHandle, INVALID_HANDLE_VALUE);
+		int desiredAccess_ = 0;
+		switch (desiredAccess)
+		{
+		case DesiredAccess::read:
+			desiredAccess_ = GENERIC_READ;
+			break;
+		case DesiredAccess::write:
+			desiredAccess_ = GENERIC_WRITE;
+			break;
+		case DesiredAccess::rdwr:
+			desiredAccess_ = GENERIC_READ | GENERIC_WRITE;
+			break;
+		default:
+			UNREACHABLE_ERROR;
+		}
+		int creationDisposition_ = 0;
+		switch (creationDisposition)
+		{
+		case CreationDisposition::create_always:
+			creationDisposition_ = CREATE_ALWAYS;
+			break;
+		case CreationDisposition::create_new:
+			creationDisposition_ = CREATE_NEW;
+			break;
+		case CreationDisposition::open_always:
+			creationDisposition_ = OPEN_ALWAYS;
+			break;
+		case CreationDisposition::open_existing:
+			creationDisposition_ = OPEN_EXISTING;
+			break;
+		case CreationDisposition::truncate_existing:
+			creationDisposition_ = TRUNCATE_EXISTING;
+			break;
+		default:
+			UNREACHABLE_ERROR;
+		}
+		_fileHandle = CreateFile(path.c_str(), desiredAccess_, FILE_SHARE_READ, NULL, creationDisposition_, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		(auto rc = _Comparator<HANDLE, std::not_equal_to>((_fileHandle), (INVALID_HANDLE_VALUE))) ? (void)0 : _StreamTypeVoidify() & RuntimeExceptionLogging(ErrorCodeType::WIN32API, GetLastError(), nullptr, __FILE__, __LINE__, __func__, "", "!=", "").stream()
+		
 	}
 
 	File::File(File&& other) noexcept

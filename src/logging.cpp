@@ -309,7 +309,7 @@ namespace Base
 	{
 		return UTF16ToUTF8(getNtStatusErrorWString(ntstatus));
 	}
-	std::string getCRTErrorString(int errnum)
+	std::string getStdCApiErrorString(int errnum)
 	{
 		char buffer[256];
 		std::string errString;
@@ -318,10 +318,11 @@ namespace Base
 		else
 			return std::string();
 	}
-#endif
+#else
+	std::string getStdCApiErrorString(int errnum)
+	{
+		return std::string(strerror(errnum));
+	}
 
-    std::string getCRTErrorString(int errnum)
-    {
-	    return std::string(strerror(errnum));
-    }
+#endif
 }
