@@ -6,7 +6,7 @@
 #include <process.h>
 #include <utility>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 #include <base/utils.h>
 
 namespace Base

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <base/exception.h>
-#include <base/utils.h>
 #include <base/preprocessor.h>
 
 #include <locale>
@@ -397,9 +396,13 @@ _CHECK_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, hand
 #define CHECK_STDCAPI(condition) \
 CHECK_STDCAPI_WITH_HANDLER(condition, nullptr)
 #define CHECK_NE_STDCAPI_WITH_HANDLER(leftExp, rightExp, handler) \
-_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+_CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
 #define CHECK_NE_STDCAPI(leftExp, rightExp) \
 CHECK_NE_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
+#define CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, handler) \
+_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+#define CHECK_EQ_STDCAPI(leftExp, rightExp) \
+CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
 
 
 /* ----------------------------- LOGGING ONLY ----------------------------- */
@@ -519,4 +522,4 @@ _LOG_IF_NOT_LT_3(leftExp, rightExp, -1)
 _LOG_IF_NOT_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
 
 #define LOG_IF_EQ_STDCAPI(leftExp, rightExp) \
-_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)

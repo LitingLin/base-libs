@@ -3,7 +3,7 @@
 #include <Shellapi.h>
 #include <Psapi.h>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 #include <base/sync.h>
 #include <base/file.h>
 

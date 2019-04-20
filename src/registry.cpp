@@ -1,5 +1,6 @@
-#include "base/registry.h"
-#include "base/logging.h"
+#include <base/registry.h>
+
+#include <base/logging/win32.h>
 
 namespace Base
 {

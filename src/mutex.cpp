@@ -1,6 +1,6 @@
 #include <base/mutex.h>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 #include <base/security_attributes.h>
 
 namespace Base

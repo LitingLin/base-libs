@@ -1,14 +1,18 @@
+#include <base/utils.h>
+
+#include <base/logging.h>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 #include <Objbase.h>
 #pragma comment(lib, "Rpcrt4.lib")
+#include <base/logging/win32.h>
 #else
 #endif
-#include <string>
 
-#include <base/logging.h>
+
+#include <string>
 #include <random>
 
 bool operator<(const GUID& left, const GUID& right)
@@ -116,10 +120,10 @@ namespace Base
     void generateGUID(GUID *guid)
     {
         int fd = open("/dev/urandom", O_RDONLY);
-        ENSURE_NE_CRTAPI(fd, -1);
+        ENSURE_NE_STDCAPI(fd, -1);
         ON_SCOPE_EXIT(close(fd));
         int bytesRead = read(fd, guid, 16);
-        ENSURE_NE_CRTAPI(bytesRead, -1);
+        ENSURE_NE_STDCAPI(bytesRead, -1);
         ENSURE_EQ(bytesRead, 16);
     }
     void generateGUID(char *str, unsigned str_size)
@@ -271,8 +275,6 @@ namespace Base
         return true;
     }
 #endif
-
-
 
 	uint8_t generateRandomUint8(uint8_t from, uint8_t to)
 	{

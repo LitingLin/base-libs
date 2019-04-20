@@ -1,9 +1,10 @@
 #include <base/file.h>
-
-#include <base/logging/win32.h>
 #include <random>
 
-#ifdef __unix__
+#include <base/logging.h>
+#ifdef _WIN32
+#include <base/logging/win32.h>
+#else
 #include <sys/stat.h>
 #endif
 
@@ -673,22 +674,13 @@ namespace Base
 		return totalWriteFileSize;
 	}
 
-	uint64_t File::read(unsigned char* buffer, uint64_t size, uint64_t offset) const
+	void File::seek(uint64_t offset)
 	{
 		LARGE_INTEGER large_integer;
 		large_integer.QuadPart = offset;
 		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
-		return read(buffer, size);
 	}
-
-	uint64_t File::write(const unsigned char* buffer, uint64_t size, uint64_t offset)
-	{
-		LARGE_INTEGER large_integer;
-		large_integer.QuadPart = offset;
-		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
-		return write(buffer, size);
-	}
-
+	
 	uint64_t File::getLastWriteTime() const
 	{
 		FILETIME lastWriteTime;
@@ -715,7 +707,7 @@ namespace Base
             case DesiredAccess::Write:
                 flag |= O_WRONLY;
                 break;
-            case DesiredAccess::Rdwr:
+            case DesiredAccess::ReadAndWrite:
                 flag |= O_RDWR;
                 break;
             default:
@@ -742,12 +734,57 @@ namespace Base
                 UNREACHABLE_ERROR;
         }
 
-	    _fd = open(path.c_str(), flag);
+	    _fd = ::open(path.c_str(), flag);
 	    CHECK_NE_STDCAPI(_fd, -1) << "open() failed with path: " << path << ", flag: " << flag;
     }
 
     File::~File() {
-        LOG_IF_EQ_STDCAPI(close(_fd));
+        if (_fd!=-1) {
+            LOG_IF_EQ_STDCAPI(::close(_fd), -1);
+        }
+    }
+
+    File::File(File &&other) noexcept
+    : _fd(other._fd)
+    {
+        other._fd = -1;
+    }
+
+    uint64_t File::getSize() const {
+        struct stat64 stat_;
+        CHECK_NE_STDCAPI(::fstat64(_fd, &stat_), -1);
+        return stat_.st_size;
+    }
+
+    uint64_t File::read(unsigned char *buffer, uint64_t size) const {
+        ssize_t bytesRead = ::read(_fd, buffer, size);
+        CHECK_NE_STDCAPI(bytesRead, -1);
+        return (uint64_t)bytesRead;
+    }
+
+    uint64_t File::write(const unsigned char *buffer, uint64_t size) {
+        ssize_t bytesWritten = ::write(_fd, buffer, size);
+        CHECK_NE_STDCAPI(bytesWritten, -1);
+    }
+
+    void File::seek(uint64_t offset) {
+        off64_t new_off = ::lseek64(_fd, offset, SEEK_SET);
+        CHECK_NE_STDCAPI(new_off, -1);
+        CHECK_EQ_STDCAPI(new_off, offset);
+    }
+
+    inline uint64_t as_nanoseconds(struct timespec ts) {
+        return ts.tv_sec * (uint64_t)1000000000L + ts.tv_nsec;
+    }
+
+    uint64_t File::getLastWriteTime() const {
+        struct stat64 stat_;
+        CHECK_NE_STDCAPI(::fstat64(_fd, &stat_), -1);
+        return as_nanoseconds(stat_.st_mtim);
+    }
+
+    int File::getFileDiscriptor() {
+        return _fd;
     }
 
 #endif

@@ -1,5 +1,5 @@
 #include <base/network.h>
-#include <base/logging.h>
+#include <base/logging/win32.h>
 
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")

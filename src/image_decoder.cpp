@@ -1,5 +1,5 @@
 #include <base/image_decoder.h>
-#include <base/logging.h>
+#include <base/logging/win32.h>
 
 #include <dshow.h>
 

@@ -23,9 +23,8 @@ namespace Base {
 	std::wstring getFullPath(const std::wstring& path);
 #else
     bool isPathExists(const std::string& path);
-    bool isFileExists(const std::string& Path)
+    bool isFileExists(const std::string& Path);
 #endif
-
 	std::string getParentPath(const std::string& path);
 	std::wstring getParentPath(const std::wstring& path);
 	std::string getFileName(const std::string& path);
@@ -116,7 +115,7 @@ namespace Base {
 				CreationDisposition creationDisposition = CreationDisposition::OpenExisting);
 #else
 		File(const std::string& path, DesiredAccess desiredAccess = DesiredAccess::Read,
-		        CreationDisposition creationDisposition = CreationDisposition::OpenExisting));
+		        CreationDisposition creationDisposition = CreationDisposition::OpenExisting);
 #endif
 		File(const File &) = delete;
 		File(File && other) noexcept;
@@ -124,8 +123,7 @@ namespace Base {
 		uint64_t getSize() const;
 		uint64_t read(unsigned char* buffer, uint64_t size) const;
 		uint64_t write(const unsigned char* buffer, uint64_t size);
-		uint64_t read(unsigned char *buffer, uint64_t size, uint64_t offset) const;
-		uint64_t write(const unsigned char *buffer, uint64_t size, uint64_t offset);
+		void seek(uint64_t offset);
 		uint64_t getLastWriteTime() const;
 #ifdef _WIN32
 		HANDLE getHANDLE();

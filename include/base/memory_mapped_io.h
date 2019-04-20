@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
 
-typedef void * HANDLE;
+#include <base/file.h>
+
 
 namespace Base
 {
@@ -9,14 +10,17 @@ namespace Base
 	class MemoryMappedIO
 	{
 	public:
-		MemoryMappedIO(const wchar_t *filename);
+        explicit MemoryMappedIO(File *file, File::DesiredAccess desiredAccess = File::DesiredAccess::Read, uint64_t size = 0, uint64_t offset = 0);
 		MemoryMappedIO(const MemoryMappedIO&) = delete;
-		~MemoryMappedIO() noexcept(false);
-		const unsigned char *getPtr() const;
-		uint64_t getSize() const;
+		~MemoryMappedIO();
+		void *get();
 	private:
-		HANDLE hFile;
-		HANDLE hFileMapping;
-		void *ptr;
+	    File *_file;
+#ifdef _WIN32
+		HANDLE _hFileMapping;
+#else
+        uint64_t _size;
+#endif
+		void *_ptr;
 	};
 }

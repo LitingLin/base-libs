@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 
 namespace Base
 {

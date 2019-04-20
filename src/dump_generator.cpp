@@ -6,7 +6,7 @@
 #include <DbgHelp.h>
 #include <vector>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 #include <base/file.h>
 #include <base/process.h>
 #include <base/thread.h>
