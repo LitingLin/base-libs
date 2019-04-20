@@ -1,6 +1,6 @@
 #include <base/file.h>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 #include <random>
 
 #ifdef __unix__
@@ -69,12 +69,12 @@ namespace Base
 	{
 		if (isURI(path))
 			return path;
-		std::wstring buffer;
-		std::wstring res;
+		std::basic_string<CharType> buffer;
+		std::basic_string<CharType> res;
 		buffer.resize(MAX_PATH);
 		while (true)
 		{
-			DWORD copied_size = GetFullPathName(path.c_str(), (DWORD)buffer.size() + 1, &buffer[0], nullptr);
+			DWORD copied_size = GetFullPathNameW(path.c_str(), (DWORD)buffer.size() + 1, &buffer[0], nullptr);
 			CHECK_NE_WIN32API(copied_size, 0U);
 			if (copied_size == buffer.size())
 				buffer.resize(buffer.size() * 2);
@@ -86,11 +86,6 @@ namespace Base
 			}
 		}
 		return res;
-	}
-
-	std::string getFullPath(const std::string& path)
-	{
-		return getFullPathHelper(path);
 	}
 
 	std::wstring getFullPath(const std::wstring& path)
@@ -113,8 +108,6 @@ namespace Base
     }
 
 #endif
-
-	unsigned char UTF16LE_BOM[2] = { 0xFF,0xFE };
 
 	template <typename CharType>
 	struct StaticCharValue
@@ -576,13 +569,13 @@ namespace Base
 		int desiredAccess_ = 0;
 		switch (desiredAccess)
 		{
-		case DesiredAccess::read:
+		case DesiredAccess::Read:
 			desiredAccess_ = GENERIC_READ;
 			break;
-		case DesiredAccess::write:
+		case DesiredAccess::Write:
 			desiredAccess_ = GENERIC_WRITE;
 			break;
-		case DesiredAccess::rdwr:
+		case DesiredAccess::ReadAndWrite:
 			desiredAccess_ = GENERIC_READ | GENERIC_WRITE;
 			break;
 		default:
@@ -591,28 +584,26 @@ namespace Base
 		int creationDisposition_ = 0;
 		switch (creationDisposition)
 		{
-		case CreationDisposition::create_always:
+		case CreationDisposition::CreateAlways:
 			creationDisposition_ = CREATE_ALWAYS;
 			break;
-		case CreationDisposition::create_new:
+		case CreationDisposition::CreateNew:
 			creationDisposition_ = CREATE_NEW;
 			break;
-		case CreationDisposition::open_always:
+		case CreationDisposition::OpenAlways:
 			creationDisposition_ = OPEN_ALWAYS;
 			break;
-		case CreationDisposition::open_existing:
+		case CreationDisposition::OpenExisting:
 			creationDisposition_ = OPEN_EXISTING;
 			break;
-		case CreationDisposition::truncate_existing:
+		case CreationDisposition::TruncateExisting:
 			creationDisposition_ = TRUNCATE_EXISTING;
 			break;
 		default:
 			UNREACHABLE_ERROR;
 		}
 		_fileHandle = CreateFile(path.c_str(), desiredAccess_, FILE_SHARE_READ, NULL, creationDisposition_, FILE_ATTRIBUTE_NORMAL, NULL);
-
-		(auto rc = _Comparator<HANDLE, std::not_equal_to>((_fileHandle), (INVALID_HANDLE_VALUE))) ? (void)0 : _StreamTypeVoidify() & RuntimeExceptionLogging(ErrorCodeType::WIN32API, GetLastError(), nullptr, __FILE__, __LINE__, __func__, "", "!=", "").stream()
-		
+		CHECK_NE(_fileHandle, INVALID_HANDLE_VALUE);
 	}
 
 	File::File(File&& other) noexcept
@@ -634,11 +625,8 @@ namespace Base
 		return large_integer.QuadPart;
 	}
 
-	uint64_t File::read(unsigned char* buffer, uint64_t offset, uint64_t size) const
+	uint64_t File::read(unsigned char* buffer, uint64_t size) const
 	{
-		LARGE_INTEGER large_integer;
-		large_integer.QuadPart = offset;
-		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
 		uint64_t totalReadFileSize = 0;
 		while (size)
 		{
@@ -661,11 +649,8 @@ namespace Base
 		return totalReadFileSize;
 	}
 
-	uint64_t File::write(const unsigned char* buffer, uint64_t offset, uint64_t size)
+	uint64_t File::write(const unsigned char* buffer, uint64_t size)
 	{
-		LARGE_INTEGER large_integer;
-		large_integer.QuadPart = offset;
-		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
 		uint64_t totalWriteFileSize = 0;
 		while (size)
 		{
@@ -688,6 +673,22 @@ namespace Base
 		return totalWriteFileSize;
 	}
 
+	uint64_t File::read(unsigned char* buffer, uint64_t size, uint64_t offset) const
+	{
+		LARGE_INTEGER large_integer;
+		large_integer.QuadPart = offset;
+		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
+		return read(buffer, size);
+	}
+
+	uint64_t File::write(const unsigned char* buffer, uint64_t size, uint64_t offset)
+	{
+		LARGE_INTEGER large_integer;
+		large_integer.QuadPart = offset;
+		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
+		return write(buffer, size);
+	}
+
 	uint64_t File::getLastWriteTime() const
 	{
 		FILETIME lastWriteTime;
@@ -701,40 +702,52 @@ namespace Base
 		return _fileHandle;
 	}
 #else
-    File::File(const std::string& path, Mode mode)
+    File::File(const std::string& path, DesiredAccess desiredAccess,
+               CreationDisposition creationDisposition)
     {
 	    int flag = 0;
 
-	    if (mode & Mode::rdwr)
-	        flag |= O_RDWR;
-	    else if (mode & Mode::read)
-	        flag |= O_RDONLY;
-	    else if (mode & Mode::write)
-	        flag |= O_WRONLY;
+	    switch (desiredAccess)
+        {
+            case DesiredAccess::Read:
+                flag |= O_RDONLY;
+                break;
+            case DesiredAccess::Write:
+                flag |= O_WRONLY;
+                break;
+            case DesiredAccess::Rdwr:
+                flag |= O_RDWR;
+                break;
+            default:
+                UNREACHABLE_ERROR;
+        }
 
-	    if (mode & Mode::create_always)
-	        flag |= (O_CREAT | O_TRUNC);
-	    else if (mode & Mode::create_new)
-	        flag |= (O_CREAT | O_EXCL);
-	    else if (mode & Mode::open_always)
-	        flag |= O_CREAT;
-	    else if (mode & Mode::truncate_existing)
-	        flag |= O_TRUNC;
+        switch (creationDisposition)
+        {
+            case CreationDisposition::OpenExisting:
+                break;
+            case CreationDisposition::CreateAlways:
+                flag |= (O_CREAT | O_TRUNC);
+                break;
+            case CreationDisposition::CreateNew:
+                flag |= (O_CREAT | O_EXCL);
+                break;
+            case CreationDisposition::OpenAlways:
+                flag |= O_CREAT;
+                break;
+            case CreationDisposition::TruncateExisting:
+                flag |= O_TRUNC;
+                break;
+            default:
+                UNREACHABLE_ERROR;
+        }
+
 	    _fd = open(path.c_str(), flag);
-	    CHECK_NE_CRTAPI(_fd, -1) << "open() failed with path: " << path << ", flag: " << flag;
-	    const char *fdopen_mode = nullptr;
-	    if (mode & Mode::rdwr)
-	        fdopen_mode = "r+";
-	    else if (mode & Mode::read)
-	        fdopen_mode = "r";
-	    else if (mode & Mode::write)
-	        fdopen_mode = "w";
-        _file = fdopen(_fd, fdopen_mode);
-
+	    CHECK_NE_STDCAPI(_fd, -1) << "open() failed with path: " << path << ", flag: " << flag;
     }
 
     File::~File() {
-        fclose(_file);
+        LOG_IF_EQ_STDCAPI(close(_fd));
     }
 
 #endif

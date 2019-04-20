@@ -114,7 +114,7 @@ namespace Base
 	{
 		MonitorWorkerContext *context = new MonitorWorkerContext{ this, process_handle };
 		HANDLE thread_handle = (HANDLE)_beginthreadex(nullptr, 0, monitor_worker, context, 0, nullptr);
-		ENSURE_NE_CRTAPI(std::ptrdiff_t(thread_handle), -1L);
+		ENSURE_NE_STDCAPI(std::ptrdiff_t(thread_handle), 0);
 		const DWORD tid = GetThreadId(thread_handle);
 		ENSURE_WIN32API(tid);
 		_running_threads.insert(std::make_pair(tid, thread_handle));

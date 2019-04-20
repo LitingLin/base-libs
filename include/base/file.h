@@ -11,6 +11,7 @@
 #endif
 #include <vector>
 #include <stdio.h>
+#include <functional>
 
 namespace Base {
 #ifdef _WIN32
@@ -19,6 +20,7 @@ namespace Base {
 	std::wstring getModuleInstanceFullPath(HINSTANCE instance);
 	std::wstring getApplicationPath();
 	std::wstring getTempPath();
+	std::wstring getFullPath(const std::wstring& path);
 #else
     bool isPathExists(const std::string& path);
     bool isFileExists(const std::string& Path)
@@ -32,8 +34,6 @@ namespace Base {
 	bool isURI(const std::wstring&string);
 	bool isDirectory(const std::string& string);
 	bool isDirectory(const std::wstring&string);
-	std::string getFullPath(const std::string& path);
-	std::wstring getFullPath(const std::wstring&path);
 	std::string appendPath(const std::string&path, const std::string&fileName);
 	std::wstring appendPath(const std::wstring& path, const std::wstring& fileName);
 
@@ -84,11 +84,16 @@ namespace Base {
 	bool getRandomShuffledDirectoryFileLists(const std::wstring& path, std::vector<std::wstring>& fileNames, std::vector<uint64_t>& lastWriteTimes);
 #endif
 
-	extern unsigned char UTF16LE_BOM[2];
-
 	class File
 	{
-	public:
+	public:		
+		enum class DesiredAccess
+		{
+			Read,
+			Write,
+			ReadAndWrite
+		};
+
 		//                          |                    When the file...
 		// This argument:           |             Exists            Does not exist
 		// -------------------------+------------------------------------------------------
@@ -97,43 +102,40 @@ namespace Base {
 		// OPEN_ALWAYS     ===| does this |===>    Opens               Creates
 		// OPEN_EXISTING      +-----------+        Opens                Fails
 		// TRUNCATE_EXISTING        |            Truncates              Fails
-		
-		enum class DesiredAccess
-		{
-			read,
-			write,
-			rdwr
-		};
 		enum class CreationDisposition
 		{
-			create_always,
-			create_new,
-			open_always,
-			open_existing,
-			truncate_existing
+			CreateAlways,
+			CreateNew,
+			OpenAlways,
+			OpenExisting,
+			TruncateExisting
 		};
+
 #ifdef _WIN32
-		File(const std::wstring &path, DesiredAccess desiredAccess = DesiredAccess::read, CreationDisposition creationDisposition = CreationDisposition::open_existing);
+		File(const std::wstring &path, DesiredAccess desiredAccess = DesiredAccess::Read, 
+				CreationDisposition creationDisposition = CreationDisposition::OpenExisting);
 #else
-		File(const std::string& path, DesiredAccess desiredAccess = DesiredAccess::read, CreationDisposition creationDisposition = CreationDisposition::open_existing));
+		File(const std::string& path, DesiredAccess desiredAccess = DesiredAccess::Read,
+		        CreationDisposition creationDisposition = CreationDisposition::OpenExisting));
 #endif
-		File(const File &path) = delete;
-		File(File &&path) noexcept;
+		File(const File &) = delete;
+		File(File && other) noexcept;
 		~File();
 		uint64_t getSize() const;
-		uint64_t read(unsigned char *buffer, uint64_t offset, uint64_t size) const;
-		uint64_t write(const unsigned char *buffer, uint64_t offset, uint64_t size);
+		uint64_t read(unsigned char* buffer, uint64_t size) const;
+		uint64_t write(const unsigned char* buffer, uint64_t size);
+		uint64_t read(unsigned char *buffer, uint64_t size, uint64_t offset) const;
+		uint64_t write(const unsigned char *buffer, uint64_t size, uint64_t offset);
 		uint64_t getLastWriteTime() const;
 #ifdef _WIN32
 		HANDLE getHANDLE();
 #else
-
+		int getFileDiscriptor();
 #endif
 	private:
 #ifdef _WIN32
 		HANDLE _fileHandle;
 #else
-		FILE* _file;
 		int _fd;
 #endif
 	};

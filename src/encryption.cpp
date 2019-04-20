@@ -29,15 +29,15 @@ namespace Base
 	{
 		if (type == AlgorithmType::SHA256)
 		{
-			ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_SHA256_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(_status);
+			ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_SHA256_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		else if (type == AlgorithmType::AES)
 		{
-			ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_AES_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(_status);
+			ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_AES_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		else if (type == AlgorithmType::RNG)
 		{
-			ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_RNG_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(_status);
+			ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_RNG_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 	}
 
@@ -53,7 +53,7 @@ namespace Base
 
 	BCRYPT_ALG_HANDLE_GUARD::~BCRYPT_ALG_HANDLE_GUARD()
 	{
-		LOG_IF_FAILED_NTSTATUS(BCryptCloseAlgorithmProvider(handle, 0)) << BCryptCloseAlgorithmProviderErrorString(_status);
+		LOG_IF_FAILED_NTSTATUS(BCryptCloseAlgorithmProvider(handle, 0)) << BCryptCloseAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
 	BCRYPT_ALG_HANDLE BCRYPT_ALG_HANDLE_GUARD::getHandle() const
@@ -88,7 +88,7 @@ namespace Base
 			(PBYTE)&_cbHashObject,
 			sizeof(DWORD),
 			&cbData,
-			0)) << BCryptGetPropertyErrorString(_status);
+			0)) << BCryptGetPropertyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		_hashObject.reset(new unsigned char[_cbHashObject]);
 
@@ -99,7 +99,7 @@ namespace Base
 			(PBYTE)&_cbHash,
 			sizeof(DWORD),
 			&cbData,
-			0)) << BCryptGetPropertyErrorString(_status);
+			0)) << BCryptGetPropertyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		_hash.reset(new unsigned char[_cbHash]);
 	}
@@ -135,12 +135,11 @@ namespace Base
 	public:
 		HashObjectGuard(BCRYPT_ALG_HANDLE alg_handle, unsigned char *hash_object, DWORD hash_object_size)
 		{
-			ENSURE_NTSTATUS(BCryptCreateHash(alg_handle, &hash_handle, hash_object, hash_object_size, NULL, 0, 0))
-				<< BCryptCreateHashErrorString(_status);
+			ENSURE_NTSTATUS(BCryptCreateHash(alg_handle, &hash_handle, hash_object, hash_object_size, NULL, 0, 0)) << BCryptCreateHashErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		~HashObjectGuard()
 		{
-			LOG_IF_FAILED_NTSTATUS(BCryptDestroyHash(hash_handle)) << BCryptDestroyHashErrorString(_status);
+			LOG_IF_FAILED_NTSTATUS(BCryptDestroyHash(hash_handle)) << BCryptDestroyHashErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		BCRYPT_HASH_HANDLE getHandle() const
 		{
@@ -190,14 +189,14 @@ namespace Base
 			hash_object.getHandle(),
 			(PBYTE)data,
 			size,
-			0)) << BCryptHashDataErrorString(_status);
+			0)) << BCryptHashDataErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		//close the hash
 		ENSURE_NTSTATUS(BCryptFinishHash(
 			hash_object.getHandle(),
 			_hash.get(),
 			_cbHash,
-			0)) << BCryptFinishHashErrorString(_status);
+			0)) << BCryptFinishHashErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		std::vector<unsigned char> hash_string(_cbHash);
 		memcpy(hash_string.data(), _hash.get(), _cbHash);
 
@@ -229,7 +228,7 @@ namespace Base
 			(PBYTE)&_cbKeyObject,
 			sizeof(ULONG),
 			&cbData,
-			0)) << BCryptGetPropertyErrorString(_status);
+			0)) << BCryptGetPropertyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		_keyObject.reset(new unsigned char[_cbKeyObject]);
 
 		ENSURE_NTSTATUS(BCryptGetProperty(
@@ -238,13 +237,13 @@ namespace Base
 			(PBYTE)&_cbBlockLen,
 			sizeof(DWORD),
 			&cbData,
-			0)) << BCryptGetPropertyErrorString(_status);
+			0)) << BCryptGetPropertyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		ENSURE_NTSTATUS(BCryptSetProperty(_hALG.getHandle(),
 			BCRYPT_CHAINING_MODE,
 			(PBYTE)BCRYPT_CHAIN_MODE_ECB,
 			sizeof(BCRYPT_CHAIN_MODE_ECB),
-			0)) << BCryptSetPropertyErrorString(_status);
+			0)) << BCryptSetPropertyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		_key = std::make_unique<KeyObjectGuard>(_hALG.getHandle(), _keyObject.get(), _cbKeyObject, (unsigned char*)key.data(), (ULONG)key.size());
 	}
@@ -283,12 +282,12 @@ namespace Base
 			key,
 			keySize,
 			0
-		)) << BCryptGenerateSymmetricKeyErrorString(_status);
+		)) << BCryptGenerateSymmetricKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
 	KeyObjectGuard::~KeyObjectGuard()
 	{
-		LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(_status);
+		LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
 	BCRYPT_KEY_HANDLE KeyObjectGuard::getHandle()
@@ -343,11 +342,11 @@ namespace Base
 				blob,
 				blobSize,
 				0
-			)) << BCryptImportKeyErrorString(_status);
+			)) << BCryptImportKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		~KeyObjectGuard_Import()
 		{
-			LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(_status);
+			LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		BCRYPT_KEY_HANDLE getHandle()
 		{
@@ -389,7 +388,7 @@ namespace Base
 			NULL,
 			0,
 			&cbCipherText,
-			0)) << BCryptEncryptErrorString(_status);
+			0)) << BCryptEncryptErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		std::vector<unsigned char> encryptedData;
 		encryptedData.resize(cbCipherText);
@@ -405,7 +404,7 @@ namespace Base
 			(PBYTE)encryptedData.data(),
 			cbCipherText,
 			&cbData,
-			0)) << BCryptEncryptErrorString(_status);
+			0)) << BCryptEncryptErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		return encryptedData;
 	}
@@ -423,7 +422,7 @@ namespace Base
 			(PBYTE)buf,
 			size,
 			&cbData,
-			0)) << BCryptEncryptErrorString(_status);
+			0)) << BCryptEncryptErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
 	std::string BCryptDecryptErrorString(NTSTATUS status)
@@ -461,7 +460,7 @@ namespace Base
 			NULL,
 			0,
 			&cbPlainText,
-			0)) << BCryptDecryptErrorString(_status);
+			0)) << BCryptDecryptErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 		std::vector<unsigned char> decryptedData;
 		decryptedData.resize(cbPlainText);
@@ -477,7 +476,7 @@ namespace Base
 			(PBYTE)decryptedData.data(),
 			cbPlainText,
 			&cbData,
-			0)) << BCryptDecryptErrorString(_status);
+			0)) << BCryptDecryptErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		return decryptedData;
 	}
 
@@ -494,7 +493,7 @@ namespace Base
 			(PBYTE)buf,
 			size,
 			&cbData,
-			0)) << BCryptDecryptErrorString(_status);
+			0)) << BCryptDecryptErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
 	DWORD AES128ECB::getBlockLen() const
@@ -528,7 +527,7 @@ namespace Base
 			(PBYTE)randomNumbers.data(),
 			size,
 			NULL
-		)) << BCryptGenRandomErrorString(_status);
+		)) << BCryptGenRandomErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		return randomNumbers;
 	}
 

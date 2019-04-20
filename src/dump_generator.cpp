@@ -82,7 +82,7 @@ namespace Base
 			BOOL isOK;
 
 			{
-				File dumpFile(dumpPath, File::Mode::write | File::Mode::create_always);
+				File dumpFile(dumpPath, File::DesiredAccess::Write, File::CreationDisposition::CreateAlways);
 				isOK = MiniDumpWriteDump(processHandle.getHANDLE(), _processId, dumpFile.getHANDLE(), MiniDumpWithFullMemory,
 					NULL, NULL, NULL);
 			}

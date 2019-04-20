@@ -91,16 +91,6 @@ namespace Base
 		ENSURE_GE(str_size, 39U);
 		ENSURE_EQ(StringFromGUID2(*guid, str, 39), 39);
 	}
-	std::wstring generateGUID()
-	{
-		std::wstring guidString;
-		guidString.resize(GUID_STRING_SIZE);
-		GUID guid;
-		UuidCreate(&guid);
-		StringFromGUID2(guid, (wchar_t*)guidString.data(), GUID_STRING_SIZE);
-
-		return guidString;
-	}
 	bool isRunningOn64bitSystem()
 	{
 #ifdef _M_X64

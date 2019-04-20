@@ -193,10 +193,12 @@ namespace Base
 
 	void SOCKETGuard::destroy()
 	{
-		if (_readEvent != WSA_INVALID_EVENT)
+		if (_readEvent != WSA_INVALID_EVENT) {
 			LOG_IF_FAILED_WIN32API(CloseHandle(_readEvent));
-		if (_socket != INVALID_SOCKET)
+		}
+		if (_socket != INVALID_SOCKET) {
 			LOG_IF_NOT_EQ_WIN32API(closesocket(_socket), 0);
+		}
 	}
 
 	HANDLE SOCKETGuard::getReadEvent()
