@@ -230,11 +230,12 @@ static char* ini_reader_string(char* str, int num, void* stream) {
 }
 
 /* See documentation in header file. */
-int ini_parse_string(const char* string, ini_handler handler, void* user) {
-    ini_parse_string_ctx ctx;
+int ini_parse_string(const char* string, size_t size, ini_handler handler, void* user)
+{
+	ini_parse_string_ctx ctx;
 
-    ctx.ptr = string;
-    ctx.num_left = strlen(string);
-    return ini_parse_stream((ini_reader)ini_reader_string, &ctx, handler,
-                            user);
+	ctx.ptr = string;
+	ctx.num_left = size;
+	return ini_parse_stream((ini_reader)ini_reader_string, &ctx, handler,
+		user);
 }

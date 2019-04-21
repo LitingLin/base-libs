@@ -19,6 +19,12 @@
     <Filter Include="Source Files\logging">
       <UniqueIdentifier>{5abead86-2098-4f1e-8090-245e2b79458b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\config">
+      <UniqueIdentifier>{53be9056-e5f5-4299-9bc1-7a5701c82275}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\config">
+      <UniqueIdentifier>{fb67a04c-a52e-4384-9d19-d0e3e0b5418a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\base\exception.h">
@@ -120,6 +126,12 @@
     <ClInclude Include="..\include\base\logging\win32.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\base\config\ini.h">
+      <Filter>Header Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\ini_parser.h">
+      <Filter>Header Files\config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dump_generator.cpp">
@@ -208,6 +220,12 @@
     </ClCompile>
     <ClCompile Include="..\src\logging\win32.cpp">
       <Filter>Source Files\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\config\ini.c">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ini_praser.cpp">
+      <Filter>Source Files\config</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
