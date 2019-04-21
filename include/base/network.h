@@ -4,9 +4,24 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
+#include <base/exception.h>
 
 namespace Base
 {
+    class NetworkAddressInUseException : public RuntimeException
+    {
+    public:
+        NetworkAddressInUseException(const std::string& _Message)
+                : RuntimeException(_Message, WSAEADDRINUSE, ErrorCodeType::WIN32API)
+        {
+        }
+
+        NetworkAddressInUseException(const char* _Message)
+                : RuntimeException(_Message, WSAEADDRINUSE, ErrorCodeType::WIN32API)
+        {
+        }
+    };
+
 	enum class net_rc {
 		ok, cancelled, connreset, wouldblock, netfail, truncated, timeout, unreachable
 	};

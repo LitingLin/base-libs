@@ -39,8 +39,7 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/src/logging.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/memory_mapped_io.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/stack_trace.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/config/ini.c")
+            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp")
 endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(cereal)

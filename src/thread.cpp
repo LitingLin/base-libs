@@ -6,7 +6,7 @@
 #include <process.h>
 #include <utility>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 #include <base/utils.h>
 
 namespace Base
@@ -47,7 +47,7 @@ namespace Base
 		else
 			_handle = reinterpret_cast<HANDLE>(_beginthreadex(NULL, 0, start_routine, this, CREATE_SUSPENDED, NULL));
 
-		ENSURE_NE_CRTAPI(reinterpret_cast<uintptr_t>(_handle), uintptr_t(-1));
+		ENSURE_NE_STDCAPI(reinterpret_cast<uintptr_t>(_handle), 0);
 	}
 
 	void Thread::run()
@@ -144,7 +144,7 @@ namespace Base
 		{
 			if (!this_class->_is_canceled_by_user)
 			{
-				throw FatalError("Thread terminated unexpected", -1L, ErrorCodeType::USERDEFINED);
+				throw FatalError("Thread terminated unexpected", -1L, ErrorCodeType::GENERIC);
 			}
 		}
 		if (this_class->_crashNofityContext)

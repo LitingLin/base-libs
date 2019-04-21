@@ -1,5 +1,5 @@
 #include <base/image_decoder.h>
-#include <base/logging.h>
+#include <base/logging/win32.h>
 
 #include <dshow.h>
 
@@ -9,8 +9,9 @@ namespace Base {
 	std::vector<unsigned char> ImageDecoder::decode()
 	{
 		CHECK_LT(_indexOfFrame, _numberOfFrames);
-		if (!_WICBitmapFrameDecoder)
+		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
+		}
 		UINT width, height;
 		CHECK_HR(_WICBitmapFrameDecoder->GetSize(&width, &height));
 		std::vector<unsigned char> buf;
@@ -95,8 +96,9 @@ namespace Base {
 	void ImageDecoder::decode(unsigned char* buf, uint32_t buf_size)
 	{
 		CHECK_LT(_indexOfFrame, _numberOfFrames);
-		if (!_WICBitmapFrameDecoder)
+		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
+		}
 		UINT width, height;
 		CHECK_HR(_WICBitmapFrameDecoder->GetSize(&width, &height));
 		WICPixelFormatGUID format;
@@ -164,8 +166,9 @@ namespace Base {
 		std::vector<unsigned char> buffer;
 		CComPtr<IWICBitmapSource> bitmapSource;
 
-		if (!_WICBitmapFrameDecoder)
+		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
+		}
 		bitmapSource = _WICBitmapFrameDecoder;
 
 		WICPixelFormatGUID format;
@@ -250,23 +253,26 @@ namespace Base {
 
 	void ImageDecoder::getResolution(uint32_t* width, uint32_t* height)
 	{
-		if (!_WICBitmapFrameDecoder)
+		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
+		}
 		CHECK_HR(_WICBitmapFrameDecoder->GetSize(width, height));
 	}
 
 	void ImageDecoder::getDPI(double* dpix, double* dpiy)
 	{
-		if (!_WICBitmapFrameDecoder)
+		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
+		}
 		CHECK_HR(_WICBitmapFrameDecoder->GetResolution(dpix, dpiy));
 	}
 
 	uint32_t ImageDecoder::getBufferSize()
 	{
 		uint32_t width, height;
-		if (!_WICBitmapFrameDecoder)
+		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
+		}
 		CHECK_HR(_WICBitmapFrameDecoder->GetSize(&width, &height));
 		size_t buf_size = width * height * 3;
 		CHECK_LE(buf_size, std::numeric_limits<UINT>::max());
@@ -291,8 +297,9 @@ namespace Base {
 
 	uint32_t ImageDecoder::getDelay()
 	{
-		if (!_WICBitmapFrameDecoder)
+		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
+		}
 		CComPtr<IWICMetadataQueryReader> WICMetadataQueryReader;
 		UINT delay = 0;
 		HRESULT hr = _WICBitmapFrameDecoder->GetMetadataQueryReader(&WICMetadataQueryReader);

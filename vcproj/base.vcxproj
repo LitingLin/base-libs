@@ -23,12 +23,14 @@
     <ClInclude Include="..\include\base\image_decoder.h" />
     <ClInclude Include="..\include\base\lock_guard.h" />
     <ClInclude Include="..\include\base\logging.h" />
+    <ClInclude Include="..\include\base\logging\win32.h" />
     <ClInclude Include="..\include\base\memory_mapped_io.h" />
     <ClInclude Include="..\include\base\message_box.h" />
     <ClInclude Include="..\include\base\message_notifier.h" />
     <ClInclude Include="..\include\base\mutex.h" />
     <ClInclude Include="..\include\base\native_event_looper.h" />
     <ClInclude Include="..\include\base\network.h" />
+    <ClInclude Include="..\include\base\preprocessor.h" />
     <ClInclude Include="..\include\base\process.h" />
     <ClInclude Include="..\include\base\registry.h" />
     <ClInclude Include="..\include\base\rw_spin_lock.h" />
@@ -36,6 +38,7 @@
     <ClInclude Include="..\include\base\serialization.hpp" />
     <ClInclude Include="..\include\base\shared_memory.h" />
     <ClInclude Include="..\include\base\sync.h" />
+    <ClInclude Include="..\include\base\text_file.h" />
     <ClInclude Include="..\include\base\thread.h" />
     <ClInclude Include="..\include\base\time.h" />
     <ClInclude Include="..\include\base\timer.h" />
@@ -55,6 +58,7 @@
     <ClCompile Include="..\src\image_decoder.cpp" />
     <ClCompile Include="..\src\lock_guard.cpp" />
     <ClCompile Include="..\src\logging.cpp" />
+    <ClCompile Include="..\src\logging\win32.cpp" />
     <ClCompile Include="..\src\memory_mapped_io.cpp" />
     <ClCompile Include="..\src\message_box.cpp" />
     <ClCompile Include="..\src\mutex.cpp" />
@@ -66,6 +70,7 @@
     <ClCompile Include="..\src\shared_memory.cpp" />
     <ClCompile Include="..\src\stack_trace.cpp" />
     <ClCompile Include="..\src\sync.cpp" />
+    <ClCompile Include="..\src\text_file.cpp" />
     <ClCompile Include="..\src\thread.cpp" />
     <ClCompile Include="..\src\time.cpp" />
     <ClCompile Include="..\src\timer.cpp" />
@@ -75,19 +80,19 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{34B7C3F3-324A-4370-963E-8725DF78C145}</ProjectGuid>
     <RootNamespace>base</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

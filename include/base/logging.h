@@ -1,7 +1,7 @@
 #pragma once
 
-#include "exception.h"
-#include "utils.h"
+#include <base/exception.h>
+#include <base/preprocessor.h>
 
 #include <locale>
 #include <functional>
@@ -9,72 +9,62 @@
 #include <memory>
 #include <sstream>
 
+#ifdef _WIN32
 #define SPDLOG_WCHAR_FILENAMES
+#endif
 #include <spdlog/spdlog.h>
 
 extern std::shared_ptr<spdlog::logger> logger;
 namespace Base
 {
-
 	std::string getStackTrace();
-	class Win32ErrorCodeToString
+
+	std::string getStdCApiErrorString(int errnum);
+
+	class _ExceptionHandlerExecutor
 	{
 	public:
-		Win32ErrorCodeToString(unsigned long errorCode, ...);
-		std::string getString() const;
-		std::wstring getWString() const;
-		~Win32ErrorCodeToString();
-	private:
-		mutable std::string ansi_str;
-		wchar_t *str;
+		_ExceptionHandlerExecutor(std::function<void(void)> function);
 	};
 
-	std::string getWin32LastErrorString();
-	std::string getWin32ErrorString(DWORD errorCode);
-	std::wstring getHRESULTErrorWString(HRESULT hr);
-	std::string getHRESULTErrorString(HRESULT hr);
-	std::wstring getNtStatusErrorWString(NTSTATUS ntstatus);
-	std::string getNtStatusErrorString(NTSTATUS ntStatus);
-	std::string getCRTErrorString(errno_t errnum);
-
-	class FatalErrorLogging
+	class _BaseLogging : public _ExceptionHandlerExecutor
 	{
 	public:
-		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function);
-		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp);
-		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2);
+		_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
+		std::ostringstream& stream();
+	protected:
+		int64_t _errorCode;
+		ErrorCodeType _errorCodeType;
+		std::ostringstream _stream;
+	};
+
+	class FatalErrorLogging : public _BaseLogging
+	{
+	public:
+		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
 		~FatalErrorLogging() noexcept(false);
-		std::ostringstream& stream();
-	private:
-		int64_t errorcode;
-		ErrorCodeType errorCodeType;
-		std::ostringstream str_stream;
 	};
 
-	class RuntimeExceptionLogging
+	class RuntimeExceptionLogging : public _BaseLogging
 	{
 	public:
-		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function);
-		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp);
-		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorcode, const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2);
+		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
 		~RuntimeExceptionLogging() noexcept(false);
-		std::ostringstream& stream();
-	private:
-		int64_t errorcode;
-		ErrorCodeType errorCodeType;
-		std::ostringstream str_stream;
 	};
 
-	class EventLogging
+	class EventLogging : public _BaseLogging
 	{
 	public:
-		EventLogging(const char* file, int line, const char* function);
-		EventLogging(const char* file, int line, const char* function, const char* exp);
-		EventLogging(const char* file, int line, const char* function, const char* exp1, const char* op, const char* exp2);
+		EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function);
+		EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp);
+		EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
 		~EventLogging() noexcept(false);
-		std::ostringstream& stream();
-	private:
-		std::ostringstream str_stream;
 	};
 
 	template <typename T1, typename T2, typename Op>
@@ -84,323 +74,452 @@ namespace Base
 		else
 			return std::make_unique<std::pair<T1, T2>>(a, b);
 	}
-	HRESULT getHRESULTFromRuntimeException(const RuntimeException&exp);
-	HRESULT getHRESULTFromFatalError(const FatalError&exp);
+	template <typename Type, template <class Type2 = Type> class Operator>
+	struct _Comparator
+	{
+		_Comparator(const Type& first, const Type& second)
+			: first(first), second(second) {}
+		operator bool()
+		{
+			Operator<> op;
+			return op(first, second);
+		}
+		Type first;
+		Type second;
+	};
+	struct _StreamTypeVoidify
+	{
+		void operator&(std::ostream&) const {}
+	};
 }
 
-#define LEFT_OPERAND_RC \
-	_rc->first
-#define RIGHT_OPERAND_RC \
-	_rc->second
+/* ----------------------------- HELPER MACRO ----------------------------- */
+#define _COMPARATOR_NAME2(PREFIX, LINENUMBER) _PP_CAT(PREFIX, LINENUMBER)
+#define _COMPARATOR_NAME _COMPARATOR_NAME2(COMPARATOR_, __LINE__)
 
-// Let it crash, don't catch
-#define FATAL_ERROR \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__).stream()
+#define LOG_GET_LEFT_EXPRESSION_RC \
+	_COMPARATOR_NAME.first
+#define LOG_GET_RIGHT_EXPRESSION_RC \
+	_COMPARATOR_NAME.second
 
-#define FATAL_ERROR_WITH_CODE(errorcode) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, errorcode, __FILE__, __LINE__, __func__).stream()
+/* ----------------------------- GENERIC ----------------------------- */
+#define _LOG_GENERIC(loggingClass, errorCodeType, errorCode, handler) \
+loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).stream()
 
-#define ENSURE(val) \
-	if (!(val)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__, #val).stream()
+#define _LOG_CONDITIONED_GENERIC(condition, loggingClass, errorCodeType, errorCode, handler) \
+!(condition) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #condition).stream()
 
-#define ENSURE_WITH_CODE(val, errorcode) \
-	if (!(val)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, errorcode, __FILE__, __LINE__, __func__, #val).stream()
+#define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
+_Comparator<decltype(leftExp), functional_op>_COMPARATOR_NAME((leftExp), (rightExp)); \
+(_COMPARATOR_NAME) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
 
-#define ENSURE_WIN32API(val) \
-	if (!(val)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::WIN32API, GetLastError(), __FILE__, __LINE__, __func__, #val).stream() << Base::getWin32LastErrorString()
+#define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to, loggingClass, errorCodeType, errorCode, handler)
 
-#define ENSURE_HR(exp) \
-	if (HRESULT _hr = (exp)) if (_hr < 0) \
-Base::FatalErrorLogging(Base::ErrorCodeType::HRESULT, _hr, __FILE__, __LINE__, __func__, #exp).stream() << Base::getHRESULTErrorString(_hr)
+#define _LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, != , std::not_equal_to, loggingClass, errorCodeType, errorCode, handler)
 
-#define ENSURE_NTSTATUS(val) \
-	if (NTSTATUS _status = (val)) if (_status < 0) \
-Base::FatalErrorLogging(Base::ErrorCodeType::NTSTATUS, _status, __FILE__, __LINE__, __func__, #val).stream() << Base::getNtStatusErrorString(_status)
+#define _LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, >= , std::greater_equal, loggingClass, errorCodeType, errorCode, handler)
 
-#define ENSURE_CRTAPI(val) \
-	if (val) \
-Base::FatalErrorLogging(Base::ErrorCodeType::CRT, errno, __FILE__, __LINE__, __func__, #val).stream() << Base::getCRTErrorString(errno)
+#define _LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, > , std::greater, loggingClass, errorCodeType, errorCode, handler)
 
-#define ENSURE_OP(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") "
+#define _LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, <= , std::less_equal, loggingClass, errorCodeType, errorCode, handler)
 
-#define ENSURE_OP_WITH_CODE(exp1, exp2, op, functional_op, errorcode)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, errorcode, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") "
+#define _LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, < , std::less, loggingClass, errorCodeType, errorCode, handler)
 
-#define ENSURE_OP_WIN32API(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::WIN32API, GetLastError(), __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") " << Base::getWin32LastErrorString()
 
-#define ENSURE_OP_CRTAPI(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::FatalErrorLogging(Base::ErrorCodeType::CRT, errno, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") " << Base::getCRTErrorString(errno)
-
-#define ENSURE_EQ(exp1, exp2) \
-	ENSURE_OP(exp1, exp2, ==, std::equal_to<>())
-#define ENSURE_NE(exp1, exp2) \
-	ENSURE_OP(exp1, exp2, !=, std::not_equal_to<>())
-#define ENSURE_LE(exp1, exp2) \
-	ENSURE_OP(exp1, exp2, <=, std::less_equal<>())
-#define ENSURE_LT(exp1, exp2) \
-	ENSURE_OP(exp1, exp2, <, std::less<>())
-#define ENSURE_GE(exp1, exp2) \
-	ENSURE_OP(exp1, exp2, >=, std::greater_equal<>())
-#define ENSURE_GT(exp1, exp2) \
-	ENSURE_OP(exp1, exp2, >, std::greater<>())
-
-#define ENSURE_EQ_WITH_CODE(exp1, exp2, errorcode) \
-	ENSURE_OP_WITH_CODE(exp1, exp2, ==, std::equal_to<>(), errorcode)
-#define ENSURE_NE_WITH_CODE(exp1, exp2, errorcode) \
-	ENSURE_OP_WITH_CODE(exp1, exp2, !=, std::not_equal_to<>(), errorcode)
-#define ENSURE_LE_WITH_CODE(exp1, exp2, errorcode) \
-	ENSURE_OP_WITH_CODE(exp1, exp2, <=, std::less_equal<>(), errorcode)
-#define ENSURE_LT_WITH_CODE(exp1, exp2, errorcode) \
-	ENSURE_OP_WITH_CODE(exp1, exp2, <, std::less<>(), errorcode)
-#define ENSURE_GE_WITH_CODE(exp1, exp2, errorcode) \
-	ENSURE_OP_WITH_CODE(exp1, exp2, >=, std::greater_equal<>(), errorcode)
-#define ENSURE_GT_WITH_CODE(exp1, exp2, errorcode) \
-	ENSURE_OP_WITH_CODE(exp1, exp2, >, std::greater<>(), errorcode)
-
-#define ENSURE_EQ_WIN32API(exp1, exp2) \
-	ENSURE_OP_WIN32API(exp1, exp2, ==, std::equal_to<>())
-#define ENSURE_NE_WIN32API(exp1, exp2) \
-	ENSURE_OP_WIN32API(exp1, exp2, !=, std::not_equal_to<>())
-#define ENSURE_LE_WIN32API(exp1, exp2) \
-	ENSURE_OP_WIN32API(exp1, exp2, <=, std::less_equal<>())
-#define ENSURE_LT_WIN32API(exp1, exp2) \
-	ENSURE_OP_WIN32API(exp1, exp2, <, std::less<>())
-#define ENSURE_GE_WIN32API(exp1, exp2) \
-	ENSURE_OP_WIN32API(exp1, exp2, >=, std::greater_equal<>())
-#define ENSURE_GT_WIN32API(exp1, exp2) \
-	ENSURE_OP_WIN32API(exp1, exp2, >, std::greater<>())
-
-#define ENSURE_EQ_CRTAPI(exp1, exp2) \
-	ENSURE_OP_CRTAPI(exp1, exp2, ==, std::equal_to<>())
-#define ENSURE_NE_CRTAPI(exp1, exp2) \
-	ENSURE_OP_CRTAPI(exp1, exp2, !=, std::not_equal_to<>())
-#define ENSURE_LE_CRTAPI(exp1, exp2) \
-	ENSURE_OP_CRTAPI(exp1, exp2, <=, std::less_equal<>())
-#define ENSURE_LT_CRTAPI(exp1, exp2) \
-	ENSURE_OP_CRTAPI(exp1, exp2, <, std::less<>())
-#define ENSURE_GE_CRTAPI(exp1, exp2) \
-	ENSURE_OP_CRTAPI(exp1, exp2, >=, std::greater_equal<>())
-#define ENSURE_GT_CRTAPI(exp1, exp2) \
-	ENSURE_OP_CRTAPI(exp1, exp2, >, std::greater<>())
-
+/* ----------------------------- UNRECOVERABLE ERROR ----------------------------- */
 #define NOT_IMPLEMENTED_ERROR \
-	Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__).stream() << "Unknown internal error. "
+_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
 
 #define UNREACHABLE_ERROR \
-	Base::FatalErrorLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__).stream() << "Unknown internal error. "
+_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
 
-// Normal error
-#define CHECK(val) \
-	if (!(val)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__, #val).stream()
+/* ----------------------------- FATAL ERROR ----------------------------- */
+// "Let it crash"
 
-#define CHECK_WITH_CODE(val, errorcode) \
-	if (!(val)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::USERDEFINED, errorcode, __FILE__, __LINE__, __func__, #val).stream()
+#define FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_FATAL_EEROR, __VA_ARGS__)
+#define _FATAL_ERROR_1(errorCode) \
+_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, errorCode, nullptr)
 
-#define CHECK_WIN32API(val) \
-	if (!(val)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::WIN32API, GetLastError(), __FILE__, __LINE__, __func__, #val).stream() << Base::getWin32LastErrorString()
+// Let it crash, don't catch
+#define _FATAL_ERROR_0() \
+_FATAL_ERROR_1(-1)
 
-#define CHECK_HR(exp) \
-	if (HRESULT _hr = (exp)) if (_hr < 0) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::HRESULT, _hr, __FILE__, __LINE__, __func__, #exp).stream() << Base::getHRESULTErrorString(_hr)
+#define FATAL_ERROR_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_FATAL_ERROR_HANDLER, __VA_ARGS__)
+#define _FATAL_ERROR_HANDLER_2(errorCode, handler) \
+_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _FATAL_ERROR_HANDLER_1(handler) \
+_FATAL_EEROR_HANDLER_2(-1, handler)
 
-#define CHECK_NTSTATUS(val) \
-	if (NTSTATUS _status = (val)) if (_status < 0) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::NTSTATUS, _status, __FILE__, __LINE__, __func__, #val).stream() << Base::getNtStatusErrorString(_status)
 
-#define CHECK_CRTAPI(val) \
-	if (val) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::CRT, errno, __FILE__, __LINE__, __func__, #val).stream() << Base::getCRTErrorString(errno)
+#define ENSURE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_GENERIC(condition, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_WITH_HANDLER_3(condition, errorCode, handler) \
+_ENSURE_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _ENSURE_WITH_HANDLER_2(condition, handler) \
+_ENSURE_WITH_HANDLER_3(condition, -1, handler)
 
-#define CHECK_OP(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") "
+#define ENSURE(...) _PP_MACRO_OVERLOAD(_ENSURE, __VA_ARGS__)
+#define _ENSURE_3(condition, errorCodeType, errorCode) \
+_ENSURE_WITH_HANDLER_4(condition, errorCodeType, errorCode, nullptr)
+#define _ENSURE_2(condition, errorCode) \
+_ENSURE_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
+#define _ENSURE_1(condition) \
+_ENSURE_2(condition, -1)
 
-#define CHECK_OP_WITH_CODE(exp1, exp2, op, functional_op, errorcode)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::USERDEFINED, errorcode, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") "
+#define ENSURE_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_EQ_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _ENSURE_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_ENSURE_EQ_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define CHECK_OP_WITH_CODE_WIN32API(exp1, exp2, op, functional_op, errorcode)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::WIN32API, errorcode, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") "  << getWin32ErrorString(errorcode)
+#define ENSURE_EQ(...) _PP_MACRO_OVERLOAD(_ENSURE_EQ, __VA_ARGS__)
+#define _ENSURE_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
+_ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _ENSURE_EQ_3(leftExp, rightExp, errorCode) \
+_ENSURE_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _ENSURE_EQ_2(leftExp, rightExp) \
+_ENSURE_EQ_3(leftExp, rightExp, -1)
 
-#define CHECK_OP_HR(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::HRESULT, LEFT_OPERAND_RC, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") "  << Base::getHRESULTErrorString(LEFT_OPERAND_RC)
+#define ENSURE_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_NE_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _ENSURE_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_ENSURE_NE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define CHECK_OP_WIN32API(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::WIN32API, GetLastError(), __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") " << Base::getWin32LastErrorString()
+#define ENSURE_NE(...) _PP_MACRO_OVERLOAD(_ENSURE_NE, __VA_ARGS__)
+#define _ENSURE_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _ENSURE_NE_3(leftExp, rightExp, errorCode) \
+_ENSURE_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _ENSURE_NE_2(leftExp, rightExp) \
+_ENSURE_NE_3(leftExp, rightExp, -1)
 
-#define CHECK_OP_CRTAPI(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::RuntimeExceptionLogging(Base::ErrorCodeType::CRT, errno, __FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") " << Base::getCRTErrorString(errno)
+#define ENSURE_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_GE_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _ENSURE_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_ENSURE_GE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define CHECK_EQ(exp1, exp2) \
-	CHECK_OP(exp1, exp2, ==, std::equal_to<>())
-#define CHECK_NE(exp1, exp2) \
-	CHECK_OP(exp1, exp2, !=, std::not_equal_to<>())
-#define CHECK_LE(exp1, exp2) \
-	CHECK_OP(exp1, exp2, <=, std::less_equal<>())
-#define CHECK_LT(exp1, exp2) \
-	CHECK_OP(exp1, exp2, <, std::less<>())
-#define CHECK_GE(exp1, exp2) \
-	CHECK_OP(exp1, exp2, >=, std::greater_equal<>())
-#define CHECK_GT(exp1, exp2) \
-	CHECK_OP(exp1, exp2, >, std::greater<>())
+#define ENSURE_GE(...) _PP_MACRO_OVERLOAD(_ENSURE_GE, __VA_ARGS__)
+#define _ENSURE_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _ENSURE_GE_3(leftExp, rightExp, errorCode) \
+_ENSURE_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _ENSURE_GE_2(leftExp, rightExp) \
+_ENSURE_GE_3(leftExp, rightExp, -1)
 
-#define CHECK_EQ_WITH_CODE(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE(exp1, exp2, ==, std::equal_to<>(), errorcode)
-#define CHECK_NE_WITH_CODE(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE(exp1, exp2, !=, std::not_equal_to<>(), errorcode)
-#define CHECK_LE_WITH_CODE(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE(exp1, exp2, <=, std::less_equal<>(), errorcode)
-#define CHECK_LT_WITH_CODE(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE(exp1, exp2, <, std::less<>(), errorcode)
-#define CHECK_GE_WITH_CODE(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE(exp1, exp2, >=, std::greater_equal<>(), errorcode)
-#define CHECK_GT_WITH_CODE(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE(exp1, exp2, >, std::greater<>(), errorcode)
+#define ENSURE_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_GT_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _ENSURE_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_ENSURE_GT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define CHECK_EQ_WITH_CODE_WIN32API(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE_WIN32API(exp1, exp2, ==, std::equal_to<>(), errorcode)
-#define CHECK_NE_WITH_CODE_WIN32API(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE_WIN32API(exp1, exp2, !=, std::not_equal_to<>(), errorcode)
-#define CHECK_LE_WITH_CODE_WIN32API(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE_WIN32API(exp1, exp2, <=, std::less_equal<>(), errorcode)
-#define CHECK_LT_WITH_CODE_WIN32API(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE_WIN32API(exp1, exp2, <, std::less<>(), errorcode)
-#define CHECK_GE_WITH_CODE_WIN32API(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE_WIN32API(exp1, exp2, >=, std::greater_equal<>(), errorcode)
-#define CHECK_GT_WITH_CODE_WIN32API(exp1, exp2, errorcode) \
-	CHECK_OP_WITH_CODE_WIN32API(exp1, exp2, >, std::greater<>(), errorcode)
+#define ENSURE_GT(...) _PP_MACRO_OVERLOAD(_ENSURE_GT, __VA_ARGS__)
+#define _ENSURE_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _ENSURE_GT_3(leftExp, rightExp, errorCode) \
+_ENSURE_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _ENSURE_GT_2(leftExp, rightExp) \
+_ENSURE_GT_3(leftExp, rightExp, -1)
 
-#define CHECK_EQ_HR(exp1, exp2) \
-	CHECK_OP_HR(exp1, exp2, ==, std::equal_to<>())
-#define CHECK_NE_HR(exp1, exp2) \
-	CHECK_OP_HR(exp1, exp2, !=, std::not_equal_to<>())
+#define ENSURE_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_LE_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _ENSURE_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_ENSURE_LE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define CHECK_EQ_WIN32API(exp1, exp2) \
-	CHECK_OP_WIN32API(exp1, exp2, ==, std::equal_to<>())
-#define CHECK_NE_WIN32API(exp1, exp2) \
-	CHECK_OP_WIN32API(exp1, exp2, !=, std::not_equal_to<>())
-#define CHECK_LE_WIN32API(exp1, exp2) \
-	CHECK_OP_WIN32API(exp1, exp2, <=, std::less_equal<>())
-#define CHECK_LT_WIN32API(exp1, exp2) \
-	CHECK_OP_WIN32API(exp1, exp2, <, std::less<>())
-#define CHECK_GE_WIN32API(exp1, exp2) \
-	CHECK_OP_WIN32API(exp1, exp2, >=, std::greater_equal<>())
-#define CHECK_GT_WIN32API(exp1, exp2) \
-	CHECK_OP_WIN32API(exp1, exp2, >, std::greater<>())
+#define ENSURE_LE(...) _PP_MACRO_OVERLOAD(_ENSURE_LE, __VA_ARGS__)
+#define _ENSURE_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _ENSURE_LE_3(leftExp, rightExp, errorCode) \
+_ENSURE_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _ENSURE_LE_2(leftExp, rightExp) \
+_ENSURE_LE_3(leftExp, rightExp, -1)
 
-#define CHECK_EQ_CRTAPI(exp1, exp2) \
-	CHECK_OP_CRTAPI(exp1, exp2, ==, std::equal_to<>())
-#define CHECK_NE_CRTAPI(exp1, exp2) \
-	CHECK_OP_CRTAPI(exp1, exp2, !=, std::not_equal_to<>())
-#define CHECK_LE_CRTAPI(exp1, exp2) \
-	CHECK_OP_CRTAPI(exp1, exp2, <=, std::less_equal<>())
-#define CHECK_LT_CRTAPI(exp1, exp2) \
-	CHECK_OP_CRTAPI(exp1, exp2, <, std::less<>())
-#define CHECK_GE_CRTAPI(exp1, exp2) \
-	CHECK_OP_CRTAPI(exp1, exp2, >=, std::greater_equal<>())
-#define CHECK_GT_CRTAPI(exp1, exp2) \
-	CHECK_OP_CRTAPI(exp1, exp2, >, std::greater<>())
+#define ENSURE_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_LT_WITH_HANDLER, __VA_ARGS__)
+#define _ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _ENSURE_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _ENSURE_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_ENSURE_LT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define NOT_EXPECT_EXCEPTION \
-	Base::RuntimeExceptionLogging(Base::ErrorCodeType::USERDEFINED, -1, __FILE__, __LINE__, __func__).stream() << "Unexpected parameter."
+#define ENSURE_LT(...) _PP_MACRO_OVERLOAD(_ENSURE_LT, __VA_ARGS__)
+#define _ENSURE_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _ENSURE_LT_3(leftExp, rightExp, errorCode) \
+_ENSURE_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _ENSURE_LT_2(leftExp, rightExp) \
+_ENSURE_LT_3(leftExp, rightExp, -1)
 
-// Just logging
-#define LOG_IF_FAILED(val) \
-	if (!(val)) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #val).stream()
+#define ENSURE_STDCAPI_WITH_HANDLER(condition, handler) \
+_ENSURE_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+#define ENSURE_STDCAPI(condition) \
+ENSURE_STDCAPI_WITH_HANDLER(condition, nullptr)
 
-#define LOG_IF_FAILED_WIN32API(val) \
-	if (!(val)) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #val).stream() << Base::getWin32LastErrorString()
+#define ENSURE_NE_STDCAPI(condition, value) \
+_ENSURE_NE_WITH_HANDLER_5(condition, value, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
-#define LOG_IF_FAILED_HR(exp) \
-	if (HRESULT _hr = (exp)) if (_hr < 0) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #exp).stream() << Base::getHRESULTErrorString(_hr)
+/* ----------------------------- UNEXPECTED ERROR ----------------------------- */
+// But recoverable
+#define CHECK_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_WITH_HANDLER, __VA_ARGS__)
+#define _CHECK_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_GENERIC(condition, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+#define _CHECK_WITH_HANDLER_3(condition, errorCode, handler) \
+_CHECK_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _CHECK_WITH_HANDLER_2(condition, handler) \
+_CHECK_WITH_HANDLER_3(condition, -1, handler)
 
-#define LOG_IF_FAILED_NTSTATUS(val) \
-	if (NTSTATUS _status = (val)) if (_status < 0) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #val).stream() << Base::getNtStatusErrorString(_status)
+#define CHECK(...) _PP_MACRO_OVERLOAD(_CHECK, __VA_ARGS__)
+#define _CHECK_3(condition, errorCodeType, errorCode) \
+_CHECK_WITH_HANDLER_4(condition, errorCodeType, errorCode, nullptr)
+#define _CHECK_2(condition, errorCode) \
+_CHECK_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
+#define _CHECK_1(condition) \
+_CHECK_2(condition, -1)
 
-#define LOG_IF_FAILED_CRTAPI(val) \
-	if (val) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #val).stream() << Base::getCRTErrorString(errno)
+#define CHECK_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_EQ_WITH_HANDLER, __VA_ARGS__)
+#define _CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+#define _CHECK_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _CHECK_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_CHECK_EQ_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define LOG_IF_OP(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") "
+#define CHECK_EQ(...) _PP_MACRO_OVERLOAD(_CHECK_EQ, __VA_ARGS__)
+#define _CHECK_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
+_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _CHECK_EQ_3(leftExp, rightExp, errorCode) \
+_CHECK_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _CHECK_EQ_2(leftExp, rightExp) \
+_CHECK_EQ_3(leftExp, rightExp, -1)
 
-#define LOG_IF_OP_WIN32API(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") " << Base::getWin32LastErrorString()
+#define CHECK_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_NE_WITH_HANDLER, __VA_ARGS__)
+#define _CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+#define _CHECK_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _CHECK_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_CHECK_NE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define LOG_IF_OP_CRTAPI(exp1, exp2, op, functional_op)  \
-	if (auto _rc = Base::check_impl((exp1), (exp2), functional_op)) \
-Base::EventLogging(__FILE__, __LINE__, __func__, #exp1, #op, #exp2).stream() \
-	<< '(' << LEFT_OPERAND_RC << " vs. " << RIGHT_OPERAND_RC << ") " << Base::getCRTErrorString(errno)
+#define CHECK_NE(...) _PP_MACRO_OVERLOAD(_CHECK_NE, __VA_ARGS__)
+#define _CHECK_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _CHECK_NE_3(leftExp, rightExp, errorCode) \
+_CHECK_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _CHECK_NE_2(leftExp, rightExp) \
+_CHECK_NE_3(leftExp, rightExp, -1)
 
-#define LOG_IF_NOT_EQ(exp1, exp2) \
-	LOG_IF_OP(exp1, exp2, ==, std::equal_to<>())
-#define LOG_IF_NOT_NE(exp1, exp2) \
-	LOG_IF_OP(exp1, exp2, !=, std::not_equal_to<>())
-#define LOG_IF_NOT_LE(exp1, exp2) \
-	LOG_IF_OP(exp1, exp2, <=, std::less_equal<>())
-#define LOG_IF_NOT_LT(exp1, exp2) \
-	LOG_IF_OP(exp1, exp2, <, std::less<>())
-#define LOG_IF_NOT_GE(exp1, exp2) \
-	LOG_IF_OP(exp1, exp2, >=, std::greater_equal<>())
-#define LOG_IF_NOT_GT(exp1, exp2) \
-	LOG_IF_OP(exp1, exp2, >, std::greater<>())
+#define CHECK_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_GE_WITH_HANDLER, __VA_ARGS__)
+#define _CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+#define _CHECK_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _CHECK_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_CHECK_GE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
 
-#define LOG_IF_NOT_EQ_WIN32API(exp1, exp2) \
-	LOG_IF_OP_WIN32API(exp1, exp2, ==, std::equal_to<>())
-#define LOG_IF_NOT_NE_WIN32API(exp1, exp2) \
-	LOG_IF_OP_WIN32API(exp1, exp2, !=, std::not_equal_to<>())
-#define LOG_IF_NOT_LE_WIN32API(exp1, exp2) \
-	LOG_IF_OP_WIN32API(exp1, exp2, <=, std::less_equal<>())
-#define LOG_IF_NOT_LT_WIN32API(exp1, exp2) \
-	LOG_IF_OP_WIN32API(exp1, exp2, <, std::less<>())
-#define LOG_IF_NOT_GE_WIN32API(exp1, exp2) \
-	LOG_IF_OP_WIN32API(exp1, exp2, >=, std::greater_equal<>())
-#define LOG_IF_NOT_GT_WIN32API(exp1, exp2) \
-	LOG_IF_OP_WIN32API(exp1, exp2, >, std::greater<>())
+#define CHECK_GE(...) _PP_MACRO_OVERLOAD(_CHECK_GE, __VA_ARGS__)
+#define _CHECK_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _CHECK_GE_3(leftExp, rightExp, errorCode) \
+_CHECK_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _CHECK_GE_2(leftExp, rightExp) \
+_CHECK_GE_3(leftExp, rightExp, -1)
 
-#define LOG_IF_NOT_EQ_CRTAPI(exp1, exp2) \
-	LOG_IF_OP_CRTAPI(exp1, exp2, ==, std::equal_to<>())
-#define LOG_IF_NOT_NE_CRTAPI(exp1, exp2) \
-	LOG_IF_OP_CRTAPI(exp1, exp2, !=, std::not_equal_to<>())
-#define LOG_IF_NOT_LE_CRTAPI(exp1, exp2) \
-	LOG_IF_OP_CRTAPI(exp1, exp2, <=, std::less_equal<>())
-#define LOG_IF_NOT_LT_CRTAPI(exp1, exp2) \
-	LOG_IF_OP_CRTAPI(exp1, exp2, <, std::less<>())
-#define LOG_IF_NOT_GE_CRTAPI(exp1, exp2) \
-	LOG_IF_OP_CRTAPI(exp1, exp2, >=, std::greater_equal<>())
-#define LOG_IF_NOT_GT_CRTAPI(exp1, exp2) \
-	LOG_IF_OP_CRTAPI(exp1, exp2, >, std::greater<>())
+#define CHECK_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_GT_WITH_HANDLER, __VA_ARGS__)
+#define _CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+#define _CHECK_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _CHECK_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_CHECK_GT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define CHECK_GT(...) _PP_MACRO_OVERLOAD(_CHECK_GT, __VA_ARGS__)
+#define _CHECK_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _CHECK_GT_3(leftExp, rightExp, errorCode) \
+_CHECK_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _CHECK_GT_2(leftExp, rightExp) \
+_CHECK_GT_3(leftExp, rightExp, -1)
+
+#define CHECK_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_LE_WITH_HANDLER, __VA_ARGS__)
+#define _CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+#define _CHECK_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _CHECK_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_CHECK_LE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define CHECK_LE(...) _PP_MACRO_OVERLOAD(_CHECK_LE, __VA_ARGS__)
+#define _CHECK_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _CHECK_LE_3(leftExp, rightExp, errorCode) \
+_CHECK_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _CHECK_LE_2(leftExp, rightExp) \
+_CHECK_LE_3(leftExp, rightExp, -1)
+
+#define CHECK_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_LT_WITH_HANDLER, __VA_ARGS__)
+#define _CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+#define _CHECK_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _CHECK_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_CHECK_LT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define CHECK_LT(...) _PP_MACRO_OVERLOAD(_CHECK_LT, __VA_ARGS__)
+#define _CHECK_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _CHECK_LT_3(leftExp, rightExp, errorCode) \
+_CHECK_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _CHECK_LT_2(leftExp, rightExp) \
+_CHECK_LT_3(leftExp, rightExp, -1)
+
+#define CHECK_STDCAPI_WITH_HANDLER(condition, handler) \
+_CHECK_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+#define CHECK_STDCAPI(condition) \
+CHECK_STDCAPI_WITH_HANDLER(condition, nullptr)
+#define CHECK_NE_STDCAPI_WITH_HANDLER(leftExp, rightExp, handler) \
+_CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+#define CHECK_NE_STDCAPI(leftExp, rightExp) \
+CHECK_NE_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
+#define CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, handler) \
+_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+#define CHECK_EQ_STDCAPI(leftExp, rightExp) \
+CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
+
+
+/* ----------------------------- LOGGING ONLY ----------------------------- */
+#define LOG_IF_FAILED_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_FAILED_WITH_HANDLER, __VA_ARGS__)
+#define _LOG_IF_FAILED_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_GENERIC(condition, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _LOG_IF_FAILED_WITH_HANDLER_3(condition, errorCode, handler) \
+_LOG_IF_FAILED_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _LOG_IF_FAILED_WITH_HANDLER_2(condition, handler) \
+_LOG_IF_FAILED_WITH_HANDLER_3(condition, -1, handler)
+
+#define LOG_IF_FAILED(...) _PP_MACRO_OVERLOAD(_LOG_IF_FAILED, __VA_ARGS__)
+#define _LOG_IF_FAILED_3(condition, errorCodeType, errorCode) \
+_LOG_IF_FAILED_WITH_HANDLER_4(condition, errorCodeType, errorCode, nullptr)
+#define _LOG_IF_FAILED_2(condition, errorCode) \
+_LOG_IF_FAILED_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
+#define _LOG_IF_FAILED_1(condition) \
+_LOG_IF_FAILED_2(condition, -1)
+
+#define LOG_IF_NOT_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_EQ_WITH_HANDLER, __VA_ARGS__)
+#define _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _LOG_IF_NOT_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _LOG_IF_NOT_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_LOG_IF_NOT_EQ_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define LOG_IF_NOT_EQ(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_EQ, __VA_ARGS__)
+#define _LOG_IF_NOT_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
+_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _LOG_IF_NOT_EQ_3(leftExp, rightExp, errorCode) \
+_LOG_IF_NOT_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _LOG_IF_NOT_EQ_2(leftExp, rightExp) \
+_LOG_IF_NOT_EQ_3(leftExp, rightExp, -1)
+
+#define LOG_IF_NOT_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_NE_WITH_HANDLER, __VA_ARGS__)
+#define _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _LOG_IF_NOT_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _LOG_IF_NOT_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_LOG_IF_NOT_NE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define LOG_IF_NOT_NE(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_NE, __VA_ARGS__)
+#define _LOG_IF_NOT_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _LOG_IF_NOT_NE_3(leftExp, rightExp, errorCode) \
+_LOG_IF_NOT_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _LOG_IF_NOT_NE_2(leftExp, rightExp) \
+_LOG_IF_NOT_NE_3(leftExp, rightExp, -1)
+
+#define LOG_IF_NOT_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GE_WITH_HANDLER, __VA_ARGS__)
+#define _LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _LOG_IF_NOT_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _LOG_IF_NOT_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_LOG_IF_NOT_GE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define LOG_IF_NOT_GE(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GE, __VA_ARGS__)
+#define _LOG_IF_NOT_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _LOG_IF_NOT_GE_3(leftExp, rightExp, errorCode) \
+_LOG_IF_NOT_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _LOG_IF_NOT_GE_2(leftExp, rightExp) \
+_LOG_IF_NOT_GE_3(leftExp, rightExp, -1)
+
+#define LOG_IF_NOT_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GT_WITH_HANDLER, __VA_ARGS__)
+#define _LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _LOG_IF_NOT_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _LOG_IF_NOT_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_LOG_IF_NOT_GT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define LOG_IF_NOT_GT(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GT, __VA_ARGS__)
+#define _LOG_IF_NOT_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _LOG_IF_NOT_GT_3(leftExp, rightExp, errorCode) \
+_LOG_IF_NOT_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _LOG_IF_NOT_GT_2(leftExp, rightExp) \
+_LOG_IF_NOT_GT_3(leftExp, rightExp, -1)
+
+#define LOG_IF_NOT_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LE_WITH_HANDLER, __VA_ARGS__)
+#define _LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _LOG_IF_NOT_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _LOG_IF_NOT_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_LOG_IF_NOT_LE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define LOG_IF_NOT_LE(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LE, __VA_ARGS__)
+#define _LOG_IF_NOT_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _LOG_IF_NOT_LE_3(leftExp, rightExp, errorCode) \
+_LOG_IF_NOT_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _LOG_IF_NOT_LE_2(leftExp, rightExp) \
+_LOG_IF_NOT_LE_3(leftExp, rightExp, -1)
+
+#define LOG_IF_NOT_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LT_WITH_HANDLER, __VA_ARGS__)
+#define _LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+#define _LOG_IF_NOT_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
+_LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
+#define _LOG_IF_NOT_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
+_LOG_IF_NOT_LT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+
+#define LOG_IF_NOT_LT(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LT, __VA_ARGS__)
+#define _LOG_IF_NOT_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _LOG_IF_NOT_LT_3(leftExp, rightExp, errorCode) \
+_LOG_IF_NOT_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _LOG_IF_NOT_LT_2(leftExp, rightExp) \
+_LOG_IF_NOT_LT_3(leftExp, rightExp, -1)
+
+#define LOG_IF_FAILED_STDCAPI_WITH_HANDLER(condition, handler) \
+_LOG_IF_NOT_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+
+#define LOG_IF_EQ_STDCAPI(leftExp, rightExp) \
+_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)

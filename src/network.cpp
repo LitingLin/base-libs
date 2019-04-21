@@ -1,5 +1,5 @@
 #include <base/network.h>
-#include <base/logging.h>
+#include <base/logging/win32.h>
 
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
@@ -193,10 +193,12 @@ namespace Base
 
 	void SOCKETGuard::destroy()
 	{
-		if (_readEvent != WSA_INVALID_EVENT)
+		if (_readEvent != WSA_INVALID_EVENT) {
 			LOG_IF_FAILED_WIN32API(CloseHandle(_readEvent));
-		if (_socket != INVALID_SOCKET)
+		}
+		if (_socket != INVALID_SOCKET) {
 			LOG_IF_NOT_EQ_WIN32API(closesocket(_socket), 0);
+		}
 	}
 
 	HANDLE SOCKETGuard::getReadEvent()

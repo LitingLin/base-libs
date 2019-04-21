@@ -6,7 +6,7 @@
 #include <DbgHelp.h>
 #include <vector>
 
-#include <base/logging.h>
+#include <base/logging/win32.h>
 #include <base/file.h>
 #include <base/process.h>
 #include <base/thread.h>
@@ -82,7 +82,7 @@ namespace Base
 			BOOL isOK;
 
 			{
-				File dumpFile(dumpPath, File::Mode::write | File::Mode::create_always);
+				File dumpFile(dumpPath, File::DesiredAccess::Write, File::CreationDisposition::CreateAlways);
 				isOK = MiniDumpWriteDump(processHandle.getHANDLE(), _processId, dumpFile.getHANDLE(), MiniDumpWithFullMemory,
 					NULL, NULL, NULL);
 			}

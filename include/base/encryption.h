@@ -6,6 +6,7 @@
 #include <Bcrypt.h>
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace Base {
 	class BCRYPT_ALG_HANDLE_GUARD
