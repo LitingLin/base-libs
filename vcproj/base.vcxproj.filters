@@ -129,7 +129,7 @@
     <ClInclude Include="..\include\base\config\ini.h">
       <Filter>Header Files\config</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\base\ini_parser.h">
+    <ClInclude Include="..\include\base\config\ini_parser.h">
       <Filter>Header Files\config</Filter>
     </ClInclude>
   </ItemGroup>

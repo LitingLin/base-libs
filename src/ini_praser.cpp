@@ -1,4 +1,4 @@
-#include <base/ini_parser.h>
+#include <base/config/ini_parser.h>
 
 #include <base/file.h>
 #include <base/memory_mapped_io.h>
@@ -60,5 +60,8 @@ namespace Base
 		auto fileSize = _file->getSize();
 		CHECK_EQ(ini_parse_string((const char *)memoryMappedIo.get(), fileSize, ini_handler, this), 0);
 	}
-
+	bool IniParser::SectionIterator::exists(const std::string& name) const
+	{
+		return _section->find(name) != _section->end();
+	}
 }

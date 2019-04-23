@@ -15,6 +15,7 @@ namespace Base {
 		public:
 			std::string &getSectionName();
 			std::string &get(const std::string &name);
+			bool exists(const std::string& name) const;
 			size_t getSize();
 		private:
 			SectionIterator(std::string *name, std::map<std::string, std::string> *section);
@@ -30,6 +31,5 @@ namespace Base {
 			const char* name, const char* value,
 			int lineno);
 		std::vector<std::pair<std::string, std::map<std::string, std::string>>> _sections;
-	};
-
+	};		
 }

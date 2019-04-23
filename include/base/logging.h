@@ -142,7 +142,7 @@ _LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, -1, nullptr)
 /* ----------------------------- FATAL ERROR ----------------------------- */
 // "Let it crash"
 
-#define FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_FATAL_EEROR, __VA_ARGS__)
+#define FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_FATAL_ERROR, __VA_ARGS__)
 #define _FATAL_ERROR_1(errorCode) \
 _LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, errorCode, nullptr)
 
