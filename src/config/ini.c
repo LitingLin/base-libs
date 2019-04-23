@@ -4,11 +4,6 @@
 
 #include <base/config/ini.h>
 
-
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -63,14 +58,6 @@ static char* find_chars_or_comment(const char* s, const char* chars)
     return (char*)s;
 }
 
-/* Version of strncpy that ensures dest (size bytes) is null-terminated. */
-static char* strncpy0(char* dest, const char* src, size_t size)
-{
-    strncpy(dest, src, size);
-    dest[size - 1] = '\0';
-    return dest;
-}
-
 /* See documentation in header file. */
 int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
                      void* user)
@@ -90,6 +77,7 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
     char* value;
     int lineno = 0;
     int error = 0;
+	int new_section = 0;
 
 #if !INI_USE_STACK
     line = (char*)malloc(INI_MAX_LINE);
@@ -99,9 +87,9 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
 #endif
 
 #if INI_HANDLER_LINENO
-#define HANDLER(u, s, n, v) handler(u, s, n, v, lineno)
+#define HANDLER(u, s, n, v, l) handler(u, s, n, v, l, lineno)
 #else
-#define HANDLER(u, s, n, v) handler(u, s, n, v)
+#define HANDLER(u, s, n, v, l) handler(u, s, n, v, l)
 #endif
 
     /* Scan through stream line by line */
@@ -126,8 +114,9 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
             else if (*prev_name && *start && start > line) {
 			/* Non-blank line with leading whitespace, treat as continuation
 			of previous name's value (as per Python configparser). */
-			if (!HANDLER(user, section, prev_name, start) && !error)
+			if (!HANDLER(user, section, prev_name, start, new_section) && !error)
 				error = lineno;
+			new_section = 0;
 		}
 #endif
         else if (*start == '[') {
@@ -135,8 +124,9 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
             end = find_chars_or_comment(start + 1, "]");
             if (*end == ']') {
                 *end = '\0';
-                strncpy0(section, start + 1, sizeof(section));
+                strncpy_s(section, sizeof(section),start + 1, sizeof(section) - 1);
                 *prev_name = '\0';
+				new_section = 1;
             }
             else if (!error) {
                 /* No ']' found on section line */
@@ -159,9 +149,10 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
                 rstrip(value);
 
                 /* Valid name[=:]value pair found, call handler */
-                strncpy0(prev_name, name, sizeof(prev_name));
-                if (!HANDLER(user, section, name, value) && !error)
+                strncpy_s(prev_name, sizeof(prev_name), name, sizeof(prev_name) - 1);
+                if (!HANDLER(user, section, name, value, new_section) && !error)
                     error = lineno;
+				new_section = 0;
             }
             else if (!error) {
                 /* No '=' or ':' found on name[=:]value line */
@@ -179,26 +170,6 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
     free(line);
 #endif
 
-    return error;
-}
-
-/* See documentation in header file. */
-int ini_parse_file(FILE* file, ini_handler handler, void* user)
-{
-    return ini_parse_stream((ini_reader)fgets, file, handler, user);
-}
-
-/* See documentation in header file. */
-int ini_parse(const char* filename, ini_handler handler, void* user)
-{
-    FILE* file;
-    int error;
-
-    file = fopen(filename, "r");
-    if (!file)
-        return -1;
-    error = ini_parse_file(file, handler, user);
-    fclose(file);
     return error;
 }
 

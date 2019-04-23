@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <base/logging/win32.h>
+#include <base/utils.h>
 #include <base/file.h>
 #include <base/process.h>
 #include <base/thread.h>

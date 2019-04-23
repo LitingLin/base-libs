@@ -1,5 +1,7 @@
 #include <base/logging/win32.h>
 
+#include <base/utils.h>
+
 namespace Base {
 	Win32ErrorCodeToString::Win32ErrorCodeToString(unsigned long errorCode, ...)
 		: str(nullptr)

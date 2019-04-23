@@ -14,17 +14,17 @@ extern "C" {
 
 /* Nonzero if ini_handler callback should accept lineno parameter. */
 #ifndef INI_HANDLER_LINENO
-#define INI_HANDLER_LINENO 1
+#define INI_HANDLER_LINENO 0
 #endif
 
 /* Typedef for prototype of handler function. */
 #if INI_HANDLER_LINENO
 typedef int(*ini_handler)(void* user, const char* section,
                           const char* name, const char* value,
-                          int lineno);
+	int new_section, int lineno);
 #else
 typedef int(*ini_handler)(void* user, const char* section,
-		const char* name, const char* value);
+		const char* name, const char* value, int new_section);
 #endif
 
 /* Typedef for prototype of fgets-style reader function. */
@@ -43,11 +43,6 @@ Returns 0 on success, line number of first error on parse error (doesn't
 stop on first error), -1 on file open error, or -2 on memory allocation
 error (only when INI_USE_STACK is zero).
 */
-int ini_parse(const char* filename, ini_handler handler, void* user);
-
-/* Same as ini_parse(), but takes a FILE* instead of filename. This doesn't
-close the file when it's finished -- the caller must do that. */
-int ini_parse_file(FILE* file, ini_handler handler, void* user);
 
 /* Same as ini_parse(), but takes an ini_reader function pointer instead of
 filename. Used for implementing custom or string-based I/O (see also
@@ -64,7 +59,7 @@ int ini_parse_string(const char* string, size_t size, ini_handler handler, void*
 configparser. If allowed, ini_parse() will call the handler with the same
 name for each subsequent line parsed. */
 #ifndef INI_ALLOW_MULTILINE
-#define INI_ALLOW_MULTILINE 1
+#define INI_ALLOW_MULTILINE 0
 #endif
 
 /* Nonzero to allow a UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of
