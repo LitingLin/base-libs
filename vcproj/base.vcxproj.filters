@@ -120,9 +120,6 @@
     <ClInclude Include="..\include\base\preprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\base\text_file.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\base\logging\win32.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
@@ -213,9 +210,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\debugoutput_logger_sink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\text_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\logging\win32.cpp">

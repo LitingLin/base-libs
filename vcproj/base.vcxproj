@@ -40,7 +40,6 @@
     <ClInclude Include="..\include\base\serialization.hpp" />
     <ClInclude Include="..\include\base\shared_memory.h" />
     <ClInclude Include="..\include\base\sync.h" />
-    <ClInclude Include="..\include\base\text_file.h" />
     <ClInclude Include="..\include\base\thread.h" />
     <ClInclude Include="..\include\base\time.h" />
     <ClInclude Include="..\include\base\timer.h" />
@@ -74,7 +73,6 @@
     <ClCompile Include="..\src\shared_memory.cpp" />
     <ClCompile Include="..\src\stack_trace.cpp" />
     <ClCompile Include="..\src\sync.cpp" />
-    <ClCompile Include="..\src\text_file.cpp" />
     <ClCompile Include="..\src\thread.cpp" />
     <ClCompile Include="..\src\time.cpp" />
     <ClCompile Include="..\src\timer.cpp" />
