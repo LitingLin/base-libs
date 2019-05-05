@@ -6,7 +6,6 @@
 
 namespace Base
 {
-	// Read Only
 	class MemoryMappedIO
 	{
 	public:
