@@ -110,18 +110,16 @@ namespace Base
 	bool StringToGUID(const wchar_t *str, unsigned str_size, GUID *guid)
 	{
 		ENSURE_GE(str_size, 39U);
-		HRESULT hr = IIDFromString(str, guid);
-		if (SUCCEEDED(hr))
-			return true;
-		else
-			return false;
+		const HRESULT hr = IIDFromString(str, guid);
+		return SUCCEEDED(hr);
 	}
 #else
     void generateGUID(GUID *guid)
     {
-        int fd = open("/dev/urandom", O_RDONLY);
+        int fd = open("/proc/sys/kernel/random/uuid", O_RDONLY);
         ENSURE_NE_STDCAPI(fd, -1);
-        ON_SCOPE_EXIT(close(fd));
+
+        ScopeGuard scopeGuard = [&]() {close(fd);};
         int bytesRead = read(fd, guid, 16);
         ENSURE_NE_STDCAPI(bytesRead, -1);
         ENSURE_EQ(bytesRead, 16);

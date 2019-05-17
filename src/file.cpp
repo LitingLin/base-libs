@@ -626,8 +626,9 @@ namespace Base
 		return large_integer.QuadPart;
 	}
 
-	uint64_t File::read(unsigned char* buffer, uint64_t size) const
+	uint64_t File::read(void* buffer, uint64_t size) const
 	{
+		char* buffer_ = static_cast<char*>(buffer);
 		uint64_t totalReadFileSize = 0;
 		while (size)
 		{
@@ -643,15 +644,16 @@ namespace Base
 			}
 
 			DWORD sizeRead;
-			CHECK_WIN32API(ReadFile(_fileHandle, buffer, this_read_size, &sizeRead, nullptr));
+			CHECK_WIN32API(ReadFile(_fileHandle, buffer_, this_read_size, &sizeRead, nullptr));
 			totalReadFileSize += sizeRead;
-			buffer += this_read_size;
+			buffer_ += this_read_size;
 		}
 		return totalReadFileSize;
 	}
 
-	uint64_t File::write(const unsigned char* buffer, uint64_t size)
+	uint64_t File::write(const void* buffer, uint64_t size)
 	{
+		const char* buffer_ = static_cast<const char*>(buffer);
 		uint64_t totalWriteFileSize = 0;
 		while (size)
 		{
@@ -667,9 +669,9 @@ namespace Base
 			}
 
 			DWORD sizeWritten;
-			CHECK_WIN32API(WriteFile(_fileHandle, buffer, currentWriteSize, &sizeWritten, nullptr));
+			CHECK_WIN32API(WriteFile(_fileHandle, buffer_, currentWriteSize, &sizeWritten, nullptr));
 			totalWriteFileSize += sizeWritten;
-			buffer += currentWriteSize;
+			buffer_ += currentWriteSize;
 		}
 		return totalWriteFileSize;
 	}
@@ -756,13 +758,13 @@ namespace Base
         return stat_.st_size;
     }
 
-    uint64_t File::read(unsigned char *buffer, uint64_t size) const {
+    uint64_t File::read(void *buffer, uint64_t size) const {
         ssize_t bytesRead = ::read(_fd, buffer, size);
         CHECK_NE_STDCAPI(bytesRead, -1);
         return (uint64_t)bytesRead;
     }
 
-    uint64_t File::write(const unsigned char *buffer, uint64_t size) {
+    uint64_t File::write(const void *buffer, uint64_t size) {
         ssize_t bytesWritten = ::write(_fd, buffer, size);
         CHECK_NE_STDCAPI(bytesWritten, -1);
     }
@@ -783,7 +785,7 @@ namespace Base
         return as_nanoseconds(stat_.st_mtim);
     }
 
-    int File::getFileDiscriptor() {
+    int File::getFileDescriptor() {
         return _fd;
     }
 

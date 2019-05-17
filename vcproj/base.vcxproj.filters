@@ -25,6 +25,12 @@
     <Filter Include="Source Files\config">
       <UniqueIdentifier>{fb67a04c-a52e-4384-9d19-d0e3e0b5418a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\3rd_party">
+      <UniqueIdentifier>{c7e0203c-222f-4cd8-a71d-c9331accafc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3rd_party">
+      <UniqueIdentifier>{d95424a8-2d45-4959-a6bc-5792b79adc52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\base\exception.h">

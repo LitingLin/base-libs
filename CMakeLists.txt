@@ -59,15 +59,17 @@ target_include_directories(base PUBLIC "include")
 target_include_directories(base PRIVATE ${CEREAL_INCLUDE_DIRS} ${SPDLOG_INCLUDE_DIRS})
 
 install(TARGETS base
-        ARCHIVE DESTINATION "lib"
-        PUBLIC_HEADER DESTINATION "include")
+        ARCHIVE DESTINATION "lib")
+
+install(DIRECTORY include/ DESTINATION include)
 
 if(NOT CEREAL_FOUND)
-    install(DIRECTORY ${CEREAL_INCLUDE_DIRS} DESTINATION "include")
+    install(DIRECTORY ${CEREAL_INCLUDE_DIRS} DESTINATION .)
 endif()
 
 if(NOT SPDLOG_FOUND)
-    install(DIRECTORY ${SPDLOG_INCLUDE_DIRS} DESTINATION "include")
+    install(DIRECTORY ${SPDLOG_INCLUDE_DIRS} DESTINATION .)
 endif()
 
+enable_testing()
 add_subdirectory(test)

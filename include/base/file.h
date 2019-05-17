@@ -121,14 +121,14 @@ namespace Base {
 		File(File && other) noexcept;
 		~File();
 		uint64_t getSize() const;
-		uint64_t read(unsigned char* buffer, uint64_t size) const;
-		uint64_t write(const unsigned char* buffer, uint64_t size);
+		uint64_t read(void* buffer, uint64_t size) const;
+		uint64_t write(const void* buffer, uint64_t size);
 		void seek(uint64_t offset);
 		uint64_t getLastWriteTime() const;
 #ifdef _WIN32
 		HANDLE getHANDLE();
 #else
-		int getFileDiscriptor();
+		int getFileDescriptor();
 #endif
 	private:
 #ifdef _WIN32

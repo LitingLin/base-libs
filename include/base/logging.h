@@ -87,6 +87,19 @@ namespace Base
 		Type first;
 		Type second;
 	};
+    template <typename Type, template <class Type2 = Type> class Operator>
+    struct _ReverseComparator
+    {
+        _ReverseComparator(const Type& first, const Type& second)
+                : first(first), second(second) {}
+        operator bool()
+        {
+            Operator<> op;
+            return !op(first, second);
+        }
+        Type first;
+        Type second;
+    };
 	struct _StreamTypeVoidify
 	{
 		void operator&(std::ostream&) const {}
@@ -98,20 +111,19 @@ namespace Base
 #define _COMPARATOR_NAME _COMPARATOR_NAME2(COMPARATOR_, __LINE__)
 
 #define LOG_GET_LEFT_EXPRESSION_RC \
-	_COMPARATOR_NAME.first
+	_values_.first
 #define LOG_GET_RIGHT_EXPRESSION_RC \
-	_COMPARATOR_NAME.second
+	_values_.second
 
 /* ----------------------------- GENERIC ----------------------------- */
 #define _LOG_GENERIC(loggingClass, errorCodeType, errorCode, handler) \
 loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).stream()
 
 #define _LOG_CONDITIONED_GENERIC(condition, loggingClass, errorCodeType, errorCode, handler) \
-!(condition) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #condition).stream()
+(condition) ? (void) 0 : Base::_StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #condition).stream()
 
 #define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
-_Comparator<decltype(leftExp), functional_op>_COMPARATOR_NAME((leftExp), (rightExp)); \
-(_COMPARATOR_NAME) ? (void) 0 : _StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
+if (auto _values_ = Base::_Comparator<decltype(leftExp), functional_op> ((leftExp), (rightExp))) ; else loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
 
 #define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
 _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to, loggingClass, errorCodeType, errorCode, handler)

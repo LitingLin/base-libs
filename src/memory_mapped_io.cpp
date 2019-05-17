@@ -28,6 +28,7 @@ namespace Base
 			break;
 		default:
 			UNREACHABLE_ERROR;
+			pageProtect = 0;
 		}
 		static_assert(sizeof(ULARGE_INTEGER) == sizeof(size), "");
 		ULARGE_INTEGER* pSize = (ULARGE_INTEGER*)&size;
@@ -47,6 +48,7 @@ namespace Base
 			break;
 		default:
 			UNREACHABLE_ERROR;
+			mapDesiredAccess = 0;
 		}
 
 		ULARGE_INTEGER* pOffset = (ULARGE_INTEGER*)&offset;
@@ -81,7 +83,7 @@ namespace Base
         }
         if (size == 0)
             size = _file->getSize() - offset;
-        _ptr = mmap(nullptr, size, prot, MAP_SHARED, _file->getFileDiscriptor(), offset);
+        _ptr = mmap(nullptr, size, prot, MAP_SHARED, _file->getFileDescriptor(), offset);
         CHECK_NE_STDCAPI(_ptr, MAP_FAILED);
         _size = size;
     }

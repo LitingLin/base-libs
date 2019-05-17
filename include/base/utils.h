@@ -23,23 +23,6 @@ typedef struct _GUID {
 #include <limits>
 #include <functional>
 
-template <typename F>
-struct ScopeExit {
-    explicit ScopeExit(F f) : f(f) {}
-    ~ScopeExit() { f(); }
-    F f;
-};
-
-template <typename F>
-ScopeExit<F> MakeScopeExit(F f) {
-    return ScopeExit<F>(f);
-};
-
-#define STRING_JOIN2(arg1, arg2) DO_STRING_JOIN2(arg1, arg2)
-#define DO_STRING_JOIN2(arg1, arg2) arg1 ## arg2
-#define ON_SCOPE_EXIT(code) \
-    auto STRING_JOIN2(scope_exit_, __LINE__) = MakeScopeExit([=](){code;})
-
 bool operator<(const GUID& left, const GUID& right);
 namespace Base
 {
@@ -68,4 +51,32 @@ namespace Base
 
 	uint8_t generateRandomUint8(uint8_t from = std::numeric_limits<uint8_t>::min(), uint8_t to = std::numeric_limits<uint8_t>::max());
 	uint16_t generateRandomUint16(uint16_t from = std::numeric_limits<uint16_t>::min(), uint16_t to = std::numeric_limits<uint16_t>::max());
+
+    class ScopeGuard {
+    public:
+        template<class Callable>
+        ScopeGuard(Callable && undo_func) try : f(std::forward<Callable>(undo_func)) {
+        } catch(...) {
+            undo_func();
+            throw;
+        }
+
+        ScopeGuard(ScopeGuard && other) : f(std::move(other.f)) {
+            other.f = nullptr;
+        }
+
+        ~ScopeGuard() {
+            if(f) f(); // must not throw
+        }
+
+        void dismiss() noexcept {
+            f = nullptr;
+        }
+
+        ScopeGuard(const ScopeGuard&) = delete;
+        void operator = (const ScopeGuard&) = delete;
+
+    private:
+        std::function<void()> f;
+    };
 }

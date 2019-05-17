@@ -42,7 +42,7 @@ namespace Base
 			// Because the CreateWindow function takes its size in pixels, we
 			// obtain the system DPI and use it to scale the window size.
 			FLOAT dpiX, dpiY;
-			m_pD2DFactory->GetDesktopDpi(&dpiX, &dpiY);
+			dpiX = dpiY = GetDpiForSystem();
 
 			m_hwnd = CreateWindow(
 				L"D2DDemoApp",
