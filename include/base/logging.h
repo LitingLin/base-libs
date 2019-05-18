@@ -404,7 +404,7 @@ _CHECK_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
 _CHECK_LT_3(leftExp, rightExp, -1)
 
 #define CHECK_STDCAPI_WITH_HANDLER(condition, handler) \
-_CHECK_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+_CHECK_WITH_HANDLER_4(condition, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
 #define CHECK_STDCAPI(condition) \
 CHECK_STDCAPI_WITH_HANDLER(condition, nullptr)
 #define CHECK_NE_STDCAPI_WITH_HANDLER(leftExp, rightExp, handler) \
