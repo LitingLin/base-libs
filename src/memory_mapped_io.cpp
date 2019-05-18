@@ -89,7 +89,7 @@ namespace Base
     }
 
     MemoryMappedIO::~MemoryMappedIO(){
-        LOG_IF_EQ_STDCAPI(munmap(_ptr, _size), -1);
+        LOG_IF_NOT_NE_STDCAPI(munmap(_ptr, _size), -1);
     }
 #endif
 	void* MemoryMappedIO::get()

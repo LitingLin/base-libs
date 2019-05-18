@@ -742,7 +742,7 @@ namespace Base
 
     File::~File() {
         if (_fd!=-1) {
-            LOG_IF_EQ_STDCAPI(::close(_fd), -1);
+            LOG_IF_NOT_NE_STDCAPI(::close(_fd), -1);
         }
     }
 

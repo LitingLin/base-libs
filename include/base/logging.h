@@ -420,7 +420,7 @@ CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
 /* ----------------------------- LOGGING ONLY ----------------------------- */
 #define LOG_IF_FAILED_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_FAILED_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_FAILED_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_GENERIC(condition, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_GENERIC(condition, Base::EventLogging, errorCodeType, errorCode, handler)
 #define _LOG_IF_FAILED_WITH_HANDLER_3(condition, errorCode, handler) \
 _LOG_IF_FAILED_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_FAILED_WITH_HANDLER_2(condition, handler) \
@@ -436,7 +436,7 @@ _LOG_IF_FAILED_2(condition, -1)
 
 #define LOG_IF_NOT_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_EQ_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -452,7 +452,7 @@ _LOG_IF_NOT_EQ_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_NE_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -468,7 +468,7 @@ _LOG_IF_NOT_NE_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GE_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -484,7 +484,7 @@ _LOG_IF_NOT_GE_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GT_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -500,7 +500,7 @@ _LOG_IF_NOT_GT_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LE_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -516,7 +516,7 @@ _LOG_IF_NOT_LE_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LT_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -531,7 +531,10 @@ _LOG_IF_NOT_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
 _LOG_IF_NOT_LT_3(leftExp, rightExp, -1)
 
 #define LOG_IF_FAILED_STDCAPI_WITH_HANDLER(condition, handler) \
-_LOG_IF_NOT_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+_LOG_IF_FAILED_WITH_HANDLER_4(condition, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
 
-#define LOG_IF_EQ_STDCAPI(leftExp, rightExp) \
+#define LOG_IF_NOT_EQ_STDCAPI(leftExp, rightExp) \
 _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+
+#define LOG_IF_NOT_NE_STDCAPI(leftExp, rightExp) \
+_LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
