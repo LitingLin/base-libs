@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string>
+#include <base/porting.h>
+
 #include <stdint.h>
 #ifdef _WIN32
 #define NOMINMAX
@@ -14,16 +15,15 @@
 #include <functional>
 
 namespace Base {
+    bool isPathExists(const PLATFORM_STRING_TYPE & path);
 #ifdef _WIN32
-	bool isPathExists(const std::wstring& path);
 	std::wstring getWorkDirectory();
 	std::wstring getModuleInstanceFullPath(HINSTANCE instance);
 	std::wstring getApplicationPath();
 	std::wstring getTempPath();
 	std::wstring getFullPath(const std::wstring& path);
 #else
-    bool isPathExists(const std::string& path);
-    bool isFileExists(const std::string& Path);
+    bool isFileExists(const std::string& path);
 #endif
 	std::string getParentPath(const std::string& path);
 	std::wstring getParentPath(const std::wstring& path);
@@ -40,48 +40,6 @@ namespace Base {
 	std::wstring getFileExtension(const std::wstring& path);
 	std::string getCanonicalPath(const std::string&path);
 	std::wstring getCanonicalPath(const std::wstring& path);
-
-#ifdef _WIN32
-	class DirectoryIterator
-	{
-	public:
-		DirectoryIterator(const std::wstring &path);
-		~DirectoryIterator();
-		bool next(std::wstring &fileName, bool &isDirectory, uint64_t &lastFileWriteTime);
-		void reset();
-	private:
-		HANDLE _handle;
-		std::wstring _path;
-	};
-
-	class IDirectoryFileListGetter
-	{
-	public:
-		virtual ~IDirectoryFileListGetter() = default;
-		virtual bool getFileList(std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes) = 0;
-	};
-
-	class SequentialDirectoryFileListGetter : public IDirectoryFileListGetter
-	{
-	public:
-		SequentialDirectoryFileListGetter(const std::wstring &path);
-		bool getFileList(std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes) override;
-	private:
-		std::wstring _path;
-	};
-
-	class RandomDirectoryFileListGetter : public IDirectoryFileListGetter
-	{
-	public:
-		RandomDirectoryFileListGetter(const std::wstring &path);
-		bool getFileList(std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes) override;
-	private:
-		std::wstring _path;
-	};
-
-	bool getDirectoryFileLists(const std::wstring& path, std::vector<std::wstring>& fileNames, std::vector<uint64_t>& lastWriteTimes);
-	bool getRandomShuffledDirectoryFileLists(const std::wstring& path, std::vector<std::wstring>& fileNames, std::vector<uint64_t>& lastWriteTimes);
-#endif
 
 	class File
 	{
@@ -110,13 +68,8 @@ namespace Base {
 			TruncateExisting
 		};
 
-#ifdef _WIN32
-		File(const std::wstring &path, DesiredAccess desiredAccess = DesiredAccess::Read, 
+		File(const PLATFORM_STRING_TYPE &path, DesiredAccess desiredAccess = DesiredAccess::Read,
 				CreationDisposition creationDisposition = CreationDisposition::OpenExisting);
-#else
-		File(const std::string& path, DesiredAccess desiredAccess = DesiredAccess::Read,
-		        CreationDisposition creationDisposition = CreationDisposition::OpenExisting);
-#endif
 		File(const File &) = delete;
 		File(File && other) noexcept;
 		~File();
@@ -137,4 +90,56 @@ namespace Base {
 		int _fd;
 #endif
 	};
+
+    enum class FileType
+    {
+        Directory,
+        File,
+        Other
+    };
+
+    class DirectoryIterator
+    {
+    public:
+        DirectoryIterator(const PLATFORM_STRING_TYPE &path);
+        ~DirectoryIterator();
+        bool next(PLATFORM_STRING_TYPE &fileName, FileType *fileType, uint64_t *lastFileWriteTime);
+        void reset();
+    private:
+#ifdef _WIN32
+        HANDLE _handle;
+        std::wstring _path;
+#else
+        DIR* _dir;
+        int _dirfd;
+#endif
+    };
+
+    class IDirectoryFileListGetter
+	{
+	public:
+		virtual ~IDirectoryFileListGetter() = default;
+		virtual bool getFileList(std::vector<PLATFORM_STRING_TYPE> &fileNames, std::vector<uint64_t> &lastWriteTimes) = 0;
+	};
+
+	class SequentialDirectoryFileListGetter : public IDirectoryFileListGetter
+	{
+	public:
+        SequentialDirectoryFileListGetter(const PLATFORM_STRING_TYPE &path);
+        bool getFileList(std::vector<PLATFORM_STRING_TYPE> &fileNames, std::vector<uint64_t> &lastWriteTimes) override;
+	private:
+        PLATFORM_STRING_TYPE _path;
+	};
+
+	class RandomDirectoryFileListGetter : public IDirectoryFileListGetter
+	{
+	public:
+        RandomDirectoryFileListGetter(const PLATFORM_STRING_TYPE &path);
+        bool getFileList(std::vector<PLATFORM_STRING_TYPE> &fileNames, std::vector<uint64_t> &lastWriteTimes) override;
+	private:
+	    PLATFORM_STRING_TYPE _path;
+	};
+
+    bool getDirectoryFileLists(const PLATFORM_STRING_TYPE& path, std::vector<PLATFORM_STRING_TYPE>& fileNames, std::vector<uint64_t>& lastWriteTimes);
+    bool getRandomShuffledDirectoryFileLists(const PLATFORM_STRING_TYPE& path, std::vector<PLATFORM_STRING_TYPE>& fileNames, std::vector<uint64_t>& lastWriteTimes);
 }

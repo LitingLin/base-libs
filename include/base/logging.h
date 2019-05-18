@@ -416,6 +416,11 @@ _CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno,
 #define CHECK_EQ_STDCAPI(leftExp, rightExp) \
 CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
 
+#define THROW_RUNTIME_EXCEPTION \
+_LOG_GENERIC(Base::RuntimeExceptionLogging, Base::ErrorCodeType::GENERIC, -1, nullptr)
+
+#define THROW_STDCAPI_RUNTIME_EXCEPTION \
+_LOG_GENERIC(Base::RuntimeExceptionLogging, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
 /* ----------------------------- LOGGING ONLY ----------------------------- */
 #define LOG_IF_FAILED_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_FAILED_WITH_HANDLER, __VA_ARGS__)
@@ -538,3 +543,9 @@ _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, e
 
 #define LOG_IF_NOT_NE_STDCAPI(leftExp, rightExp) \
 _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+
+#define LOGGING_ERROR \
+_LOG_GENERIC(Base::EventLogging, Base::ErrorCodeType::GENERIC, -1, nullptr)
+
+#define LOGGING_STDCAPI_ERROR \
+_LOG_GENERIC(Base::EventLogging, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)

@@ -6,6 +6,8 @@
 #include <base/logging/win32.h>
 #else
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #endif
 
 namespace Base
@@ -403,7 +405,7 @@ namespace Base
 			LOG_IF_FAILED_WIN32API(FindClose(_handle));
 	}
 
-	bool DirectoryIterator::next(std::wstring& fileName, bool &isDirectory, uint64_t &lastFileWriteTime)
+	bool DirectoryIterator::next(std::wstring& fileName, FileType& fileType, uint64_t &lastFileWriteTime)
 	{
 		WIN32_FIND_DATA fileData;
 		if (!_handle) {
@@ -418,7 +420,10 @@ namespace Base
 				return false;
 
 		fileName = fileData.cFileName;
-		isDirectory = fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+		if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			fileType = FileType::Directory;
+		else
+			fileType = FileType::File;
 		lastFileWriteTime = *((uint64_t*)&fileData.ftLastWriteTime);
 		return true;
 	}
@@ -431,36 +436,91 @@ namespace Base
 		}
 	}
 
-	SequentialDirectoryFileListGetter::SequentialDirectoryFileListGetter(const std::wstring& path)
+#else
+
+    inline uint64_t as_nanoseconds(struct timespec ts) {
+        return ts.tv_sec * (uint64_t)1000000000L + ts.tv_nsec;
+    }
+
+    DirectoryIterator::DirectoryIterator(const std::string &path) {
+        _dir = opendir(path.c_str());
+        CHECK_STDCAPI(_dir);
+        _dirfd = dirfd(_dir);
+    }
+    DirectoryIterator::~DirectoryIterator()
+    {
+        LOG_IF_NOT_EQ_STDCAPI(closedir(_dir), 0);
+    }
+    bool DirectoryIterator::next(std::string &fileName, FileType *fileType, uint64_t *lastFileWriteTime)
+    {
+        while (true) {
+            errno = 0;
+            struct dirent *dirent = readdir(_dir);
+            if (dirent == nullptr) {
+                if (errno == 0)
+                    return false;
+                else
+                    THROW_STDCAPI_RUNTIME_EXCEPTION << "readdir() failed";
+            }
+
+            int fd = openat(_dirfd, dirent->d_name, O_RDONLY);
+            if (fileType || lastFileWriteTime) {
+                struct stat stat;
+                int rc = fstat(fd, &stat);
+                if (rc != 0) {
+                    LOGGING_STDCAPI_ERROR << "openat() failed." << "file: " << dirent->d_name;
+                    LOG_IF_NOT_EQ_STDCAPI(close(fd), 0);
+                    continue;
+                }
+                if (fileType) {
+                    if (S_ISREG(stat.st_mode)) *fileType = FileType::File;
+                    else if (S_ISDIR(stat.st_mode)) *fileType = FileType::Directory;
+                    else *fileType = FileType::Other;
+                }
+                if (lastFileWriteTime)
+                    *lastFileWriteTime = as_nanoseconds(stat.st_mtim);
+            }
+            fileName = (char *) (dirent->d_name);
+            LOG_IF_NOT_EQ_STDCAPI(close(fd), 0);
+            return true;
+        }
+    }
+    void DirectoryIterator::reset()
+    {
+        rewinddir(_dir);
+    }
+#endif
+
+	SequentialDirectoryFileListGetter::SequentialDirectoryFileListGetter(const PLATFORM_STRING_TYPE& path)
 		: _path(path)
 	{
 	}
 
-	bool SequentialDirectoryFileListGetter::getFileList(std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes)
+	bool SequentialDirectoryFileListGetter::getFileList(std::vector<PLATFORM_STRING_TYPE>& fileNames, std::vector<uint64_t>& lastWriteTimes)
 	{
 		return getDirectoryFileLists(_path, fileNames, lastWriteTimes);
 	}
 
-	RandomDirectoryFileListGetter::RandomDirectoryFileListGetter(const std::wstring& path)
+	RandomDirectoryFileListGetter::RandomDirectoryFileListGetter(const PLATFORM_STRING_TYPE& path)
 		: _path(path)
 	{
 	}
 
-	bool RandomDirectoryFileListGetter::getFileList(std::vector<std::wstring>& fileNames,
+	bool RandomDirectoryFileListGetter::getFileList(std::vector<PLATFORM_STRING_TYPE>& fileNames,
 		std::vector<uint64_t>& lastWriteTimes)
 	{
 		return getRandomShuffledDirectoryFileLists(_path, fileNames, lastWriteTimes);
 	}
 
-	bool getDirectoryFileLists(const std::wstring &path, std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes)
+	bool getDirectoryFileLists(const PLATFORM_STRING_TYPE& path, std::vector<PLATFORM_STRING_TYPE>& fileNames, std::vector<uint64_t>& lastWriteTimes)
 	{
 		DirectoryIterator directoryIterator(path);
-		std::wstring tempFileName;
-		bool isDirectory;
+        PLATFORM_STRING_TYPE tempFileName;
+		FileType fileType;
 		uint64_t tempLastWriteTime;
-		while (directoryIterator.next(tempFileName, isDirectory, tempLastWriteTime))
+		while (directoryIterator.next(tempFileName, &fileType, &tempLastWriteTime))
 		{
-			if (isDirectory)
+			if (fileType != FileType::File)
 				continue;
 			fileNames.push_back(tempFileName);
 			lastWriteTimes.push_back(tempLastWriteTime);
@@ -468,9 +528,9 @@ namespace Base
 		return !fileNames.empty();
 	}
 
-	bool getRandomShuffledDirectoryFileLists(const std::wstring &path, std::vector<std::wstring> &fileNames, std::vector<uint64_t> &lastWriteTimes)
+	bool getRandomShuffledDirectoryFileLists(const PLATFORM_STRING_TYPE & path, std::vector<PLATFORM_STRING_TYPE> & fileNames, std::vector<uint64_t> & lastWriteTimes)
 	{
-		std::vector<std::wstring> sequentialFileNames;
+		std::vector<PLATFORM_STRING_TYPE> sequentialFileNames;
 		std::vector<uint64_t> sequentialLastWriteTimes;
 		if (getDirectoryFileLists(path, sequentialFileNames, sequentialLastWriteTimes))
 		{
@@ -494,18 +554,18 @@ namespace Base
 		return false;
 	}
 
-	bool randomPickFile(DirectoryIterator& direcotryIterator, std::wstring& fileName, uint64_t* lastWriteTimePtr,
-		std::vector<std::wstring>* fileNamesPtr, std::vector<uint64_t>* lastWriteTimesPtr, size_t* indexPtr)
+	bool randomPickFile(DirectoryIterator & directoryIterator, PLATFORM_STRING_TYPE & fileName, uint64_t * lastWriteTimePtr,
+		std::vector<PLATFORM_STRING_TYPE> * fileNamesPtr, std::vector<uint64_t> * lastWriteTimesPtr, size_t * indexPtr)
 	{
-		direcotryIterator.reset();
-		std::vector<std::wstring> fileNames;
+		directoryIterator.reset();
+		std::vector<PLATFORM_STRING_TYPE> fileNames;
 		std::vector<uint64_t> lastWriteTimes;
-		std::wstring tempFileName;
-		bool isDirectory;
+        PLATFORM_STRING_TYPE tempFileName;
+		FileType fileType;
 		uint64_t tempLastWriteTime;
-		while (direcotryIterator.next(tempFileName, isDirectory, tempLastWriteTime))
+		while (directoryIterator.next(tempFileName, &fileType, &tempLastWriteTime))
 		{
-			if (isDirectory)
+			if (fileType != FileType::File)
 				continue;
 			fileNames.push_back(tempFileName);
 			lastWriteTimes.push_back(tempLastWriteTime);
@@ -532,22 +592,22 @@ namespace Base
 		return true;
 	}
 
-	bool pickNextFile(DirectoryIterator & direcotryIterator, std::wstring & fileName, uint64_t * lastWriteTimePtr)
+	bool pickNextFile(DirectoryIterator & directoryIterator, PLATFORM_STRING_TYPE & fileName, uint64_t * lastWriteTimePtr)
 	{
-		bool isDirectory;
-		std::wstring tempFileName;
+		FileType fileType;
+        PLATFORM_STRING_TYPE tempFileName;
 		uint64_t lastWriteTime;
-		while (direcotryIterator.next(tempFileName, isDirectory, lastWriteTime))
+		while (directoryIterator.next(tempFileName, &fileType, &lastWriteTime))
 		{
-			if (!isDirectory)
+			if (fileType == FileType::File)
 				break;
 		}
 		if (tempFileName.empty())
 		{
-			direcotryIterator.reset();
-			while (direcotryIterator.next(tempFileName, isDirectory, lastWriteTime))
+			directoryIterator.reset();
+			while (directoryIterator.next(tempFileName, &fileType, &lastWriteTime))
 			{
-				if (!isDirectory)
+				if (fileType == FileType::File)
 					break;
 			}
 		}
@@ -561,9 +621,6 @@ namespace Base
 			return true;
 		}
 	}
-
-#endif
-
 #ifdef _WIN32
 	File::File(const std::wstring& path, DesiredAccess desiredAccess, CreationDisposition creationDisposition)
 	{
@@ -737,7 +794,7 @@ namespace Base
         }
 
 	    _fd = ::open(path.c_str(), flag);
-	    CHECK_NE_STDCAPI(_fd, -1) << "open() failed with path: " << path << ", flag: " << flag;
+	    CHECK_NE_STDCAPI(_fd, -1) << " open() failed with path: " << path << ", flag: " << flag;
     }
 
     File::~File() {
@@ -773,10 +830,6 @@ namespace Base
         off64_t new_off = ::lseek64(_fd, offset, SEEK_SET);
         CHECK_NE_STDCAPI(new_off, -1);
         CHECK_EQ_STDCAPI(new_off, offset);
-    }
-
-    inline uint64_t as_nanoseconds(struct timespec ts) {
-        return ts.tv_sec * (uint64_t)1000000000L + ts.tv_nsec;
     }
 
     uint64_t File::getLastWriteTime() const {
