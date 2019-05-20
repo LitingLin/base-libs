@@ -49,6 +49,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\com.cpp" />
     <ClCompile Include="..\src\config\ini.c" />
+    <ClCompile Include="..\src\config\ini_praser.cpp" />
     <ClCompile Include="..\src\d2d_window.cpp" />
     <ClCompile Include="..\src\debugoutput_logger_sink.cpp" />
     <ClCompile Include="..\src\dump_generator.cpp" />
@@ -58,7 +59,6 @@
     <ClCompile Include="..\src\file.cpp" />
     <ClCompile Include="..\src\fragmented_udp.cpp" />
     <ClCompile Include="..\src\image_decoder.cpp" />
-    <ClCompile Include="..\src\ini_praser.cpp" />
     <ClCompile Include="..\src\lib_jpeg_turbo_decoder.cpp" />
     <ClCompile Include="..\src\lib_png_decoder.cpp" />
     <ClCompile Include="..\src\lock_guard.cpp" />
