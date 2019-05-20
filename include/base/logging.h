@@ -5,9 +5,9 @@
 
 #include <locale>
 #include <functional>
-#include <codecvt>
 #include <memory>
 #include <sstream>
+#include <string>
 
 #ifdef _WIN32
 #define SPDLOG_WCHAR_FILENAMES

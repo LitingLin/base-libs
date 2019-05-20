@@ -8,12 +8,12 @@
 
 namespace Base
 {
-	void debugoutput_sink::sink_it_(const spdlog::details::log_msg& msg)
+	void debugoutput_sink::_sink_it(const spdlog::details::log_msg& msg)
 	{
-		OutputDebugString(UTF8ToUTF16(msg.payload.data()).c_str());
+		OutputDebugString(UTF8ToUTF16(msg.formatted.c_str()).c_str());
 	}
 
-	void debugoutput_sink::flush_()
+	void debugoutput_sink::_flush()
 	{
 	}
 }

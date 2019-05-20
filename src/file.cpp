@@ -405,7 +405,7 @@ namespace Base
 			LOG_IF_FAILED_WIN32API(FindClose(_handle));
 	}
 
-	bool DirectoryIterator::next(std::wstring& fileName, FileType& fileType, uint64_t &lastFileWriteTime)
+	bool DirectoryIterator::next(std::wstring& fileName, FileType *fileType, uint64_t *lastFileWriteTime)
 	{
 		WIN32_FIND_DATA fileData;
 		if (!_handle) {
@@ -420,11 +420,15 @@ namespace Base
 				return false;
 
 		fileName = fileData.cFileName;
-		if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			fileType = FileType::Directory;
-		else
-			fileType = FileType::File;
-		lastFileWriteTime = *((uint64_t*)&fileData.ftLastWriteTime);
+		if (fileType)
+		{
+			if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				*fileType = FileType::Directory;
+			else
+				*fileType = FileType::File;
+		}
+		if (lastFileWriteTime)
+			*lastFileWriteTime = *((uint64_t*)&fileData.ftLastWriteTime);
 		return true;
 	}
 

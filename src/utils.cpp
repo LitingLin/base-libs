@@ -274,6 +274,29 @@ namespace Base
     }
 #endif
 
+    template <typename CharType> inline
+    bool endsWithHelper(const std::basic_string<CharType> &string, const std::basic_string<CharType> &ending)
+    {
+        if (string.length() >= ending.length())
+        {
+            return (0 == string.compare(string.length() - ending.length(), ending.length(), ending));
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool endsWith(const std::string& string, const std::string& ending)
+    {
+        return endsWithHelper<char>(string, ending);
+    }
+
+    bool endsWith(const std::wstring& string, const std::wstring& ending)
+    {
+        return endsWithHelper<wchar_t>(string, ending);
+    }
+
 	uint8_t generateRandomUint8(uint8_t from, uint8_t to)
 	{
 		return uint8_t(generateRandomUint16(from, to));
