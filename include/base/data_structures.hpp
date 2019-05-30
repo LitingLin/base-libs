@@ -17,6 +17,9 @@ namespace Base {
 		Type& back();
 		const Type& front() const;
 		const Type& back() const;
+		Type& operator[](size_t index);
+		const Type& operator[](size_t index) const;
+		void clear();
 		size_t capacity() const;
 	private:
 		void shrink_index();
@@ -96,6 +99,27 @@ namespace Base {
 	{
 		if (_back_index == _front_index) throw std::runtime_error("queue is empty");
 		return _array[(_back_index - 1) % _array.size()];
+	}
+
+	template<typename Type>
+	Type& CircularQueue<Type>::operator[](size_t index)
+	{
+		if (index >= size()) throw std::out_of_range("index out of range");
+		return _array[(_front_index + index) % _array.size()];
+	}
+
+	template<typename Type>
+	const Type& CircularQueue<Type>::operator[](size_t index) const
+	{
+		if (index >= size()) throw std::out_of_range("index out of range");
+		return _array[(_front_index + index) % _array.size()];
+	}
+
+	template<typename Type>
+	void CircularQueue<Type>::clear()
+	{
+		_back_index = 0;
+		_front_index = 0;
 	}
 
 	template <typename Type>

@@ -786,9 +786,12 @@ TEST(CircularQueue, Case2)
 	EXPECT_EQ(queue.size(), 3);
 	EXPECT_EQ(queue.front(), 2);
 	EXPECT_EQ(queue.back(), 6);
+	EXPECT_EQ(queue[1], 5);
 	queue.pop();
 	EXPECT_EQ(queue.front(), 5);
 	EXPECT_EQ(queue.size(), 2);
 	queue.push(33);
 	EXPECT_EQ(queue.back(), 33);
+	EXPECT_EQ(queue[1], 6);
+	EXPECT_EQ(queue[2], 33);
 }
