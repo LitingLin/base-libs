@@ -45,7 +45,6 @@ namespace Base
 		CComPtr<IWICFormatConverter> _WICFormatConverter;
 		CComPtr<IWICStream> _IWICStream;
 		CComPtr<IWICBitmapFrameDecode> _WICBitmapFrameDecoder;
-		GUID _formatType;
 		bool _globalPaletteAvaliableBit;
 		uint32_t _numberOfFrames;
 		uint32_t _indexOfFrame;

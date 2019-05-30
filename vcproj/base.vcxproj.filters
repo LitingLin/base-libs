@@ -135,6 +135,9 @@
     <ClInclude Include="..\include\base\config\ini_parser.h">
       <Filter>Header Files\config</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\base\data_structures.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dump_generator.cpp">

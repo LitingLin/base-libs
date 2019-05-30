@@ -15,6 +15,7 @@
     <ClInclude Include="..\include\base\config\ini.h" />
     <ClInclude Include="..\include\base\config\ini_parser.h" />
     <ClInclude Include="..\include\base\d2d_window.h" />
+    <ClInclude Include="..\include\base\data_structures.hpp" />
     <ClInclude Include="..\include\base\debugoutput_logger_sink.h" />
     <ClInclude Include="..\include\base\dump_generator.h" />
     <ClInclude Include="..\include\base\encryption.h" />
@@ -121,7 +122,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/Zc:throwingNew /Zc:strictStrings /Zc:inline /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;$(ProjectDir)..\3rd_party\libjpeg-turbo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_LIB_PNG;HAVE_LIB_JPEG_TURBO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -135,7 +136,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/Zc:throwingNew /Zc:strictStrings /Zc:inline /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;$(ProjectDir)..\3rd_party\libjpeg-turbo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_LIB_PNG;HAVE_LIB_JPEG_TURBO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>

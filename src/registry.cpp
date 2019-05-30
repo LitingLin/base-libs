@@ -134,6 +134,25 @@ namespace Base
 		}
 	}
 
+	RegistryCurrentSoftware::RegistryCurrentSoftware(const wchar_t* orgName, const wchar_t* productName,
+		const wchar_t* subkey)
+		: Registry(L"")
+	{
+		prefix = L"SOFTWARE\\";
+		if (orgName) {
+			prefix += orgName;
+			prefix += L'\\';
+			if (productName) {
+				prefix += productName;
+				prefix += L'\\';
+				if (subkey) {
+					prefix += subkey;
+					prefix += L'\\';
+				}
+			}
+		}
+	}
+
 	Registry::Registry(const wchar_t* prefix, HKEY rootKey, bool wow64Redirection)
 		: prefix(prefix), rootKey(rootKey), wow64Redirection(wow64Redirection)
 	{

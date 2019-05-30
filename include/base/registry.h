@@ -50,4 +50,9 @@ namespace Base
 	public:
 		RegistryLocalMachineSoftware(const wchar_t *orgName, const wchar_t *productName = nullptr, const wchar_t *subkey = nullptr);
 	};
+	class RegistryCurrentSoftware : public Registry
+	{
+	public:
+		RegistryCurrentSoftware(const wchar_t* orgName, const wchar_t* productName = nullptr, const wchar_t* subkey = nullptr);
+	};
 }
