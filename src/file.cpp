@@ -665,7 +665,7 @@ namespace Base
 			UNREACHABLE_ERROR;
 		}
 		_fileHandle = CreateFile(path.c_str(), desiredAccess_, FILE_SHARE_READ, NULL, creationDisposition_, FILE_ATTRIBUTE_NORMAL, NULL);
-		CHECK_NE(_fileHandle, INVALID_HANDLE_VALUE);
+		CHECK_NE_WIN32API(_fileHandle, INVALID_HANDLE_VALUE);
 	}
 
 	File::File(File&& other) noexcept
@@ -802,7 +802,7 @@ namespace Base
     }
 
     File::~File() {
-        if (_fd!=-1) {
+        if (_fd != -1) {
             LOG_IF_NOT_EQ_STDCAPI(::close(_fd), 0);
         }
     }
