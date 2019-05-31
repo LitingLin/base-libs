@@ -43,16 +43,16 @@ int main(int argc, char* argv[])
 		if (Base::endsWith(fileName, _T(".jpg")))
 		{
 			Base::JPEGDecoder decoder;
-			decoder.initialize(mmap.get(), file.getSize());
+			decoder.load(mmap.get(), file.getSize());
 			decoderImage = cv::Mat(decoder.getHeight(), decoder.getWidth(), CV_8UC3);
-			decoder.decompress(decoderImage.data);
+			decoder.decode(decoderImage.data);
 		}
 		else if(Base::endsWith(fileName, _T(".png")))
 		{
 			Base::PNGDecoder decoder;
-			decoder.initialize(mmap.get(), file.getSize());
+			decoder.load(mmap.get(), file.getSize());
 			decoderImage = cv::Mat(decoder.getHeight(), decoder.getWidth(), CV_8UC3);
-			decoder.decompress(decoderImage.data);
+			decoder.decode(decoderImage.data);
 		}
 		else
 			return -2;
