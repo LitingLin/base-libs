@@ -79,6 +79,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../3rd_party/spdlog/include;$(ProjectDir)../3rd_party/cereal/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_LIB_JPEG_TURBO;HAVE_LIB_PNG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,6 +124,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../3rd_party/spdlog/include;$(ProjectDir)../3rd_party/cereal/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_LIB_JPEG_TURBO;HAVE_LIB_PNG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

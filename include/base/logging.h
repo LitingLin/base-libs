@@ -9,9 +9,6 @@
 #include <sstream>
 #include <string>
 
-#ifdef _WIN32
-#define SPDLOG_WCHAR_FILENAMES
-#endif
 #include <spdlog/spdlog.h>
 
 extern std::shared_ptr<spdlog::logger> logger;

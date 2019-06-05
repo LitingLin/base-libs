@@ -68,7 +68,7 @@ namespace Base
 		_stream << std::endl
 			<< "*** Check failure stack trace: ***" << std::endl
 			<< getStackTrace();
-		if (std::uncaught_exception())
+		if (std::uncaught_exceptions())
 			logger->critical("Fatal error occured during exception handling. Message: {}", _stream.str());
 		else {
 			logger->critical(_stream.str());
@@ -85,7 +85,7 @@ namespace Base
 
 	RuntimeExceptionLogging::~RuntimeExceptionLogging() noexcept(false)
 	{
-		if (std::uncaught_exception())
+		if (std::uncaught_exceptions())
 			logger->error("Runtime exception occured during exception handling. Message: {}", _stream.str());
 		else {
 			logger->warn(_stream.str());
