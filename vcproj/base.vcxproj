@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -11,14 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\base\aligned_span.h" />
     <ClInclude Include="..\include\base\com.h" />
     <ClInclude Include="..\include\base\config\ini.h" />
     <ClInclude Include="..\include\base\config\ini_parser.h" />
+    <ClInclude Include="..\include\base\cpu_info.h" />
+    <ClInclude Include="..\include\base\cpu_info\gcc.h" />
+    <ClInclude Include="..\include\base\cpu_info\msvc.h" />
     <ClInclude Include="..\include\base\d2d_window.h" />
     <ClInclude Include="..\include\base\data_structures.hpp" />
     <ClInclude Include="..\include\base\debugoutput_logger_sink.h" />
     <ClInclude Include="..\include\base\dump_generator.h" />
-    <ClInclude Include="..\include\base\encryption.h" />
+    <ClInclude Include="..\include\base\crypto.h" />
     <ClInclude Include="..\include\base\event.h" />
     <ClInclude Include="..\include\base\exception.h" />
     <ClInclude Include="..\include\base\file.h" />
@@ -35,6 +39,7 @@
     <ClInclude Include="..\include\base\network.h" />
     <ClInclude Include="..\include\base\preprocessor.h" />
     <ClInclude Include="..\include\base\process.h" />
+    <ClInclude Include="..\include\base\random.hpp" />
     <ClInclude Include="..\include\base\registry.h" />
     <ClInclude Include="..\include\base\rw_spin_lock.h" />
     <ClInclude Include="..\include\base\security_attributes.h" />
@@ -48,13 +53,17 @@
     <ClInclude Include="..\include\base\utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\aligned_span.cpp" />
     <ClCompile Include="..\src\com.cpp" />
     <ClCompile Include="..\src\config\ini.c" />
     <ClCompile Include="..\src\config\ini_praser.cpp" />
+    <ClCompile Include="..\src\cpu_info.cpp" />
+    <ClCompile Include="..\src\cpu_info\gcc.cpp" />
+    <ClCompile Include="..\src\cpu_info\msvc.cpp" />
     <ClCompile Include="..\src\d2d_window.cpp" />
     <ClCompile Include="..\src\debugoutput_logger_sink.cpp" />
     <ClCompile Include="..\src\dump_generator.cpp" />
-    <ClCompile Include="..\src\encryption.cpp" />
+    <ClCompile Include="..\src\crypto.cpp" />
     <ClCompile Include="..\src\event.cpp" />
     <ClCompile Include="..\src\exception.cpp" />
     <ClCompile Include="..\src\file.cpp" />

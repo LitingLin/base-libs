@@ -25,11 +25,11 @@
     <Filter Include="Source Files\config">
       <UniqueIdentifier>{fb67a04c-a52e-4384-9d19-d0e3e0b5418a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\3rd_party">
-      <UniqueIdentifier>{c7e0203c-222f-4cd8-a71d-c9331accafc2}</UniqueIdentifier>
+    <Filter Include="Header Files\cpu_info">
+      <UniqueIdentifier>{ca7457fb-9a5f-413c-bfc7-27426c4b9a25}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\3rd_party">
-      <UniqueIdentifier>{d95424a8-2d45-4959-a6bc-5792b79adc52}</UniqueIdentifier>
+    <Filter Include="Source Files\cpu_info">
+      <UniqueIdentifier>{f4124d01-664e-4633-bf60-44465cdc1441}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -117,9 +117,6 @@
     <ClInclude Include="..\include\base\dump_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\base\encryption.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\base\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -138,12 +135,27 @@
     <ClInclude Include="..\include\base\data_structures.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\base\crypto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\random.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\cpu_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\cpu_info\msvc.h">
+      <Filter>Header Files\cpu_info</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\cpu_info\gcc.h">
+      <Filter>Header Files\cpu_info</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\aligned_span.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dump_generator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\encryption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\event.cpp">
@@ -235,6 +247,21 @@
     </ClCompile>
     <ClCompile Include="..\src\config\ini_praser.cpp">
       <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\crypto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu_info\msvc.cpp">
+      <Filter>Source Files\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu_info\gcc.cpp">
+      <Filter>Source Files\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu_info.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\aligned_span.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
