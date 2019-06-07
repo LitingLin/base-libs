@@ -100,7 +100,7 @@ namespace Base
 
         for (int i = 1;i<frames;++i)
         {
-            snprintf(buffer, address_buffer_length, "%llx", stacks.get()[i]);
+            snprintf(buffer, address_buffer_length, "%llx", (long long unsigned int)stacks.get()[i]);
             message += std::to_string(i - 1) + "\t0x" + buffer + '\t' + symbols.get()[i] + '\n';
         }
         return message;
