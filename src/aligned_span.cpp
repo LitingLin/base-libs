@@ -20,6 +20,13 @@ namespace Base
 		CHECK_STDCAPI(_ptr);
 #endif
 	}
+
+	AlignedSpan::AlignedSpan(const AlignedSpan& other)
+		: AlignedSpan(other._size, other._alignment)
+	{
+		memcpy(_ptr, other._ptr, _size);
+	}
+
 	AlignedSpan::~AlignedSpan()
 	{
 #ifdef _WIN32
@@ -32,6 +39,17 @@ namespace Base
 	{
 		return _ptr;
 	}
+
+	size_t AlignedSpan::size()
+	{
+		return _size;
+	}
+
+	unsigned AlignedSpan::alignment()
+	{
+		return _alignment;
+	}
+
 	void AlignedSpan::resize(size_t size, unsigned alignment)
 	{
 		void* ptr;
