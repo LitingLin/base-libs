@@ -72,7 +72,12 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/thread.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/time.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/timer.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp")
+            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp"
+
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info.h"
+            "${CMAKE_CURRENT_LIST_DIR}/src/cpu_info.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info/msvc.h"
+            "${CMAKE_CURRENT_LIST_DIR}/src/cpu_info/msvc.cpp")
 else()
     set(SRC_FILES
             "${CMAKE_CURRENT_LIST_DIR}/include/base/exception.h"
@@ -91,7 +96,12 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/src/lib_jpeg_turbo_decoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/lib_png_decoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/stack_trace.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp")
+            "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp"
+
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info.h"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info/gcc.h"
+            "${CMAKE_CURRENT_LIST_DIR}/src/cpu_info/gcc.cpp"
+            )
 endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(cereal)
