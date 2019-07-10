@@ -15,7 +15,7 @@
 #include <base/process.h>
 #include <base/memory_mapped_io.h>
 #include <base/file.h>
-#include <base/encryption.h>
+#include <base/crypto.h>
 #include <base/timer.h>
 
 #include <base/data_structures.hpp>
@@ -24,18 +24,18 @@ TEST(Utility, wideCharStringToLocalMultiByteString)
 {
 	std::wstring str = L"test_string";
 	EXPECT_EQ(Base::UTF16ToUTF8(str), "test_string");
-	str = L"中文";
-	EXPECT_EQ(Base::UTF16ToUTF8(str), u8"中文");
-	EXPECT_EQ(Base::UTF16ToUTF8(str) + "sd", u8"中文sd");
+	str = L"涓枃";
+	EXPECT_EQ(Base::UTF16ToUTF8(str), u8"涓枃");
+	EXPECT_EQ(Base::UTF16ToUTF8(str) + "sd", u8"涓枃sd");
 }
 
 TEST(Utility, localMultiByteStringToWideCharString)
 {
 	std::string str = "test_string";
 	EXPECT_EQ(Base::UTF8ToUTF16(str), L"test_string");
-	str = u8"中文";
-	EXPECT_EQ(Base::UTF8ToUTF16(str), L"中文");
-	EXPECT_EQ(Base::UTF8ToUTF16(str) + L"sd", L"中文sd");
+	str = u8"涓枃";
+	EXPECT_EQ(Base::UTF8ToUTF16(str), L"涓枃");
+	EXPECT_EQ(Base::UTF8ToUTF16(str) + L"sd", L"涓枃sd");
 }
 
 TEST(Utility, GUIDToString)
@@ -581,15 +581,15 @@ std::vector<unsigned char> stringToVector(const std::string & data)
 
 TEST(Crypto, CreateObject)
 {
-	Base::SHA256 hasher;	
+	Base::Crypto::SHA256 hasher;	
 }
 
 TEST(Crypto, Hashdata)
 {
 	std::string data = "dadsfsdge";
-	Base::SHA256 hasher;
+	Base::Crypto::SHA256 hasher;
 	std::vector<unsigned char> hash = hasher.hash(stringToVector(data));
-	std::string hex = Base::BinaryToHexadecimalString(hash);
+	std::string hex = Base::Crypto::BinaryToHexadecimalString(hash);
 	EXPECT_EQ(hex, "b1d1524775db1ce3b3d45c5d737b7e5cde28c4eb1f9cbcd7439cfec52abf4486");
 }
 
@@ -597,30 +597,30 @@ TEST(Crypto, BinaryToHex)
 {
 	std::string data_string = "dadsfsdge";
 	std::vector<unsigned char> data = stringToVector(data_string);
-	std::string hex = Base::BinaryToHexadecimalString(data);
-	EXPECT_EQ(data, Base::HexadecimalStringToBinary(hex));
+	std::string hex = Base::Crypto::BinaryToHexadecimalString(data);
+	EXPECT_EQ(data, Base::Crypto::HexadecimalStringToBinary(hex));
 }
 
 TEST(Crypto, Base64)
 {
 	std::string data_string = "this is an example";
 	std::vector<unsigned char> data = stringToVector(data_string);
-	std::string base64 = Base::Base64Encode(data);
+	std::string base64 = Base::Crypto::Base64Encode(data);
 	EXPECT_EQ(base64, "dGhpcyBpcyBhbiBleGFtcGxl");
-	EXPECT_EQ(Base::Base64Decode(base64), data);
+	EXPECT_EQ(Base::Crypto::Base64Decode(base64), data);
 }
 
 TEST(Crypto, RNG)
 {
-	Base::RNG rng;
+	Base::Crypto::RNG rng;
 	std::vector<unsigned char> bytes = rng.getBytes(5);
 }
 
 TEST(Crypto, AES128ECB)
 {
 	std::string key = "12345678";
-	Base::SHA256 hasher;
-	Base::AES128ECB encrypter(hasher.hash(stringToVector(key)));
+	Base::Crypto::SHA256 hasher;
+	Base::Crypto::AES128ECB encrypter(hasher.hash(stringToVector(key)));
 	std::string data_string = "5951151261232689";
 	std::vector<unsigned char> data = stringToVector(data_string);
 	std::vector<unsigned char> encryptedData = encrypter.encrypt(data);
@@ -630,8 +630,8 @@ TEST(Crypto, AES128ECB)
 TEST(Crypto, AES128ECBZeroCopy)
 {
 	std::string key = "12345678";
-	Base::SHA256 hasher;
-	Base::AES128ECB encrypter(hasher.hash(stringToVector(key)));
+	Base::Crypto::SHA256 hasher;
+	Base::Crypto::AES128ECB encrypter(hasher.hash(stringToVector(key)));
 	std::string data = "5951151261232689";
 	unsigned char buf[16];
 	unsigned char result[16];
@@ -647,10 +647,10 @@ TEST(Crypto, DecryptCustomProtocol)
 	uint64_t file_size = *(const uint64_t*)mmap.get();
 	EXPECT_EQ(file_size, 8);
 	std::string key = "12345678";
-	Base::SHA256 hasher;
+	Base::Crypto::SHA256 hasher;
 	const char salt[] = "{565f6653-d443-42a7-a9e6-e84a159b1728}";
 
-	Base::AES128ECB encrypter(hasher.hash(stringToVector(key + salt)));
+	Base::Crypto::AES128ECB encrypter(hasher.hash(stringToVector(key + salt)));
 	unsigned char buf[16];
 	encrypter.decrypt((unsigned char*)mmap.get() + 8, buf, 16);
 
