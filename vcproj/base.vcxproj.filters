@@ -150,7 +150,7 @@
     <ClInclude Include="..\include\base\cpu_info\gcc.h">
       <Filter>Header Files\cpu_info</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\base\aligned_span.h">
+    <ClInclude Include="..\include\base\memory_alignment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -260,7 +260,7 @@
     <ClCompile Include="..\src\cpu_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\aligned_span.cpp">
+    <ClCompile Include="..\src\memory_alignment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

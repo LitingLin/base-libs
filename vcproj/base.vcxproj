@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\base\aligned_span.h" />
     <ClInclude Include="..\include\base\com.h" />
     <ClInclude Include="..\include\base\config\ini.h" />
     <ClInclude Include="..\include\base\config\ini_parser.h" />
@@ -31,6 +30,7 @@
     <ClInclude Include="..\include\base\lock_guard.h" />
     <ClInclude Include="..\include\base\logging.h" />
     <ClInclude Include="..\include\base\logging\win32.h" />
+    <ClInclude Include="..\include\base\memory_alignment.h" />
     <ClInclude Include="..\include\base\memory_mapped_io.h" />
     <ClInclude Include="..\include\base\message_box.h" />
     <ClInclude Include="..\include\base\message_notifier.h" />
@@ -53,7 +53,6 @@
     <ClInclude Include="..\include\base\utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\aligned_span.cpp" />
     <ClCompile Include="..\src\com.cpp" />
     <ClCompile Include="..\src\config\ini.c" />
     <ClCompile Include="..\src\config\ini_praser.cpp" />
@@ -74,6 +73,7 @@
     <ClCompile Include="..\src\lock_guard.cpp" />
     <ClCompile Include="..\src\logging.cpp" />
     <ClCompile Include="..\src\logging\win32.cpp" />
+    <ClCompile Include="..\src\memory_alignment.cpp" />
     <ClCompile Include="..\src\memory_mapped_io.cpp" />
     <ClCompile Include="..\src\message_box.cpp" />
     <ClCompile Include="..\src\mutex.cpp" />
