@@ -1,1 +1,1 @@
-SET(SPDLOG_INCLUDE_DIRS 3rd_party/spdlog/include)
+SET(SPDLOG_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/spdlog/include/)

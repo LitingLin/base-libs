@@ -40,6 +40,9 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/include/base/logging/win32.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/config/ini.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/config/ini_parser.h"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/data_structures.hpp"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/random.hpp"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/memory_alignment.h"
 
             "${CMAKE_CURRENT_LIST_DIR}/src/config/ini.c"
             "${CMAKE_CURRENT_LIST_DIR}/src/config/ini_parser.cpp"
@@ -73,6 +76,7 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/time.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/timer.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/memory_alignment.cpp"
 
             "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info.h"
             "${CMAKE_CURRENT_LIST_DIR}/src/cpu_info.cpp"
@@ -80,6 +84,9 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/cpu_info/msvc.cpp")
 else()
     set(SRC_FILES
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/data_structures.hpp"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/random.hpp"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/memory_alignment.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/exception.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/file.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/image_decoder.h"
@@ -97,11 +104,11 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/src/lib_png_decoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/stack_trace.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/memory_alignment.cpp"
 
             "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info/gcc.h"
-            "${CMAKE_CURRENT_LIST_DIR}/src/cpu_info/gcc.cpp"
-            )
+            "${CMAKE_CURRENT_LIST_DIR}/src/cpu_info/gcc.cpp")
 endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(cereal)
@@ -120,24 +127,27 @@ add_library(base STATIC ${SRC_FILES})
 
 find_package(TurboJPEG)
 if(TURBOJPEG_FOUND)
-    target_compile_definitions(base PUBLIC HAVE_LIB_JPEG_TURBO)
-    target_include_directories(base PUBLIC ${TURBOJPEG_INCLUDE_DIR})
-    target_link_libraries(base ${TURBOJPEG_LIBRARY})
+    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG_TURBO)
+    list(APPEND BASE_INCLUDE_DIRS ${TURBOJPEG_INCLUDE_DIR})
+    list(APPEND BASE_LINK_LIBRARIES ${TURBOJPEG_LIBRARY})
 else()
     message(STATUS "Disabled TurboJPEG decoder")
 endif()
 
 find_package(PNG)
 if(PNG_FOUND)
-    target_compile_definitions(base PUBLIC HAVE_LIB_PNG)
-    target_include_directories(base PUBLIC ${PNG_INCLUDE_DIRS})
-    target_link_libraries(base ${PNG_LIBRARIES})
+    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_PNG)
+    list(APPEND BASE_INCLUDE_DIRS ${PNG_INCLUDE_DIRS})
+    list(APPEND BASE_LINK_LIBRARIES ${PNG_LIBRARIES})
 else()
     message(STATUS "Disabled TurboJPEG decoder")
 endif()
 
-target_include_directories(base PUBLIC "include")
-target_include_directories(base PUBLIC ${CEREAL_INCLUDE_DIRS} ${SPDLOG_INCLUDE_DIRS})
+list(APPEND BASE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/include ${CEREAL_INCLUDE_DIRS} ${SPDLOG_INCLUDE_DIRS})
+
+target_compile_definitions(base PUBLIC ${BASE_COMPILE_DEFINITIONS})
+target_include_directories(base PUBLIC ${BASE_INCLUDE_DIRS})
+target_link_libraries(base ${BASE_LINK_LIBRARIES})
 
 install(TARGETS base
         ARCHIVE DESTINATION "lib")
@@ -152,7 +162,7 @@ if(NOT SPDLOG_FOUND)
     install(DIRECTORY ${SPDLOG_INCLUDE_DIRS} DESTINATION .)
 endif()
 
-option(BUILD_TEST "Build the tests" OFF)
+option(BUILD_TEST "Build the tests" ON)
 if(BUILD_TEST)
     enable_testing()
     add_subdirectory(test)
