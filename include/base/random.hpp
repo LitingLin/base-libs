@@ -16,7 +16,7 @@ namespace Base
 				std::is_same_v<Type, long long> || std::is_same_v<Type, unsigned short> || std::is_same_v<Type, unsigned int> || std::is_same_v<Type, unsigned long> ||
 				std::is_same_v<Type, unsigned long long>> = 0)
 		{
-			const std::uniform_real_distribution<Type> distribution(min, max);
+			const std::uniform_int_distribution<Type> distribution(min, max);
 			return distribution(_engine);
 		}
 
@@ -26,7 +26,7 @@ namespace Base
 				std::enable_if_t<std::numeric_limits<Type>::is_integer && std::is_signed_v<Type> &&
 				!(std::is_same_v<Type, short> || std::is_same_v<Type, int> || std::is_same_v<Type, long> || std::is_same_v<Type, long long>)> = 0)
 		{
-			const std::uniform_real_distribution<int> distribution(min, max);
+			const std::uniform_int_distribution<int> distribution(min, max);
 			return Type(distribution(_engine));
 		}
 
@@ -37,7 +37,7 @@ namespace Base
 				!(std::is_same_v<Type, unsigned short> || std::is_same_v<Type, unsigned int> || std::is_same_v<Type, unsigned long> ||
 					std::is_same_v<Type, unsigned long long>)> = 0)
 		{
-			const std::uniform_real_distribution<unsigned> distribution(min, max);
+			const std::uniform_int_distribution<unsigned> distribution(min, max);
 			return Type(distribution(_engine));
 		}
 		// [a, b)
