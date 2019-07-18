@@ -9,6 +9,7 @@ namespace Base
 	class RNG
 	{
 	public:
+		RNG() : _engine(std::random_device()()) {}
 		// [a, b]
 		template <typename Type,
 			std::enable_if_t<std::is_same_v<Type, short> || std::is_same_v<Type, int> || std::is_same_v<Type, long> ||
