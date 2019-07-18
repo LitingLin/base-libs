@@ -797,7 +797,10 @@ namespace Base
                 UNREACHABLE_ERROR;
         }
 
-	    _fd = ::open(path.c_str(), flag);
+		if (flag & O_CREAT || flag & O_TMPFILE)
+			_fd = ::open(path.c_str(), flag, 0666);
+		else
+			_fd = ::open(path.c_str(), flag);
 	    CHECK_NE_STDCAPI(_fd, -1) << " open() failed with path: " << path << ", flag: " << flag;
     }
 
