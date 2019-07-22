@@ -11,4 +11,6 @@ TEST(RANDOM, A)
     Base::RNG rng;
     std::cout << rng.get<double>() << std::endl;
     std::cout << rng.get<int>() << std::endl;
+    std::cout << rng.get<bool>() << std::endl;
+    std::cout << rng.get<char>() << std::endl;
 }

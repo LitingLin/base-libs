@@ -123,7 +123,6 @@ if(NOT SPDLOG_FOUND)
     include(3rd_party/spdlog.cmake)
 endif()
 
-add_library(base STATIC ${SRC_FILES})
 
 find_package(TurboJPEG)
 if(TURBOJPEG_FOUND)
@@ -145,6 +144,15 @@ endif()
 
 list(APPEND BASE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/include ${CEREAL_INCLUDE_DIRS} ${SPDLOG_INCLUDE_DIRS})
 
+option(BUILD_SHARED_LIBS "Build as shared library" ON)
+if(BUILD_SHARED_LIBS)
+    set(BUILDING_TYPE SHARED)
+else()
+    set(BUILDING_TYPE STATIC)
+endif()
+
+add_library(base ${BUILDING_TYPE} ${SRC_FILES})
+
 target_compile_definitions(base PUBLIC ${BASE_COMPILE_DEFINITIONS})
 target_include_directories(base PUBLIC ${BASE_INCLUDE_DIRS})
 target_link_libraries(base ${BASE_LINK_LIBRARIES})
@@ -155,11 +163,11 @@ install(TARGETS base
 install(DIRECTORY include/ DESTINATION include)
 
 if(NOT CEREAL_FOUND)
-    install(DIRECTORY ${CEREAL_INCLUDE_DIRS} DESTINATION .)
+    install(DIRECTORY ${CEREAL_INCLUDE_DIRS} DESTINATION include)
 endif()
 
 if(NOT SPDLOG_FOUND)
-    install(DIRECTORY ${SPDLOG_INCLUDE_DIRS} DESTINATION .)
+    install(DIRECTORY ${SPDLOG_INCLUDE_DIRS} DESTINATION include)
 endif()
 
 option(BUILD_TEST "Build the tests" ON)
