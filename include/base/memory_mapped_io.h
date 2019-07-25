@@ -33,6 +33,7 @@ namespace Base
 		void setPosition(uint64_t position);
 		uint64_t getPosition();
 		void* getFilePointer();
+		File* getFile();
 	private:
 		File* _file;
 		std::unique_ptr<MemoryMappedIO> _memoryMappedIO;

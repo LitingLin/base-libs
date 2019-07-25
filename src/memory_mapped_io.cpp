@@ -157,6 +157,11 @@ namespace Base
 
 	void* BufferedFileOperator::getFilePointer()
 	{
-		return _memoryMappedIO->get();
+		return (char*)_memoryMappedIO->get() + _position;
+	}
+
+	File* BufferedFileOperator::getFile()
+	{
+		return _file;
 	}
 }
