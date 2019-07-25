@@ -43,7 +43,7 @@ namespace Base {
 
 	class File
 	{
-	public:		
+	public:
 		enum class DesiredAccess
 		{
 			Read,
@@ -76,8 +76,10 @@ namespace Base {
 		uint64_t getSize() const;
 		uint64_t read(void* buffer, uint64_t size) const;
 		uint64_t write(const void* buffer, uint64_t size);
-		void seek(uint64_t offset);
+		void setPosition(uint64_t offset);
+		uint64_t getPosition() const;
 		uint64_t getLastWriteTime() const;
+		void setSize(uint64_t size);
 #ifdef _WIN32
 		HANDLE getHANDLE();
 #else

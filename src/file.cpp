@@ -737,19 +737,33 @@ namespace Base
 		return totalWriteFileSize;
 	}
 
-	void File::seek(uint64_t offset)
+	void File::setPosition(uint64_t offset)
 	{
 		LARGE_INTEGER large_integer;
 		large_integer.QuadPart = offset;
 		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
 	}
-	
+
+	uint64_t File::getPosition() const
+	{
+		LARGE_INTEGER zero = { 0 };
+		LARGE_INTEGER position;
+		CHECK_WIN32API(SetFilePointerEx(_fileHandle, zero, &position, FILE_CURRENT));
+		return (uint64_t)position.QuadPart;
+	}
+
 	uint64_t File::getLastWriteTime() const
 	{
 		FILETIME lastWriteTime;
 		CHECK_WIN32API(GetFileTime(_fileHandle, nullptr, nullptr, &lastWriteTime));
 		static_assert(sizeof(uint64_t) == sizeof(FILETIME), "");
 		return *((uint64_t*)(&lastWriteTime));
+	}
+
+	void File::setSize(uint64_t size)
+	{
+		setPosition(size);
+		CHECK_WIN32API(SetEndOfFile(_fileHandle));
 	}
 
 	HANDLE File::getHANDLE()
@@ -833,11 +847,18 @@ namespace Base
         CHECK_NE_STDCAPI(bytesWritten, -1);
     }
 
-    void File::seek(uint64_t offset) {
+    void File::setPosition(uint64_t offset) {
         off64_t new_off = ::lseek64(_fd, offset, SEEK_SET);
         CHECK_NE_STDCAPI(new_off, -1);
         CHECK_EQ_STDCAPI(new_off, offset);
     }
+
+	uint64_t File::getPosition()
+	{
+		off64_t off = ::lseek64(_fd, 0, SEEK_CUR);
+		CHECK_NE_STDCAPI(new_off, -1);
+		return off;
+	}
 
     uint64_t File::getLastWriteTime() const {
         struct stat64 stat_;
@@ -848,6 +869,11 @@ namespace Base
     int File::getFileDescriptor() {
         return _fd;
     }
+
+	void File::setSize(uint64_t size)
+	{
+		CHECK_NE_STDCAPI(ftruncate64(_fd, size), -1);
+	}
 
 #endif
 

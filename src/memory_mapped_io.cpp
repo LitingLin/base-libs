@@ -96,4 +96,67 @@ namespace Base
 	{
 		return _ptr;
 	}
+
+	BufferedFileOperator::BufferedFileOperator(File* file, File::DesiredAccess desiredAccess, uint64_t position, uint64_t expandingSize)
+		: _file(file), _memoryMappedIO(new MemoryMappedIO(_file, desiredAccess)), _desiredAccess(desiredAccess), _position(position), _expandingSize(expandingSize), _actualFileSize(_file->getSize())
+	{		
+	}
+	BufferedFileOperator::~BufferedFileOperator()
+	{
+		_memoryMappedIO.reset();
+		_file->setSize(_actualFileSize);
+	}
+	void BufferedFileOperator::read(void* buffer, uint64_t size)
+	{
+		char* ptr = (char*)(_memoryMappedIO)->get();
+		memcpy(buffer, ptr + _position, size);
+		_position += size;
+	}
+
+	void BufferedFileOperator::write(const void* buffer, uint64_t size)
+	{
+		auto fileSize = _file->getSize();
+		uint64_t newFileSize = 0;
+		if (fileSize < _position + size) {
+			newFileSize = _position + size;
+			if (newFileSize - fileSize < _expandingSize)
+				newFileSize = fileSize + _expandingSize;
+		}
+		if (newFileSize)
+		{
+			_memoryMappedIO.reset();
+			try {
+				_file->setSize(newFileSize);
+			}
+			catch (...)
+			{
+				_memoryMappedIO.reset(new MemoryMappedIO(_file, _desiredAccess));
+				throw;
+			}
+			_memoryMappedIO.reset(new MemoryMappedIO(_file, _desiredAccess));
+		}
+		
+		char* ptr = (char*)_memoryMappedIO->get();
+		memcpy(ptr + _position, buffer, size);
+				
+		_position += size;
+
+		if (_position > _actualFileSize)
+			_actualFileSize = _position;
+	}
+
+	void BufferedFileOperator::setPosition(uint64_t position)
+	{
+		_position = position;
+	}
+
+	uint64_t BufferedFileOperator::getPosition()
+	{
+		return _position;
+	}
+
+	void* BufferedFileOperator::getFilePointer()
+	{
+		return _memoryMappedIO->get();
+	}
 }
