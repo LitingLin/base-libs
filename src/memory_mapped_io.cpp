@@ -164,4 +164,14 @@ namespace Base
 	{
 		return _file;
 	}
+	
+	uint64_t BufferedFileOperator::getSize()
+	{
+		return _actualFileSize;
+	}
+
+	MemoryMappedIO* BufferedFileOperator::getMemoryMappedIO()
+	{
+		return _memoryMappedIO.get();
+	}
 }

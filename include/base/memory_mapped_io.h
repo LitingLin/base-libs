@@ -34,6 +34,8 @@ namespace Base
 		uint64_t getPosition();
 		void* getFilePointer();
 		File* getFile();
+		uint64_t getSize();
+		MemoryMappedIO* getMemoryMappedIO();
 	private:
 		File* _file;
 		std::unique_ptr<MemoryMappedIO> _memoryMappedIO;
