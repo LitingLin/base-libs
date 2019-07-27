@@ -13,6 +13,7 @@ namespace Base
 		MemoryMappedIO(const MemoryMappedIO&) = delete;
 		~MemoryMappedIO();
 		void *get();
+		const void* get() const;
 	private:
 	    File *_file;
 #ifdef _WIN32
@@ -33,9 +34,11 @@ namespace Base
 		void setPosition(uint64_t position);
 		uint64_t getPosition();
 		void* getFilePointer();
+		const void* getFilePointer() const;
 		File* getFile();
 		uint64_t getSize();
 		MemoryMappedIO* getMemoryMappedIO();
+		const MemoryMappedIO* getMemoryMappedIO() const;
 	private:
 		File* _file;
 		std::unique_ptr<MemoryMappedIO> _memoryMappedIO;

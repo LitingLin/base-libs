@@ -97,6 +97,11 @@ namespace Base
 		return _ptr;
 	}
 
+	const void* MemoryMappedIO::get() const
+	{
+		return _ptr;
+	}
+
 	BufferedFileOperator::BufferedFileOperator(File* file, File::DesiredAccess desiredAccess, uint64_t position, uint64_t expandingSize)
 		: _file(file), _memoryMappedIO(new MemoryMappedIO(_file, desiredAccess)), _desiredAccess(desiredAccess), _position(position), _expandingSize(expandingSize), _actualFileSize(_file->getSize())
 	{		
@@ -160,6 +165,11 @@ namespace Base
 		return (char*)_memoryMappedIO->get() + _position;
 	}
 
+	const void* BufferedFileOperator::getFilePointer() const
+	{
+		return (char*)_memoryMappedIO->get() + _position;
+	}
+
 	File* BufferedFileOperator::getFile()
 	{
 		return _file;
@@ -171,6 +181,11 @@ namespace Base
 	}
 
 	MemoryMappedIO* BufferedFileOperator::getMemoryMappedIO()
+	{
+		return _memoryMappedIO.get();
+	}
+
+	const MemoryMappedIO* BufferedFileOperator::getMemoryMappedIO() const
 	{
 		return _memoryMappedIO.get();
 	}
