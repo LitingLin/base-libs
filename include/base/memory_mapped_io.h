@@ -32,11 +32,11 @@ namespace Base
 		void read(void* buffer, uint64_t size);
 		void write(const void* buffer, uint64_t size);
 		void setPosition(uint64_t position);
-		uint64_t getPosition();
+		uint64_t getPosition() const;
 		void* getFilePointer();
 		const void* getFilePointer() const;
-		File* getFile();
-		uint64_t getSize();
+		File* getFile() const;
+		uint64_t getSize() const;
 		MemoryMappedIO* getMemoryMappedIO();
 		const MemoryMappedIO* getMemoryMappedIO() const;
 	private:

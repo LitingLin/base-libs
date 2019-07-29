@@ -155,7 +155,7 @@ namespace Base
 		_position = position;
 	}
 
-	uint64_t BufferedFileOperator::getPosition()
+	uint64_t BufferedFileOperator::getPosition() const
 	{
 		return _position;
 	}
@@ -170,12 +170,12 @@ namespace Base
 		return (char*)_memoryMappedIO->get() + _position;
 	}
 
-	File* BufferedFileOperator::getFile()
+	File* BufferedFileOperator::getFile() const
 	{
 		return _file;
 	}
 	
-	uint64_t BufferedFileOperator::getSize()
+	uint64_t BufferedFileOperator::getSize() const
 	{
 		return _actualFileSize;
 	}
