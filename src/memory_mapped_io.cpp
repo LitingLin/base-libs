@@ -103,13 +103,24 @@ namespace Base
 	}
 
 	BufferedFileOperator::BufferedFileOperator(File* file, File::DesiredAccess desiredAccess, uint64_t position, uint64_t expandingSize)
-		: _file(file), _memoryMappedIO(new MemoryMappedIO(_file, desiredAccess)), _desiredAccess(desiredAccess), _position(position), _expandingSize(expandingSize), _actualFileSize(_file->getSize())
-	{		
+		: _file(file), _desiredAccess(desiredAccess), _position(position), _expandingSize(expandingSize), _actualFileSize(_file->getSize())
+	{
+		if (desiredAccess == File::DesiredAccess::ReadAndWrite || desiredAccess == File::DesiredAccess::Write)
+			if (_actualFileSize == 0)
+			{
+				if (_expandingSize)
+					_file->setSize(_expandingSize);
+				else
+					_file->setSize(1);
+			}
+		_memoryMappedIO.reset(new MemoryMappedIO(_file, desiredAccess));
 	}
 	BufferedFileOperator::~BufferedFileOperator()
 	{
-		_memoryMappedIO.reset();
-		_file->setSize(_actualFileSize);
+		if (_file->getSize() != _actualFileSize) {
+			_memoryMappedIO.reset();
+			_file->setSize(_actualFileSize);
+		}
 	}
 	void BufferedFileOperator::read(void* buffer, uint64_t size)
 	{

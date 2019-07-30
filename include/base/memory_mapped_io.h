@@ -27,7 +27,7 @@ namespace Base
 	class BufferedFileOperator
 	{
 	public:
-		explicit BufferedFileOperator(File* file, File::DesiredAccess desiredAccess = File::DesiredAccess::Read, uint64_t position = 0, uint64_t expandingSize = 4 * 1024);
+		explicit BufferedFileOperator(File* file, File::DesiredAccess desiredAccess = File::DesiredAccess::Read, uint64_t position = 0, uint64_t expandingSize = 4 * 1024 * 1024);
 		~BufferedFileOperator();
 		void read(void* buffer, uint64_t size);
 		void write(const void* buffer, uint64_t size);
