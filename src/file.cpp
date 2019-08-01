@@ -853,10 +853,10 @@ namespace Base
         CHECK_EQ_STDCAPI(new_off, offset);
     }
 
-	uint64_t File::getPosition()
+	uint64_t File::getPosition() const
 	{
 		off64_t off = ::lseek64(_fd, 0, SEEK_CUR);
-		CHECK_NE_STDCAPI(new_off, -1);
+		CHECK_NE_STDCAPI(off, -1);
 		return off;
 	}
 
