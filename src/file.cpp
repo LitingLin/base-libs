@@ -737,11 +737,26 @@ namespace Base
 		return totalWriteFileSize;
 	}
 
-	void File::setPosition(uint64_t offset)
+	void File::setPosition(uint64_t offset, MoveMethod moveMethod) const
 	{
+		DWORD dwMoveMethod;
+		switch (moveMethod)
+		{
+		case MoveMethod::Begin:
+			dwMoveMethod = FILE_BEGIN;
+			break;
+		case MoveMethod::Current:
+			dwMoveMethod = FILE_CURRENT;
+			break;
+		case MoveMethod::End:
+			dwMoveMethod = FILE_END;
+			break;
+		default:
+			UNREACHABLE_ERROR;
+		}
 		LARGE_INTEGER large_integer;
 		large_integer.QuadPart = offset;
-		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, FILE_BEGIN));
+		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, dwMoveMethod));
 	}
 
 	uint64_t File::getPosition() const
@@ -847,8 +862,26 @@ namespace Base
         CHECK_NE_STDCAPI(bytesWritten, -1);
     }
 
-    void File::setPosition(uint64_t offset) {
-        off64_t new_off = ::lseek64(_fd, offset, SEEK_SET);
+    void File::setPosition(uint64_t offset, MoveMethod moveMethod) {
+		int whence;
+		switch (moveMethod)
+		{
+		case MoveMethod::Begin:
+			dwMoveMethod = FILE_BEGIN;
+			whence = SEEK_SET;
+			break;
+		case MoveMethod::Current:
+			dwMoveMethod = FILE_CURRENT;
+			whence = SEEK_CUR;
+			break;
+		case MoveMethod::End:
+			dwMoveMethod = FILE_END;
+			whence = SEEK_END;
+			break;
+		default:
+			UNREACHABLE_ERROR;
+		}
+        off64_t new_off = ::lseek64(_fd, offset, whence);
         CHECK_NE_STDCAPI(new_off, -1);
         CHECK_EQ_STDCAPI(new_off, offset);
     }

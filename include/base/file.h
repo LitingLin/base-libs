@@ -68,6 +68,13 @@ namespace Base {
 			TruncateExisting
 		};
 
+		enum class MoveMethod
+		{
+			Begin,
+			Current,
+			End
+		};
+
 		File(const PLATFORM_STRING_TYPE &path, DesiredAccess desiredAccess = DesiredAccess::Read,
 				CreationDisposition creationDisposition = CreationDisposition::OpenExisting);
 		File(const File &) = delete;
@@ -76,7 +83,7 @@ namespace Base {
 		uint64_t getSize() const;
 		uint64_t read(void* buffer, uint64_t size) const;
 		uint64_t write(const void* buffer, uint64_t size);
-		void setPosition(uint64_t offset);
+		void setPosition(uint64_t offset, MoveMethod moveMethod = MoveMethod::Begin) const;
 		uint64_t getPosition() const;
 		uint64_t getLastWriteTime() const;
 		void setSize(uint64_t size);

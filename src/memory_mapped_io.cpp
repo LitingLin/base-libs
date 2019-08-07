@@ -115,6 +115,7 @@ namespace Base
 			}
 		_memoryMappedIO.reset(new MemoryMappedIO(_file, desiredAccess));
 	}
+
 	BufferedFileOperator::~BufferedFileOperator()
 	{
 		if (_file->getSize() != _actualFileSize) {
@@ -122,7 +123,8 @@ namespace Base
 			_file->setSize(_actualFileSize);
 		}
 	}
-	void BufferedFileOperator::read(void* buffer, uint64_t size)
+
+	void BufferedFileOperator::read(void* buffer, uint64_t size) const
 	{
 		char* ptr = (char*)(_memoryMappedIO)->get();
 		memcpy(buffer, ptr + _position, size);
@@ -161,9 +163,22 @@ namespace Base
 			_actualFileSize = _position;
 	}
 
-	void BufferedFileOperator::setPosition(uint64_t position)
+	void BufferedFileOperator::setPosition(uint64_t position, File::MoveMethod moveMethod) const
 	{
-		_position = position;
+		switch (moveMethod)
+		{
+		case File::MoveMethod::Begin:
+			_position = position;
+			break;
+		case File::MoveMethod::Current:
+			_position += position;
+			break;
+		case File::MoveMethod::End:
+			_position = _actualFileSize;
+			break;
+		default:
+			UNREACHABLE_ERROR;
+		}
 	}
 
 	uint64_t BufferedFileOperator::getPosition() const
@@ -199,5 +214,24 @@ namespace Base
 	const MemoryMappedIO* BufferedFileOperator::getMemoryMappedIO() const
 	{
 		return _memoryMappedIO.get();
+	}
+
+	void BufferedFileOperator::setSize(uint64_t size)
+	{
+		_memoryMappedIO.reset();
+		try
+		{
+			_file->setSize(size);
+		}
+		catch (...)
+		{
+			_memoryMappedIO.reset(new MemoryMappedIO(_file));
+			throw;
+		}
+
+		_memoryMappedIO.reset(new MemoryMappedIO(_file));
+		_actualFileSize = size;
+		if (_position > _actualFileSize)
+			_position = _actualFileSize;
 	}
 }

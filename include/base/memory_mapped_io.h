@@ -30,9 +30,9 @@ namespace Base
 	public:
 		explicit BufferedFileOperator(File* file, File::DesiredAccess desiredAccess = File::DesiredAccess::Read, uint64_t position = 0, uint64_t expandingSize = 4 * 1024 * 1024);
 		~BufferedFileOperator();
-		void read(void* buffer, uint64_t size);
+		void read(void* buffer, uint64_t size) const;
 		void write(const void* buffer, uint64_t size);
-		void setPosition(uint64_t position);
+		void setPosition(uint64_t position, File::MoveMethod moveMethod = File::MoveMethod::Begin) const;
 		uint64_t getPosition() const;
 		void* getFilePointer();
 		const void* getFilePointer() const;
@@ -40,11 +40,12 @@ namespace Base
 		uint64_t getSize() const;
 		MemoryMappedIO* getMemoryMappedIO();
 		const MemoryMappedIO* getMemoryMappedIO() const;
+		void setSize(uint64_t size);
 	private:
 		File* _file;
 		std::unique_ptr<MemoryMappedIO> _memoryMappedIO;
 		File::DesiredAccess _desiredAccess;
-		uint64_t _position;
+		mutable uint64_t _position;
 		uint64_t _expandingSize;
 
 		uint64_t _actualFileSize;
