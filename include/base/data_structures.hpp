@@ -138,5 +138,122 @@ namespace Base {
 		}
 	}
 
+	template <typename Type>
+	class FixedVector
+	{
+	public:
+		typedef const Type* const_iterator;
+		typedef Type* iterator;
+		FixedVector(size_t reserved);
+		~FixedVector();
+		template <class... Args>
+		void emplace_back(Args... args);
+		template <class... Args>
+		void replace(size_t index, Args... args);
+		void erase_back();
+		Type& operator[](size_t index);
+		const Type& operator[](size_t index) const;
+		size_t size() const;
+		const_iterator begin() const;
+		iterator begin();
+		const_iterator end() const;
+		iterator end();
+	private:
+		size_t _reserved;
+		size_t _size;
+		Type* _ptr;
+	};
 
+	template <typename Type>
+	FixedVector<Type>::FixedVector(size_t reserved)
+		: _reserved(reserved), _size(0), _ptr((Type*)malloc(sizeof(Type) * reserved))
+	{
+		if (!_ptr)
+			throw std::bad_alloc();
+	}
+
+	template <typename Type>
+	FixedVector<Type>::~FixedVector()
+	{
+		for (size_t i = _size; i > 0; --i)
+		{
+			_ptr[i - 1].~Type();
+		}
+		free(_ptr);
+	}
+
+	template <typename Type>
+	template <class ... Args>
+	void FixedVector<Type>::emplace_back(Args... args)
+	{
+		if (_size >= _reserved)
+			throw std::out_of_range("can not exceed reserved size");
+		new (&_ptr[_size]) Type(args...);
+		++_size;
+	}
+
+	template <typename Type>
+	template <class ... Args>
+	void FixedVector<Type>::replace(size_t index, Args... args)
+	{
+		if (index >= _size)
+			throw std::out_of_range("");
+		_ptr[index].~Type();
+		new (&_ptr[index]) Type(args...);
+	}
+
+	template <typename Type>
+	void FixedVector<Type>::erase_back()
+	{
+		if (_size == 0)
+			throw std::out_of_range("");
+		_ptr[_size - 1].~Type();
+		--_size;
+	}
+
+	template <typename Type>
+	Type& FixedVector<Type>::operator[](size_t index)
+	{
+		if (index >= _size)
+			throw std::out_of_range("");
+		return _ptr[index];
+	}
+
+	template <typename Type>
+	const Type& FixedVector<Type>::operator[](size_t index) const
+	{
+		if (index >= _size)
+			throw std::out_of_range("");
+		return _ptr[index];
+	}
+
+	template <typename Type>
+	size_t FixedVector<Type>::size() const
+	{
+		return _size;
+	}
+
+	template <typename Type>
+	typename FixedVector<Type>::const_iterator FixedVector<Type>::begin() const
+	{
+		return _ptr;
+	}
+
+	template <typename Type>
+	typename FixedVector<Type>::iterator FixedVector<Type>::begin()
+	{
+		return _ptr;
+	}
+
+	template <typename Type>
+	typename FixedVector<Type>::const_iterator FixedVector<Type>::end() const
+	{
+		return _ptr + _size;
+	}
+
+	template <typename Type>
+	typename FixedVector<Type>::iterator FixedVector<Type>::end()
+	{
+		return _ptr + _size;
+	}
 }
