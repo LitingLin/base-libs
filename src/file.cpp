@@ -862,20 +862,17 @@ namespace Base
         CHECK_NE_STDCAPI(bytesWritten, -1);
     }
 
-    void File::setPosition(uint64_t offset, MoveMethod moveMethod) {
+    void File::setPosition(uint64_t offset, MoveMethod moveMethod) const {
 		int whence;
 		switch (moveMethod)
 		{
 		case MoveMethod::Begin:
-			dwMoveMethod = FILE_BEGIN;
 			whence = SEEK_SET;
 			break;
 		case MoveMethod::Current:
-			dwMoveMethod = FILE_CURRENT;
 			whence = SEEK_CUR;
 			break;
 		case MoveMethod::End:
-			dwMoveMethod = FILE_END;
 			whence = SEEK_END;
 			break;
 		default:
