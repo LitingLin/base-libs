@@ -225,11 +225,11 @@ namespace Base
 		}
 		catch (...)
 		{
-			_memoryMappedIO.reset(new MemoryMappedIO(_file));
+			_memoryMappedIO.reset(new MemoryMappedIO(_file, _desiredAccess));
 			throw;
 		}
 
-		_memoryMappedIO.reset(new MemoryMappedIO(_file));
+		_memoryMappedIO.reset(new MemoryMappedIO(_file, _desiredAccess));
 		_actualFileSize = size;
 		if (_position > _actualFileSize)
 			_position = _actualFileSize;
