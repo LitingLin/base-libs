@@ -81,10 +81,12 @@ namespace Base
             default:
                 UNREACHABLE_ERROR;
         }
-        if (size == 0)
-            size = _file->getSize() - offset;
+		if (size == 0) {
+			size = _file->getSize() - offset;
+			CHECK(size);
+		}
         _ptr = mmap(nullptr, size, prot, MAP_SHARED, _file->getFileDescriptor(), offset);
-        CHECK_NE_STDCAPI(_ptr, MAP_FAILED) << "size: " << size << ", prot: " << prot << ", fd: " << _file->getFileDescriptor() << ", offset" << offset;
+        CHECK_NE_STDCAPI(_ptr, MAP_FAILED) << ". Details: ( size: " << size << ", prot: " << prot << ", fd: " << _file->getFileDescriptor() << ", offset: " << offset << ")";
         _size = size;
     }
 
