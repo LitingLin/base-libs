@@ -84,7 +84,7 @@ namespace Base
         if (size == 0)
             size = _file->getSize() - offset;
         _ptr = mmap(nullptr, size, prot, MAP_SHARED, _file->getFileDescriptor(), offset);
-        CHECK_NE_STDCAPI(_ptr, MAP_FAILED);
+        CHECK_NE_STDCAPI(_ptr, MAP_FAILED) << "size: " << size << ", prot: " << prot << ", fd: " << _file->getFileDescriptor() << ", offset" << offset;
         _size = size;
     }
 

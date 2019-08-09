@@ -28,11 +28,7 @@ namespace Base
 	class BufferedFileOperator
 	{
 	public:
-#ifdef _WIN32
-		const static uint64_t ExpandingSize = 4 * 1024 * 1024; // 4MB
-#else
-		const static uint64_t ExpandingSize = 4 * 1024 * 1024 * 1024 * 1024; // 4TB
-#endif
+		constexpr static uint64_t ExpandingSize = 4ULL * 1024ULL * 1024ULL; // 4MB
 
 		explicit BufferedFileOperator(File* file, File::DesiredAccess desiredAccess = File::DesiredAccess::Read, uint64_t position = 0, uint64_t expandingSize = ExpandingSize);
 		~BufferedFileOperator();
