@@ -860,6 +860,7 @@ namespace Base
     uint64_t File::write(const void *buffer, uint64_t size) {
         ssize_t bytesWritten = ::write(_fd, buffer, size);
         CHECK_NE_STDCAPI(bytesWritten, -1);
+        return (uint64_t)bytesWritten;
     }
 
     void File::setPosition(uint64_t offset, MoveMethod moveMethod) const {
@@ -982,7 +983,6 @@ namespace Base
         return path.substr(0, end_pos);
     }
 #endif
-
 
 	std::string getParentPath(const std::string& path)
 	{

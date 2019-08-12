@@ -150,7 +150,14 @@ namespace Base
 			}
 			catch (...)
 			{
-				_memoryMappedIO.reset(new MemoryMappedIO(_file, _desiredAccess));
+			    logger->warn("Failed to set file size, trying to recover");
+			    try {
+                    _memoryMappedIO.reset(new MemoryMappedIO(_file, _desiredAccess));
+                }
+			    catch (...)
+                {
+			        logger->warn("Failed to recover");
+                }
 				throw;
 			}
 			_memoryMappedIO.reset(new MemoryMappedIO(_file, _desiredAccess));
