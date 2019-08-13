@@ -4,10 +4,14 @@
 
 namespace Base
 {
+	unsigned getSIMDMemoryAlignmentRequirement();
+	bool isAligned(const void* ptr, unsigned alignment);
+	bool isAlignedWithSIMDMemoryAlignmentRequirement(const void* ptr);
+
 	class AlignedMemorySpace
 	{
 	public:
-		AlignedMemorySpace(size_t size, unsigned alignment);
+		AlignedMemorySpace(size_t size, unsigned alignment = getSIMDMemoryAlignmentRequirement());
 		AlignedMemorySpace(const AlignedMemorySpace&) = delete;
 		AlignedMemorySpace(AlignedMemorySpace&&) = delete;
 		~AlignedMemorySpace();
@@ -20,7 +24,7 @@ namespace Base
 	class AlignedSpan
 	{
 	public:
-		AlignedSpan(size_t numberOfElements, unsigned alignment) : _alignedMemorySpace(numberOfElements * sizeof(Type), alignment) {}
+		AlignedSpan(size_t numberOfElements, unsigned alignment = getSIMDMemoryAlignmentRequirement()) : _alignedMemorySpace(numberOfElements * sizeof(Type), alignment) {}
 		[[nodiscard]] Type* get() { return (Type*)_alignedMemorySpace.get(); }
 	private:
 		AlignedMemorySpace _alignedMemorySpace;
@@ -30,14 +34,14 @@ namespace Base
 	{
 	public:
 		AlignedDynamicRawArray();
-		AlignedDynamicRawArray(size_t size, unsigned alignment);
+		AlignedDynamicRawArray(size_t size, unsigned alignment = getSIMDMemoryAlignmentRequirement());
 		AlignedDynamicRawArray(const AlignedDynamicRawArray& other);
 		AlignedDynamicRawArray(AlignedDynamicRawArray&& other) noexcept;
 		~AlignedDynamicRawArray();
 		[[nodiscard]] void* get() const;
 		[[nodiscard]] size_t size() const;
 		[[nodiscard]] unsigned alignment() const;
-		void resize(size_t size, unsigned alignment);
+		void resize(size_t size, unsigned alignment = getSIMDMemoryAlignmentRequirement());
 	private:
 		void* _ptr;
 		size_t _size;
@@ -49,12 +53,12 @@ namespace Base
 	{
 	public:
 		AlignedDynamicArray() {}
-		AlignedDynamicArray(size_t numberOfElements, unsigned alignment) : _array(numberOfElements * sizeof(Type), alignment) {}		
+		AlignedDynamicArray(size_t numberOfElements, unsigned alignment = getSIMDMemoryAlignmentRequirement()) : _array(numberOfElements * sizeof(Type), alignment) {}
 		[[nodiscard]] Type* get() const { return (Type*)_array.get(); }
 		[[nodiscard]] size_t elements() const { return _array.size() / sizeof(Type); }
 		[[nodiscard]] size_t bytes() const { return _array.size(); }
 		[[nodiscard]] unsigned alignment() const { return _array.alignment(); }
-		void resize(size_t numberOfElements, unsigned alignment) { return _array.resize(numberOfElements * sizeof(Type), alignment); }
+		void resize(size_t numberOfElements, unsigned alignment = getSIMDMemoryAlignmentRequirement()) { return _array.resize(numberOfElements * sizeof(Type), alignment); }
 	private:
 		AlignedDynamicRawArray _array;
 	};

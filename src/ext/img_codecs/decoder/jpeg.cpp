@@ -1,6 +1,6 @@
 #ifdef HAVE_LIB_JPEG_TURBO
 
-#include <base/image_decoder.h>
+#include <base/ext/img_codecs/decoder/jpeg.h>
 #include <base/logging.h>
 
 namespace Base
@@ -46,7 +46,7 @@ namespace Base
 
 	int JPEGDecoder::getDecompressedSize()
 	{
-		return _width * _height* tjPixelSize[TJPF_RGB];
+		return _width * _height * tjPixelSize[TJPF_RGB];
 	}
 
 	void JPEGDecoder::decode(void* buffer)

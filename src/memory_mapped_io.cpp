@@ -107,7 +107,12 @@ namespace Base
 	BufferedFileOperator::BufferedFileOperator(File* file, File::DesiredAccess desiredAccess, uint64_t position, uint64_t expandingSize)
 		: _file(file), _desiredAccess(desiredAccess), _position(position), _expandingSize(expandingSize), _actualFileSize(_file->getSize())
 	{
-		if (desiredAccess == File::DesiredAccess::ReadAndWrite || desiredAccess == File::DesiredAccess::Write)
+	    if (desiredAccess == File::DesiredAccess::Read)
+	    {
+	        CHECK(_actualFileSize);
+	    }
+		else if (desiredAccess == File::DesiredAccess::ReadAndWrite || desiredAccess == File::DesiredAccess::Write)
+		{
 			if (_actualFileSize == 0)
 			{
 				if (_expandingSize)
@@ -115,6 +120,8 @@ namespace Base
 				else
 					_file->setSize(1);
 			}
+		}
+
 		_memoryMappedIO.reset(new MemoryMappedIO(_file, desiredAccess));
 	}
 

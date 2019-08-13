@@ -1,5 +1,5 @@
 #ifdef HAVE_LIB_PNG
-#include <base/image_decoder.h>
+#include <base/ext/img_codecs/decoder/png.h>
 #include <base/logging.h>
 
 namespace Base
@@ -60,7 +60,7 @@ namespace Base
 		for (unsigned long i = 0; i < _image_height; i++) {
 			_row_pointers[i] = (png_bytep)((char*)buffer + i * _image_width * 3);
 		}
-		
+
 		png_read_image(_png_ptr, _row_pointers.data());
 		_currentImagePosition = _sourceImage;
 	}
@@ -69,10 +69,10 @@ namespace Base
 	{
 		unsigned char** source_data = (unsigned char**)png_get_io_ptr(png_ptr);
 		memcpy(data, *source_data, length);
-		
+
 		*source_data += length;
 	}
-	
+
 	void PNGDecoder::load(const void* image, uint64_t size)
 	{
 		if (_png_ptr)

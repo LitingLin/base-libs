@@ -1,6 +1,7 @@
 #include <base/memory_alignment.h>
 
 #include <base/logging.h>
+#include <base/cpu_info.h>
 
 #ifdef _WIN32
 #include <malloc.h>
@@ -31,7 +32,28 @@ namespace Base
 		free(ptr);
 #endif
 	}
-	
+
+	unsigned getSIMDMemoryAlignmentRequirement()
+	{
+		if (hasAVX512f())
+			return 512;
+		else if (hasAVX())
+			return 256;
+		else
+			return 128;
+	}
+
+	bool isAligned(const void* ptr, unsigned alignment)
+	{
+		std::ptrdiff_t ptr_ = (std::ptrdiff_t)ptr;
+		return ptr_ % alignment == 0;
+	}
+
+	bool isAlignedWithSIMDMemoryAlignmentRequirement(const void* ptr)
+	{
+		return isAligned(ptr, getSIMDMemoryAlignmentRequirement());
+	}
+
 	AlignedMemorySpace::AlignedMemorySpace(size_t size, unsigned alignment)
 	{
 		_ptr = alignedMemoryAllocation(size, alignment);
