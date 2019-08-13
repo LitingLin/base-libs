@@ -67,16 +67,20 @@ namespace Base
     {
 	    CHECK(size > 0 || _file->getSize() >= offset);
 	    int prot;
+		int flag;
 	    switch (desiredAccess)
         {
             case File::DesiredAccess::Read:
                 prot = PROT_READ;
+				flag = MAP_PRIVATE;
                 break;
             case File::DesiredAccess::Write:
                 prot = PROT_WRITE;
+				flag = MAP_SHARED;
                 break;
             case File::DesiredAccess::ReadAndWrite:
                 prot = PROT_READ | PROT_WRITE;
+				flag = MAP_SHARED;
                 break;
             default:
                 UNREACHABLE_ERROR;
@@ -85,7 +89,7 @@ namespace Base
 			size = _file->getSize() - offset;
 			CHECK(size);
 		}
-        _ptr = mmap(nullptr, size, prot, MAP_SHARED, _file->getFileDescriptor(), offset);
+        _ptr = mmap(nullptr, size, prot, flag, _file->getFileDescriptor(), offset);
         CHECK_NE_STDCAPI(_ptr, MAP_FAILED) << ". Details: ( size: " << size << ", prot: " << prot << ", fd: " << _file->getFileDescriptor() << ", offset: " << offset << ")";
         _size = size;
     }
