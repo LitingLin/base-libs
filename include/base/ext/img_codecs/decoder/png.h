@@ -4,6 +4,7 @@
 
 #include <png.h>
 #include <vector>
+#include <cstdint>
 
 namespace Base
 {

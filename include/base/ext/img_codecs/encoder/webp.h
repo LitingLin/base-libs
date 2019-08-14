@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef HAVE_LIB_WEBP
+
+#include <cstddef>
+
 namespace Base
 {
 	class WebPEncoder
@@ -21,3 +25,5 @@ namespace Base
 		Container encode(const void* rgb, int width, int height);
 	};
 }
+
+#endif

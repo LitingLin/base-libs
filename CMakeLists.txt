@@ -100,8 +100,10 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/src/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/logging.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/memory_mapped_io.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/lib_jpeg_turbo_decoder.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/lib_png_decoder.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/decoder/jpeg.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/decoder/png.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/decoder/webp_decoder.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/encoder/webp_encoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/stack_trace.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/utils.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/memory_alignment.cpp"
@@ -140,6 +142,15 @@ if(PNG_FOUND)
     list(APPEND BASE_LINK_LIBRARIES ${PNG_LIBRARIES})
 else()
     message(STATUS "Disabled TurboJPEG decoder")
+endif()
+
+find_package(WEBP)
+if(WEBP_FOUND)
+    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_WEBP)
+    list(APPEND BASE_INCLUDE_DIRS ${WEBP_INCLUDE_DIRS})
+    list(APPEND BASE_LINK_LIBRARIES ${WEBP_LIBRARIES})
+else()
+    message(STATUS "Disabled WEBP codecs")
 endif()
 
 list(APPEND BASE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/include ${CEREAL_INCLUDE_DIRS} ${SPDLOG_INCLUDE_DIRS})
