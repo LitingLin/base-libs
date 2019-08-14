@@ -1,3 +1,4 @@
+#ifdef HAVE_LIB_WEBP
 #include <base/ext/img_codecs/decoder/webp.h>
 
 #include <base/logging.h>
@@ -31,3 +32,4 @@ namespace Base
 		CHECK_EQ(WebPDecodeRGBInto((const uint8_t*)_pointer, _size, (uint8_t*)buffer, _width * _height * 3, _width * 3), (uint8_t*)buffer);
 	}
 }
+#endif

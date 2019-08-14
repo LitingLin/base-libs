@@ -1,3 +1,4 @@
+#ifdef HAVE_LIB_WEBP
 #include <base/ext/img_codecs/encoder/webp.h>
 
 #include <base/logging.h>
@@ -31,3 +32,4 @@ namespace Base
 		return Container(output, size);
 	}
 }
+#endif
