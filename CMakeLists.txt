@@ -156,7 +156,7 @@ else()
     message(STATUS "Disabled TurboJPEG decoder")
 endif()
 
-find_package(WEBP)
+find_package(WebP)
 if(WEBP_FOUND)
     list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_WEBP)
     list(APPEND BASE_INCLUDE_DIRS ${WEBP_INCLUDE_DIRS})
