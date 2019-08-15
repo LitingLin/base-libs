@@ -12,7 +12,7 @@ namespace Base
 	public:
 		JPEGDecoder();
 		JPEGDecoder(const JPEGDecoder&) = delete;
-		JPEGDecoder(JPEGDecoder&& object) = delete;
+		JPEGDecoder(JPEGDecoder&& object) noexcept;
 		~JPEGDecoder();
 		void load(const void* pointer, uint64_t size);
 		int getWidth();

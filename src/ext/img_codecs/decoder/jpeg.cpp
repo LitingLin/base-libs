@@ -28,9 +28,17 @@ namespace Base
 		jpeg_create_decompress(&decInfo);
 	}
 
+	JPEGDecoder::JPEGDecoder(JPEGDecoder&& object) noexcept
+	{
+		memcpy(&decInfo, &object.decInfo, sizeof(decInfo));
+		memcpy(&jerr, &object.jerr, sizeof(jerr));
+		object.decInfo.err = nullptr;
+	}
+
 	JPEGDecoder::~JPEGDecoder()
 	{
-		jpeg_destroy_decompress(&decInfo);
+		if (decInfo.err)
+			jpeg_destroy_decompress(&decInfo);
 	}
 
 	void JPEGDecoder::load(const void* pointer, const uint64_t fileSize)
