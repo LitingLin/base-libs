@@ -137,7 +137,6 @@ if(NOT SPDLOG_FOUND)
     include(${CMAKE_CURRENT_LIST_DIR}/3rd_party/spdlog.cmake)
 endif()
 
-
 find_package(TurboJPEG)
 if(TURBOJPEG_FOUND)
     list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG_TURBO)
@@ -171,14 +170,7 @@ if (WIN32)
     list(APPEND BASE_LINK_LIBRARIES d2d1 strmiids)
 endif()
 
-option(BUILD_SHARED_LIBS "Build as shared library" OFF)
-if(BUILD_SHARED_LIBS)
-    set(BUILDING_TYPE SHARED)
-else()
-    set(BUILDING_TYPE STATIC)
-endif()
-
-add_library(base ${BUILDING_TYPE} ${SRC_FILES})
+add_library(base STATIC ${SRC_FILES})
 
 target_compile_definitions(base PUBLIC ${BASE_COMPILE_DEFINITIONS})
 target_include_directories(base PUBLIC ${BASE_INCLUDE_DIRS})
@@ -202,3 +194,7 @@ if(BUILD_TEST)
     enable_testing()
     add_subdirectory(test)
 endif()
+
+set(BASE_COMPILE_DEFINITIONS ${BASE_COMPILE_DEFINITIONS} PARENT_SCOPE)
+set(BASE_INCLUDE_DIRS ${BASE_INCLUDE_DIRS} PARENT_SCOPE)
+set(BASE_LINK_LIBRARIES ${BASE_LINK_LIBRARIES} PARENT_SCOPE)
