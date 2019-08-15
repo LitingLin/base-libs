@@ -239,9 +239,6 @@
     <ClCompile Include="..\src\config\ini.c">
       <Filter>Source Files\config</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\config\ini_praser.cpp">
-      <Filter>Source Files\config</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\crypto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -256,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="..\src\memory_alignment.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\config\ini_parser.cpp">
+      <Filter>Source Files\config</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

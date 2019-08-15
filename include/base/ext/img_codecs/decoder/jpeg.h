@@ -1,7 +1,8 @@
 #pragma once
 
-#ifdef HAVE_LIB_JPEG_TURBO
-#include <turbojpeg.h>
+#ifdef HAVE_LIB_JPEG
+#include <cstdio>
+#include <jpeglib.h>
 #include <cstdint>
 
 namespace Base
@@ -11,7 +12,7 @@ namespace Base
 	public:
 		JPEGDecoder();
 		JPEGDecoder(const JPEGDecoder&) = delete;
-		JPEGDecoder(JPEGDecoder&& object) noexcept;
+		JPEGDecoder(JPEGDecoder&& object) = delete;
 		~JPEGDecoder();
 		void load(const void* pointer, uint64_t size);
 		int getWidth();
@@ -21,9 +22,9 @@ namespace Base
 	private:
 		const unsigned char* _pointer;
 		unsigned long _fileSize;
-		tjhandle _handle;
-		int _width, _height;
-		int _jpegSubsamp, _jpegColorspace;
+		
+		jpeg_decompress_struct decInfo;
+		struct jpeg_error_mgr jerr;
 	};
 }
 #endif
