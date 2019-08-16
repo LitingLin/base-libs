@@ -11,10 +11,10 @@
 namespace Base
 {
 #ifdef _WIN32
-	class ImageDecoder
+	class WindowsImageDecoder
 	{
 	public:
-		ImageDecoder(const unsigned char *data, uint32_t data_size);
+		WindowsImageDecoder(const unsigned char *data, uint32_t data_size);
 		// index auto increment 
 		std::vector<unsigned char> decode();
 		// index auto increment 

@@ -42,9 +42,6 @@
     <ClInclude Include="..\include\base\fragmented_udp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\base\image_decoder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\base\lock_guard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -151,6 +148,9 @@
       <Filter>Header Files\cpu_info</Filter>
     </ClInclude>
     <ClInclude Include="..\include\base\memory_alignment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\image_decoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,7 +7,7 @@
 #pragma comment(lib, "windowscodecs.lib")
 
 namespace Base {
-	std::vector<unsigned char> ImageDecoder::decode()
+	std::vector<unsigned char> WindowsImageDecoder::decode()
 	{
 		CHECK_LT(_indexOfFrame, _numberOfFrames);
 		if (!_WICBitmapFrameDecoder) {
@@ -94,7 +94,7 @@ namespace Base {
 		return TransformOptions;
 	}
 
-	void ImageDecoder::decode(unsigned char* buf, uint32_t buf_size)
+	void WindowsImageDecoder::decode(unsigned char* buf, uint32_t buf_size)
 	{
 		CHECK_LT(_indexOfFrame, _numberOfFrames);
 		if (!_WICBitmapFrameDecoder) {
@@ -161,7 +161,7 @@ namespace Base {
 		CHECK_HR(WICBitmapFlipRotator->CopyPixels(nullptr, *dstWidth * 3, srcWidth*srcHeight * 3, dst));
 	}
 
-	void ImageDecoder::decodeAndScale(unsigned char* buf, uint32_t maxWidth, uint32_t maxHeight, uint32_t buf_size)
+	void WindowsImageDecoder::decodeAndScale(unsigned char* buf, uint32_t maxWidth, uint32_t maxHeight, uint32_t buf_size)
 	{
 		CHECK_LT(_indexOfFrame, _numberOfFrames);
 		std::vector<unsigned char> buffer;
@@ -252,7 +252,7 @@ namespace Base {
 		_WICBitmapFrameDecoder.Release();
 	}
 
-	void ImageDecoder::getResolution(uint32_t* width, uint32_t* height)
+	void WindowsImageDecoder::getResolution(uint32_t* width, uint32_t* height)
 	{
 		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
@@ -260,7 +260,7 @@ namespace Base {
 		CHECK_HR(_WICBitmapFrameDecoder->GetSize(width, height));
 	}
 
-	void ImageDecoder::getDPI(double* dpix, double* dpiy)
+	void WindowsImageDecoder::getDPI(double* dpix, double* dpiy)
 	{
 		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
@@ -268,7 +268,7 @@ namespace Base {
 		CHECK_HR(_WICBitmapFrameDecoder->GetResolution(dpix, dpiy));
 	}
 
-	uint32_t ImageDecoder::getBufferSize()
+	uint32_t WindowsImageDecoder::getBufferSize()
 	{
 		uint32_t width, height;
 		if (!_WICBitmapFrameDecoder) {
@@ -280,23 +280,23 @@ namespace Base {
 		return (uint32_t)buf_size;
 	}
 
-	uint32_t ImageDecoder::getNumberOfFrames()
+	uint32_t WindowsImageDecoder::getNumberOfFrames()
 	{
 		return _numberOfFrames;
 	}
 
-	GUID ImageDecoder::getFormat()
+	GUID WindowsImageDecoder::getFormat()
 	{
 		return MEDIASUBTYPE_RGB24;
 	}
 
-	void ImageDecoder::setIndexOfFrame(uint32_t index)
+	void WindowsImageDecoder::setIndexOfFrame(uint32_t index)
 	{
 		CHECK_LT(index, _numberOfFrames);
 		_indexOfFrame = index;
 	}
 
-	uint32_t ImageDecoder::getDelay()
+	uint32_t WindowsImageDecoder::getDelay()
 	{
 		if (!_WICBitmapFrameDecoder) {
 			CHECK_HR(_WICBitmapDecoder->GetFrame(_indexOfFrame, &_WICBitmapFrameDecoder));
@@ -326,7 +326,7 @@ namespace Base {
 		return delay;
 	}
 
-	ImageDecoder::ImageDecoder(const unsigned char* data, uint32_t data_size)
+	WindowsImageDecoder::WindowsImageDecoder(const unsigned char* data, uint32_t data_size)
 		: _indexOfFrame(0)
 	{
 		ENSURE_HR(CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void **>(&_WICFactory)));
