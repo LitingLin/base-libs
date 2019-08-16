@@ -30,6 +30,11 @@
     <ClCompile Include="..\src\ext\img_codecs\decoder\webp_decoder.cpp" />
     <ClCompile Include="..\src\ext\img_codecs\encoder\webp_encoder.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="base.vcxproj">
+      <Project>{34b7c3f3-324a-4370-963e-8725df78c145}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{63DDE045-7F6E-4BF6-8DFB-96C9F47BC91D}</ProjectGuid>
@@ -91,7 +96,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../3rd_party/spdlog/include;$(ProjectDir)../3rd_party/cereal/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>HAVE_LIB_WEBP;HAVE_LIB_PNG;HAVE_LIB_JPEG_TURBO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,7 +139,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)../include;$(ProjectDir)../3rd_party/spdlog/include;$(ProjectDir)../3rd_party/cereal/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>HAVE_LIB_WEBP;HAVE_LIB_PNG;HAVE_LIB_JPEG_TURBO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -55,7 +55,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\com.cpp" />
     <ClCompile Include="..\src\config\ini.c" />
-    <ClCompile Include="..\src\config\ini_praser.cpp" />
+    <ClCompile Include="..\src\config\ini_parser.cpp" />
     <ClCompile Include="..\src\cpu_info.cpp" />
     <ClCompile Include="..\src\cpu_info\gcc.cpp" />
     <ClCompile Include="..\src\cpu_info\msvc.cpp" />
