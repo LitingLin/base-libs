@@ -8,14 +8,6 @@ namespace Base
 	void jpegErrorExit(j_common_ptr cinfo)
 	{
 		char jpegLastErrorMsg[JMSG_LENGTH_MAX];
-		/* cinfo->err actually points to a jpegErrorManager struct */
-		auto myerr = cinfo->err;
-		/* note : *(cinfo->err) is now equivalent to myerr->pub */
-
-		/* output_message is a method to print an error message */
-		/*(* (cinfo->err->output_message) ) (cinfo);*/
-
-		/* Create the message */
 		(*(cinfo->err->format_message)) (cinfo, jpegLastErrorMsg);
 
 		THROW_RUNTIME_EXCEPTION << jpegLastErrorMsg;

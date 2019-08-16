@@ -105,6 +105,8 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/include/base/porting.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/preprocessor.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/utils.h"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder.h"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/types.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/jpeg.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/png.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/webp.h"
@@ -114,6 +116,7 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/src/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/logging.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/memory_mapped_io.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/decoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/decoder/jpeg.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/decoder/png.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/ext/img_codecs/decoder/webp_decoder.cpp"
@@ -139,13 +142,13 @@ if(NOT SPDLOG_FOUND)
     include(${CMAKE_CURRENT_LIST_DIR}/3rd_party/spdlog.cmake)
 endif()
 
-find_package(TurboJPEG)
-if(TURBOJPEG_FOUND)
-    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG_TURBO)
-    list(APPEND BASE_INCLUDE_DIRS ${TURBOJPEG_INCLUDE_DIR})
-    list(APPEND BASE_LINK_LIBRARIES ${TURBOJPEG_LIBRARY})
+find_package(JPEG)
+if(JPEG_FOUND)
+    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG)
+    list(APPEND BASE_INCLUDE_DIRS ${JPEG_INCLUDE_DIR})
+    list(APPEND BASE_LINK_LIBRARIES ${JPEG_LIBRARIES})
 else()
-    message(STATUS "Disabled TurboJPEG decoder")
+    message(STATUS "Disabled JPEG decoder")
 endif()
 
 find_package(PNG)
@@ -154,7 +157,7 @@ if(PNG_FOUND)
     list(APPEND BASE_INCLUDE_DIRS ${PNG_INCLUDE_DIRS})
     list(APPEND BASE_LINK_LIBRARIES ${PNG_LIBRARIES})
 else()
-    message(STATUS "Disabled TurboJPEG decoder")
+    message(STATUS "Disabled PNG decoder")
 endif()
 
 find_package(WebP)
