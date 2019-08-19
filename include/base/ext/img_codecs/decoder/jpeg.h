@@ -1,6 +1,11 @@
 #pragma once
 
 #ifdef HAVE_LIB_JPEG
+
+#ifdef _WIN32
+#define NOMINMAX
+#include <basetsd.h>
+#endif
 #include <cstdio>
 #include <jpeglib.h>
 #include <cstdint>

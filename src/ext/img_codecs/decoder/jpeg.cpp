@@ -1,7 +1,7 @@
 #ifdef HAVE_LIB_JPEG
 
-#include <base/ext/img_codecs/decoder/jpeg.h>
 #include <base/logging.h>
+#include <base/ext/img_codecs/decoder/jpeg.h>
 
 namespace Base
 {
