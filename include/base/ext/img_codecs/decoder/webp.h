@@ -1,10 +1,13 @@
 #pragma once
 
 #ifdef HAVE_LIB_WEBP
+
+#include <base/common.h>
 #include <cstdint>
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	class WebPDecoder
 	{
 	public:

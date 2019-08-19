@@ -1,4 +1,6 @@
 #pragma once
+
+#include <base/common.h>
 #include <stdexcept>
 #include <stddef.h>
 
@@ -15,6 +17,7 @@ namespace Base {
 		GENERIC, WIN32API, HRESULT, NTSTATUS, STDCAPI, SQLITE3, CUDA
 	};
 
+	ATTRIBUTE_INTERFACE
 	class FatalError : public std::runtime_error
 	{
 	public:
@@ -33,6 +36,7 @@ namespace Base {
 		ErrorCodeType _errorCodeType;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class RuntimeException : public std::runtime_error
 	{
 	public:
@@ -52,7 +56,9 @@ namespace Base {
 	};
 
 #ifdef _WIN32
+	ATTRIBUTE_INTERFACE
     HRESULT getHRESULTFromException(const FatalError& exp);
+	ATTRIBUTE_INTERFACE
 	HRESULT getHRESULTFromException(const RuntimeException& exp);
 #endif
 }

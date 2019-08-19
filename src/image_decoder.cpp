@@ -1,6 +1,6 @@
 #ifdef _WIN32
 #include <base/image_decoder.h>
-#include <base/logging/win32.h>
+#include <base/logging.h>
 
 #include <dshow.h>
 

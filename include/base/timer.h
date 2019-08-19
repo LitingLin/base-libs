@@ -1,9 +1,12 @@
 #pragma once
+
+#include <base/common.h>
 #include <cstdint>
 
 typedef void *HANDLE;
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	class Timer
 	{
 	public:

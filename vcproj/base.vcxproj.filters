@@ -13,20 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\logging">
-      <UniqueIdentifier>{f6cdddd1-0a41-44a6-b94d-e7a66a355979}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\logging">
-      <UniqueIdentifier>{5abead86-2098-4f1e-8090-245e2b79458b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\config">
       <UniqueIdentifier>{53be9056-e5f5-4299-9bc1-7a5701c82275}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\config">
       <UniqueIdentifier>{fb67a04c-a52e-4384-9d19-d0e3e0b5418a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\cpu_info">
-      <UniqueIdentifier>{ca7457fb-9a5f-413c-bfc7-27426c4b9a25}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\cpu_info">
       <UniqueIdentifier>{f4124d01-664e-4633-bf60-44465cdc1441}</UniqueIdentifier>
@@ -43,9 +34,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\base\lock_guard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\base\logging.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\base\memory_mapped_io.h">
@@ -120,9 +108,6 @@
     <ClInclude Include="..\include\base\preprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\base\logging\win32.h">
-      <Filter>Header Files\logging</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\base\config\ini.h">
       <Filter>Header Files\config</Filter>
     </ClInclude>
@@ -141,17 +126,17 @@
     <ClInclude Include="..\include\base\cpu_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\base\cpu_info\msvc.h">
-      <Filter>Header Files\cpu_info</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\base\cpu_info\gcc.h">
-      <Filter>Header Files\cpu_info</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\base\memory_alignment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\base\image_decoder.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cpu_info\msvc.h">
+      <Filter>Source Files\cpu_info</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -174,9 +159,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lock_guard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\logging.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\memory_mapped_io.cpp">
@@ -206,9 +188,6 @@
     <ClCompile Include="..\src\shared_memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\stack_trace.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sync.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -233,9 +212,6 @@
     <ClCompile Include="..\src\debugoutput_logger_sink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\logging\win32.cpp">
-      <Filter>Source Files\logging</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\config\ini.c">
       <Filter>Source Files\config</Filter>
     </ClCompile>
@@ -247,9 +223,6 @@
     </ClCompile>
     <ClCompile Include="..\src\cpu_info\gcc.cpp">
       <Filter>Source Files\cpu_info</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\cpu_info.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\memory_alignment.cpp">
       <Filter>Source Files</Filter>

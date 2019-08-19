@@ -1,4 +1,4 @@
-#include <base/cpu_info/gcc.h>
+#include <base/cpu_info.h>
 
 #ifdef __GNUC__
 namespace Base

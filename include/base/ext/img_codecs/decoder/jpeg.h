@@ -4,14 +4,16 @@
 
 #ifdef _WIN32
 #define NOMINMAX
-#include <basetsd.h>
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #endif
-#include <cstdio>
+#include <base/common.h>
 #include <jpeglib.h>
 #include <cstdint>
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	class JPEGDecoder
 	{
 	public:

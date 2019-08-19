@@ -1,7 +1,7 @@
 #define WIN32_NO_STATUS
 #include <base/crypto.h>
 
-#include <base/logging/win32.h>
+#include <base/logging.h>
 #include <wincrypt.h>
 #undef WIN32_NO_STATUS
 #include <ntstatus.h>

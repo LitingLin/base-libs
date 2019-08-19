@@ -1,6 +1,6 @@
 #include <base/registry.h>
 
-#include <base/logging/win32.h>
+#include <base/logging.h>
 
 namespace Base
 {

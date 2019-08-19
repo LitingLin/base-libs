@@ -1,5 +1,6 @@
 #pragma once
 
+#include <base/common.h>
 #include <base/porting.h>
 
 #include <stdint.h>
@@ -15,32 +16,54 @@
 #include <functional>
 
 namespace Base {
+	ATTRIBUTE_INTERFACE
     bool isPathExists(const PLATFORM_STRING_TYPE & path);
 #ifdef _WIN32
+	ATTRIBUTE_INTERFACE
 	std::wstring getWorkDirectory();
+	ATTRIBUTE_INTERFACE
 	std::wstring getModuleInstanceFullPath(HINSTANCE instance);
+	ATTRIBUTE_INTERFACE
 	std::wstring getApplicationPath();
+	ATTRIBUTE_INTERFACE
 	std::wstring getTempPath();
+	ATTRIBUTE_INTERFACE
 	std::wstring getFullPath(const std::wstring& path);
 #else
+	ATTRIBUTE_INTERFACE
     bool isFileExists(const std::string& path);
 #endif
+	ATTRIBUTE_INTERFACE
 	std::string getParentPath(const std::string& path);
+	ATTRIBUTE_INTERFACE
 	std::wstring getParentPath(const std::wstring& path);
+	ATTRIBUTE_INTERFACE
 	std::string getFileName(const std::string& path);
+	ATTRIBUTE_INTERFACE
 	std::wstring getFileName(const std::wstring& path);
+	ATTRIBUTE_INTERFACE
 	bool isURI(const std::string& string);
+	ATTRIBUTE_INTERFACE
 	bool isURI(const std::wstring&string);
+	ATTRIBUTE_INTERFACE
 	bool isDirectory(const std::string& string);
+	ATTRIBUTE_INTERFACE
 	bool isDirectory(const std::wstring&string);
+	ATTRIBUTE_INTERFACE
 	std::string appendPath(const std::string&path, const std::string&fileName);
+	ATTRIBUTE_INTERFACE
 	std::wstring appendPath(const std::wstring& path, const std::wstring& fileName);
 
+	ATTRIBUTE_INTERFACE
 	std::string getFileExtension(const std::string&path);
+	ATTRIBUTE_INTERFACE
 	std::wstring getFileExtension(const std::wstring& path);
+	ATTRIBUTE_INTERFACE
 	std::string getCanonicalPath(const std::string&path);
+	ATTRIBUTE_INTERFACE
 	std::wstring getCanonicalPath(const std::wstring& path);
 
+	ATTRIBUTE_INTERFACE
 	class File
 	{
 	public:
@@ -107,6 +130,7 @@ namespace Base {
         Other
     };
 
+	ATTRIBUTE_INTERFACE
     class DirectoryIterator
     {
     public:
@@ -131,6 +155,7 @@ namespace Base {
 		virtual bool getFileList(std::vector<PLATFORM_STRING_TYPE> &fileNames, std::vector<uint64_t> &lastWriteTimes) = 0;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class SequentialDirectoryFileListGetter : public IDirectoryFileListGetter
 	{
 	public:
@@ -140,6 +165,7 @@ namespace Base {
         PLATFORM_STRING_TYPE _path;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class RandomDirectoryFileListGetter : public IDirectoryFileListGetter
 	{
 	public:
@@ -148,7 +174,9 @@ namespace Base {
 	private:
 	    PLATFORM_STRING_TYPE _path;
 	};
-
+	
+	ATTRIBUTE_INTERFACE
     bool getDirectoryFileLists(const PLATFORM_STRING_TYPE& path, std::vector<PLATFORM_STRING_TYPE>& fileNames, std::vector<uint64_t>& lastWriteTimes);
+	ATTRIBUTE_INTERFACE
     bool getRandomShuffledDirectoryFileLists(const PLATFORM_STRING_TYPE& path, std::vector<PLATFORM_STRING_TYPE>& fileNames, std::vector<uint64_t>& lastWriteTimes);
 }

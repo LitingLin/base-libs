@@ -1,13 +1,18 @@
 #pragma once
 
+#include <base/common.h>
 #include <cstddef>
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	unsigned getSIMDMemoryAlignmentRequirement();
+	ATTRIBUTE_INTERFACE
 	bool isAligned(const void* ptr, unsigned alignment);
+	ATTRIBUTE_INTERFACE
 	bool isAlignedWithSIMDMemoryAlignmentRequirement(const void* ptr);
 
+	ATTRIBUTE_INTERFACE
 	class AlignedMemorySpace
 	{
 	public:
@@ -29,7 +34,8 @@ namespace Base
 	private:
 		AlignedMemorySpace _alignedMemorySpace;
 	};
-	
+
+	ATTRIBUTE_INTERFACE
 	class AlignedDynamicRawArray
 	{
 	public:

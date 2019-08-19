@@ -1,4 +1,4 @@
-#include <base/logging/win32.h>
+#include <base/logging.h>
 
 #include <base/utils.h>
 

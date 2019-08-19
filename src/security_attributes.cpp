@@ -1,7 +1,7 @@
 #include <base/security_attributes.h>
 
 #include <Sddl.h>
-#include <base/logging/win32.h>
+#include <base/logging.h>
 
 namespace Base
 {

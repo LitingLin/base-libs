@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 
-#include "event.h"
+#include <base/event.h>
 
 namespace Base
 {
@@ -19,6 +19,7 @@ namespace Base
 		virtual void callback(uint32_t index) = 0;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class NativeEventLooper
 	{
 	public:

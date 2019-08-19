@@ -2,7 +2,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <base/shared_memory.h>
 
-#include <base/logging/win32.h>
+#include <base/logging.h>
 #include <intsafe.h>
 
 namespace Base

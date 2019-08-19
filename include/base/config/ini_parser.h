@@ -1,5 +1,6 @@
 #pragma once
 
+#include <base/common.h>
 #include <string>
 #include <map>
 #include <vector>
@@ -7,9 +8,11 @@
 namespace Base {
 	class File;
 
+	ATTRIBUTE_INTERFACE
 	class IniParser
 	{
 	public:
+		ATTRIBUTE_INTERFACE
 		class SectionIterator
 		{
 		public:

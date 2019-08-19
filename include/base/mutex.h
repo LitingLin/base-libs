@@ -1,5 +1,6 @@
 #pragma once
 
+#include <base/common.h>
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -19,6 +20,7 @@ namespace Base
 		CRITICAL_SECTION _handle;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class NamedMutex
 	{
 	public:

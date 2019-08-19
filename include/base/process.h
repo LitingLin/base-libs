@@ -1,5 +1,6 @@
 #pragma once
-#include "event.h"
+
+#include <base/event.h>
 #include <mutex>
 #include <vector>
 
@@ -12,6 +13,7 @@
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	class OpenProcessGuard
 	{
 	public:
@@ -22,6 +24,7 @@ namespace Base
 		HANDLE handle;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class Process
 	{
 	public:
@@ -37,6 +40,7 @@ namespace Base
 		HANDLE _processHandle;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class ProcessMonitor
 	{
 	public:
@@ -56,11 +60,16 @@ namespace Base
 		unsigned static __stdcall monitor_worker(void *);
 	};
 
+	ATTRIBUTE_INTERFACE
 	std::vector<uint32_t> getSystemProcessesIds();
+	ATTRIBUTE_INTERFACE
 	std::vector<HMODULE> getProcessModules(HANDLE hProcess);
+	ATTRIBUTE_INTERFACE
 	std::wstring getModuleFullPath(HANDLE hProcess, HMODULE hModule);
+	ATTRIBUTE_INTERFACE
 	std::wstring getProcessFullPath(HANDLE hProcess);
+	ATTRIBUTE_INTERFACE
 	std::wstring getProcessName(HANDLE hProcess);
-
+	ATTRIBUTE_INTERFACE
 	std::wstring enumerateAllProcessInfomation();
 }

@@ -6,7 +6,7 @@
 #include <atomic>
 #include <mutex>
 
-#include "event.h"
+#include <base/event.h>
 
 namespace Base
 {
@@ -18,6 +18,7 @@ namespace Base
 		virtual bool job_cancel() = 0; // true: exit signal posted; false: not acceptable or not support
 	};
 
+	ATTRIBUTE_INTERFACE
 	class Thread
 	{
 	public:
@@ -58,6 +59,7 @@ namespace Base
 		HANDLE _handle;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class WorkerWrapper
 	{
 	public:
@@ -81,6 +83,7 @@ namespace Base
 		Thread _thread;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class ThreadSynchronization
 	{
 	public:

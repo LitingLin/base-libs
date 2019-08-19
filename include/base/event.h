@@ -1,8 +1,10 @@
 #pragma once
 
+#include <base/common.h>
 typedef void * HANDLE;
 
 namespace Base {
+	ATTRIBUTE_INTERFACE
 	class Event
 	{
 	public:

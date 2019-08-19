@@ -1,5 +1,7 @@
 #pragma once
 
+#include <base/common.h>
+
 #ifdef _WIN32
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -23,36 +25,52 @@ typedef struct _GUID {
 #include <limits>
 #include <functional>
 
+ATTRIBUTE_INTERFACE
 bool operator<(const GUID& left, const GUID& right);
 namespace Base
 {
 #ifdef _WIN32
+	ATTRIBUTE_INTERFACE
 	std::wstring UTF8ToUTF16(const std::string& str);
+	ATTRIBUTE_INTERFACE
 	std::string UTF16ToUTF8(const std::wstring& str);
 	//std::string toUpperCase(const std::string &str);
 	//std::wstring toUpperCase(const std::wstring &str);
 	//std::string toLowerCase(const std::string &str);
+	ATTRIBUTE_INTERFACE
 	std::wstring toLowerCase(const std::wstring& str);
+	ATTRIBUTE_INTERFACE
 	void GUIDToString(const GUID* guid, wchar_t* str, unsigned str_size);
+	ATTRIBUTE_INTERFACE
 	void generateGUID(wchar_t* str, unsigned str_size);
+	ATTRIBUTE_INTERFACE
 	std::wstring generateGUID();
+	ATTRIBUTE_INTERFACE
 	bool StringToGUID(const wchar_t* str, unsigned str_size, GUID* guid);
+	ATTRIBUTE_INTERFACE
 	bool isRunningOn64bitSystem();
 #else
+	ATTRIBUTE_INTERFACE
 	std::string generateGUID();
+	ATTRIBUTE_INTERFACE
 	void generateGUID(char* str, unsigned str_size);
+	ATTRIBUTE_INTERFACE
 	void GUIDToString(const GUID * guid, char* str, unsigned str_size);
+	ATTRIBUTE_INTERFACE
 	bool StringToGUID(const char* str, unsigned str_size, GUID * guid);
 #endif
-
+	ATTRIBUTE_INTERFACE
     bool endsWith(const std::string& string, const std::string& ending);
+	ATTRIBUTE_INTERFACE
     bool endsWith(const std::wstring& string, const std::wstring& ending);
-
+	ATTRIBUTE_INTERFACE
 	bool isMemoryZero(void* buf, size_t size);
 	const uint8_t GUID_STRING_SIZE = 39;
+	ATTRIBUTE_INTERFACE
 	void generateGUID(GUID * guid);
-
+	ATTRIBUTE_INTERFACE
 	uint8_t generateRandomUint8(uint8_t from = std::numeric_limits<uint8_t>::min(), uint8_t to = std::numeric_limits<uint8_t>::max());
+	ATTRIBUTE_INTERFACE
 	uint16_t generateRandomUint16(uint16_t from = std::numeric_limits<uint16_t>::min(), uint16_t to = std::numeric_limits<uint16_t>::max());
 
 	class ScopeGuard {

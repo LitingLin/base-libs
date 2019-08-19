@@ -2,13 +2,16 @@
 
 #ifdef HAVE_LIB_WEBP
 
+#include <base/common.h>
 #include <cstddef>
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	class WebPEncoder
 	{
 	public:
+		ATTRIBUTE_INTERFACE
 		class Container
 		{
 		public:

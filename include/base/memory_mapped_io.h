@@ -7,6 +7,7 @@
 namespace Base
 {
 	// File backend
+	ATTRIBUTE_INTERFACE
 	class MemoryMappedIO
 	{
 	public:
@@ -25,6 +26,7 @@ namespace Base
 		void *_ptr;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class BufferedFileOperator
 	{
 	public:

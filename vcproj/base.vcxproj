@@ -12,11 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\base\com.h" />
+    <ClInclude Include="..\include\base\common.h" />
     <ClInclude Include="..\include\base\config\ini.h" />
     <ClInclude Include="..\include\base\config\ini_parser.h" />
     <ClInclude Include="..\include\base\cpu_info.h" />
-    <ClInclude Include="..\include\base\cpu_info\gcc.h" />
-    <ClInclude Include="..\include\base\cpu_info\msvc.h" />
     <ClInclude Include="..\include\base\d2d_window.h" />
     <ClInclude Include="..\include\base\data_structures.hpp" />
     <ClInclude Include="..\include\base\debugoutput_logger_sink.h" />
@@ -28,8 +27,6 @@
     <ClInclude Include="..\include\base\fragmented_udp.h" />
     <ClInclude Include="..\include\base\image_decoder.h" />
     <ClInclude Include="..\include\base\lock_guard.h" />
-    <ClInclude Include="..\include\base\logging.h" />
-    <ClInclude Include="..\include\base\logging\win32.h" />
     <ClInclude Include="..\include\base\memory_alignment.h" />
     <ClInclude Include="..\include\base\memory_mapped_io.h" />
     <ClInclude Include="..\include\base\message_box.h" />
@@ -51,12 +48,12 @@
     <ClInclude Include="..\include\base\timer.h" />
     <ClInclude Include="..\include\base\types.h" />
     <ClInclude Include="..\include\base\utils.h" />
+    <ClInclude Include="..\src\cpu_info\msvc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\com.cpp" />
     <ClCompile Include="..\src\config\ini.c" />
     <ClCompile Include="..\src\config\ini_parser.cpp" />
-    <ClCompile Include="..\src\cpu_info.cpp" />
     <ClCompile Include="..\src\cpu_info\gcc.cpp" />
     <ClCompile Include="..\src\cpu_info\msvc.cpp" />
     <ClCompile Include="..\src\d2d_window.cpp" />
@@ -69,8 +66,6 @@
     <ClCompile Include="..\src\fragmented_udp.cpp" />
     <ClCompile Include="..\src\image_decoder.cpp" />
     <ClCompile Include="..\src\lock_guard.cpp" />
-    <ClCompile Include="..\src\logging.cpp" />
-    <ClCompile Include="..\src\logging\win32.cpp" />
     <ClCompile Include="..\src\memory_alignment.cpp" />
     <ClCompile Include="..\src\memory_mapped_io.cpp" />
     <ClCompile Include="..\src\message_box.cpp" />
@@ -81,7 +76,6 @@
     <ClCompile Include="..\src\registry.cpp" />
     <ClCompile Include="..\src\security_attributes.cpp" />
     <ClCompile Include="..\src\shared_memory.cpp" />
-    <ClCompile Include="..\src\stack_trace.cpp" />
     <ClCompile Include="..\src\sync.cpp" />
     <ClCompile Include="..\src\thread.cpp" />
     <ClCompile Include="..\src\time.cpp" />
@@ -130,7 +124,6 @@
       <AdditionalOptions>/Zc:throwingNew /Zc:strictStrings /Zc:inline /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_LIB_PNG;HAVE_LIB_JPEG_TURBO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -145,7 +138,6 @@
       <AdditionalOptions>/Zc:throwingNew /Zc:strictStrings /Zc:inline /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_LIB_PNG;HAVE_LIB_JPEG_TURBO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

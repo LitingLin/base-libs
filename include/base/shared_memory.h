@@ -1,11 +1,13 @@
 #pragma once
 
-#include "security_attributes.h"
+#include <base/common.h>
+#include <base/security_attributes.h>
 
 typedef void * HANDLE;
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	class SharedMemory
 	{
 	public:

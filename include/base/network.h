@@ -8,6 +8,7 @@
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
     class NetworkAddressInUseException : public RuntimeException
     {
     public:
@@ -26,6 +27,7 @@ namespace Base
 		ok, cancelled, connreset, wouldblock, netfail, truncated, timeout, unreachable
 	};
 
+	ATTRIBUTE_INTERFACE
 	std::ostream& operator<<(std::ostream &os, net_rc rc);
 
 	class WSAGuard
@@ -37,6 +39,7 @@ namespace Base
 		WSADATA wsaData;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class SOCKETGuard
 	{
 	public:
@@ -66,8 +69,10 @@ namespace Base
 		HANDLE _readEvent;
 	};
 
+	ATTRIBUTE_INTERFACE
 	sockaddr_in getIPv4UDPSockAddr(const wchar_t* address, uint16_t port);
 
+	ATTRIBUTE_INTERFACE
 	class UDPServer
 	{
 	public:
@@ -88,6 +93,7 @@ namespace Base
 		SOCKETGuard socket;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class UDPClient
 	{
 	public:

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <base/common.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -12,6 +13,7 @@
 
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	class Registry
 	{
 	public:
@@ -45,11 +47,13 @@ namespace Base
 		bool wow64Redirection;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class RegistryLocalMachineSoftware : public Registry
 	{
 	public:
 		RegistryLocalMachineSoftware(const wchar_t *orgName, const wchar_t *productName = nullptr, const wchar_t *subkey = nullptr);
 	};
+	ATTRIBUTE_INTERFACE
 	class RegistryCurrentSoftware : public Registry
 	{
 	public:

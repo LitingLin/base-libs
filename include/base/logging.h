@@ -14,8 +14,10 @@
 extern std::shared_ptr<spdlog::logger> logger;
 namespace Base
 {
+	ATTRIBUTE_INTERFACE
 	std::string getStackTrace();
 
+	ATTRIBUTE_INTERFACE
 	std::string getStdCApiErrorString(int errnum);
 
 	class _ExceptionHandlerExecutor
@@ -37,6 +39,7 @@ namespace Base
 		std::ostringstream _stream;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class FatalErrorLogging : public _BaseLogging
 	{
 	public:
@@ -46,6 +49,7 @@ namespace Base
 		~FatalErrorLogging() noexcept(false);
 	};
 
+	ATTRIBUTE_INTERFACE
 	class RuntimeExceptionLogging : public _BaseLogging
 	{
 	public:
@@ -55,6 +59,7 @@ namespace Base
 		~RuntimeExceptionLogging() noexcept(false);
 	};
 
+	ATTRIBUTE_INTERFACE
 	class EventLogging : public _BaseLogging
 	{
 	public:
@@ -546,3 +551,7 @@ _LOG_GENERIC(Base::EventLogging, Base::ErrorCodeType::GENERIC, -1, nullptr)
 
 #define LOGGING_STDCAPI_ERROR \
 _LOG_GENERIC(Base::EventLogging, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+
+#ifdef _WIN32
+#include <base/logging/win32.h>
+#endif

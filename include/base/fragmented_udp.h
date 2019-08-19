@@ -1,6 +1,6 @@
 #pragma once
 
-#include "network.h"
+#include <base/network.h>
 
 #include <memory>
 #include <map>
@@ -11,8 +11,10 @@ namespace Base
 {
 	static const uint32_t reliable_mtu = 576;
 
+	ATTRIBUTE_INTERFACE
 	bool operator<(const GUID& left, const GUID& right);
 
+	ATTRIBUTE_INTERFACE
 	class BaseFragmentedUDP
 	{
 	public:
@@ -30,6 +32,7 @@ namespace Base
 		std::map<GUID, MessageContext> _message_cache;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class FragmentedUDPServer : public BaseFragmentedUDP
 	{
 	public:
@@ -43,6 +46,7 @@ namespace Base
 		std::unique_ptr<UDPServer> _udp_server;
 	};
 
+	ATTRIBUTE_INTERFACE
 	class FragmentedUDPClient : public BaseFragmentedUDP
 	{
 	public:

@@ -3,7 +3,7 @@
 #define NOMINMAX
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
-#include <base/logging/win32.h>
+#include <base/logging.h>
 
 namespace Base
 {

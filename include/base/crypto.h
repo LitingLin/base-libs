@@ -1,5 +1,7 @@
 #pragma once
 
+#include <base/common.h>
+
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -10,6 +12,7 @@
 
 namespace Base {
 	namespace Crypto {
+		ATTRIBUTE_INTERFACE
 		class BCRYPT_ALG_HANDLE_GUARD
 		{
 		public:
@@ -23,7 +26,8 @@ namespace Base {
 		private:
 			BCRYPT_ALG_HANDLE handle;
 		};
-
+		
+		ATTRIBUTE_INTERFACE
 		class SHA256
 		{
 		public:
@@ -37,7 +41,7 @@ namespace Base {
 			DWORD _cbHash;
 			std::unique_ptr<unsigned char[]> _hash;
 		};
-
+				
 		class KeyObjectGuard
 		{
 		public:
@@ -48,6 +52,7 @@ namespace Base {
 			BCRYPT_KEY_HANDLE _handle;
 		};
 
+		ATTRIBUTE_INTERFACE
 		class AES128ECB
 		{
 		public:
@@ -65,6 +70,7 @@ namespace Base {
 			std::unique_ptr<KeyObjectGuard> _key;
 		};
 
+		ATTRIBUTE_INTERFACE
 		class RNG
 		{
 		public:
@@ -73,10 +79,14 @@ namespace Base {
 		private:
 			BCRYPT_ALG_HANDLE_GUARD _hALG;
 		};
-
+		
+		ATTRIBUTE_INTERFACE
 		std::string Base64Encode(const std::vector<unsigned char>& binary);
+		ATTRIBUTE_INTERFACE
 		std::vector<unsigned char> Base64Decode(const std::string& base64);
+		ATTRIBUTE_INTERFACE
 		std::string BinaryToHexadecimalString(const std::vector<unsigned char>& binary);
+		ATTRIBUTE_INTERFACE
 		std::vector<unsigned char> HexadecimalStringToBinary(const std::string& hex);
 	}
 }

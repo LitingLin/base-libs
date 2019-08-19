@@ -1,9 +1,7 @@
 #pragma once
 
-#include <base/logging.h>
-
-namespace Base {
-	class Win32ErrorCodeToString
+namespace Base {	
+	class ATTRIBUTE_INTERFACE Win32ErrorCodeToString
 	{
 	public:
 		Win32ErrorCodeToString(unsigned long errorCode, ...);
