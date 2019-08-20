@@ -22,7 +22,6 @@
     <ClInclude Include="..\include\base\dump_generator.h" />
     <ClInclude Include="..\include\base\crypto.h" />
     <ClInclude Include="..\include\base\event.h" />
-    <ClInclude Include="..\include\base\exception.h" />
     <ClInclude Include="..\include\base\file.h" />
     <ClInclude Include="..\include\base\fragmented_udp.h" />
     <ClInclude Include="..\include\base\image_decoder.h" />

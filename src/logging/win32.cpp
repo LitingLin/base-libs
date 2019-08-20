@@ -1,9 +1,9 @@
 #include <base/logging.h>
 
-#include <base/utils.h>
+#include <base/logging/win32/utils.h>
 
 namespace Base {
-	namespace Logging {
+	namespace Logging {		
 		Win32ErrorCodeToString::Win32ErrorCodeToString(unsigned long errorCode, ...)
 			: str(nullptr)
 		{
@@ -42,7 +42,7 @@ namespace Base {
 			if (ansi_str.empty())
 				if (str)
 				{
-					ansi_str = UTF16ToUTF8(str);
+					ansi_str = Details::UTF16ToUTF8(str);
 				}
 
 			return ansi_str.c_str();
@@ -164,7 +164,7 @@ namespace Base {
 
 		std::string getHRESULTErrorString(HRESULT dwErrorMsgId)
 		{
-			return UTF16ToUTF8(getHRESULTErrorWString(dwErrorMsgId));
+			return Details::UTF16ToUTF8(getHRESULTErrorWString(dwErrorMsgId));
 		}
 
 		std::wstring getNtStatusErrorWString(NTSTATUS ntstatus)
@@ -205,7 +205,7 @@ namespace Base {
 
 		std::string getNtStatusErrorString(NTSTATUS ntstatus)
 		{
-			return UTF16ToUTF8(getNtStatusErrorWString(ntstatus));
+			return Details::UTF16ToUTF8(getNtStatusErrorWString(ntstatus));
 		}
 	}
 }

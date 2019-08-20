@@ -2,13 +2,13 @@
 
 namespace Base
 {
-	FatalError::FatalError(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
+	FatalError::FatalError(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType)
+		: _message(message), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
-	FatalError::FatalError(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
+	FatalError::FatalError(std::string&& message, int64_t errorCode, ErrorCodeType errorCodeType)
+		: _message(std::move(message)), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
@@ -44,14 +44,19 @@ namespace Base
 		return _errorCodeType;
 	}
 
+	char const* FatalError::what() const
+	{
+		return _message.data();
+	}
 
-	RuntimeException::RuntimeException(const std::string& _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
+
+	RuntimeException::RuntimeException(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType)
+		: _message(message), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
-	RuntimeException::RuntimeException(const char* _Message, int64_t errorCode, ErrorCodeType errorCodeType)
-		: runtime_error(_Message), _errorCode(errorCode), _errorCodeType(errorCodeType)
+	RuntimeException::RuntimeException(std::string&& message, int64_t errorCode, ErrorCodeType errorCodeType)
+		: _message(std::move(message)), _errorCode(errorCode), _errorCodeType(errorCodeType)
 	{
 	}
 
@@ -85,6 +90,11 @@ namespace Base
 	ErrorCodeType RuntimeException::getErrorCodeType() const
 	{
 		return _errorCodeType;
+	}
+
+	char const* RuntimeException::what() const
+	{
+		return _message.data();
 	}
 
 #ifdef _WIN32

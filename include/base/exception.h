@@ -14,15 +14,17 @@
 namespace Base {
 	enum class ErrorCodeType
 	{
-		GENERIC, WIN32API, HRESULT, NTSTATUS, STDCAPI, SQLITE3, CUDA
+		GENERIC, STDCAPI, SQLITE3, CUDA,
+#ifdef _WIN32
+		WIN32API, HRESULT, NTSTATUS,
+#endif
 	};
-
-	ATTRIBUTE_INTERFACE
-	class FatalError : public std::runtime_error
+		
+	class ATTRIBUTE_INTERFACE FatalError : public std::exception
 	{
 	public:
-		explicit FatalError(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
-		explicit FatalError(const char* message, int64_t errorCode, ErrorCodeType errorCodeType);
+		FatalError(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
+		FatalError(std::string&& message, int64_t errorCode, ErrorCodeType errorCodeType);
 		int64_t getErrorCode() const;
 		int getErrorCodeAsCRTErrno() const;
 #ifdef _WIN32
@@ -31,17 +33,19 @@ namespace Base {
 		NTSTATUS getErrorCodeAsNTSTATUS() const;
 #endif
 		ErrorCodeType getErrorCodeType() const;
+		~FatalError() noexcept override = default;
+		char const* what() const override;
 	private:
+		std::string _message;
 		int64_t _errorCode;
 		ErrorCodeType _errorCodeType;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class RuntimeException : public std::runtime_error
+	class ATTRIBUTE_INTERFACE RuntimeException : public std::exception
 	{
 	public:
-		explicit RuntimeException(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
-		explicit RuntimeException(const char* message, int64_t errorCode, ErrorCodeType errorCodeType);
+		RuntimeException(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
+		RuntimeException(std::string&& message, int64_t errorCode, ErrorCodeType errorCodeType);
 		int64_t getErrorCode() const;
 		int getErrorCodeAsCRTErrno() const;
 #ifdef _WIN32
@@ -50,7 +54,10 @@ namespace Base {
 		NTSTATUS getErrorCodeAsNTSTATUS() const;
 #endif
 		ErrorCodeType getErrorCodeType() const;
+		~RuntimeException() noexcept override = default;
+		char const* what() const override;
 	private:
+		std::string _message;
 		int64_t _errorCode;
 		ErrorCodeType _errorCodeType;
 	};

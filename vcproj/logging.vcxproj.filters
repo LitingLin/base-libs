@@ -19,8 +19,23 @@
     <Filter Include="Header Files\logging">
       <UniqueIdentifier>{f261cef4-1101-40fd-83cc-817baa0bd55f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\logging\detail">
-      <UniqueIdentifier>{c7de5adf-0100-4e5b-9960-9cd7df7991ee}</UniqueIdentifier>
+    <Filter Include="Header Files\logging\sinks">
+      <UniqueIdentifier>{fe9a9943-e3bc-4dad-a6a8-3943bd8ffcd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logging\dispatcher">
+      <UniqueIdentifier>{955f41a5-c1bb-4443-acd1-6aa563517e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logging\dispatcher">
+      <UniqueIdentifier>{9cda2c80-f435-4e18-ba08-908b52b4de58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logging\sinks">
+      <UniqueIdentifier>{48ac1f98-bd67-4ad9-8bbf-22467e896d83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logging\win32">
+      <UniqueIdentifier>{e1453ad2-eb84-4bfa-b197-cdaacdf507f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logging\win32">
+      <UniqueIdentifier>{6def1945-d5d9-4930-a323-b75c6faf02cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +47,18 @@
     </ClCompile>
     <ClCompile Include="..\src\logging\win32.cpp">
       <Filter>Source Files\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\base\logging\base.cpp">
+      <Filter>Source Files\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\base\logging\dispatcher\dispatcher.cpp">
+      <Filter>Source Files\logging\dispatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\base\logging\sinks\stdout.cpp">
+      <Filter>Source Files\logging\sinks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\base\logging\win32\utils.cpp">
+      <Filter>Source Files\logging\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +76,30 @@
     </ClInclude>
     <ClInclude Include="..\include\base\logging\macros.h">
       <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\logging\base.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\debugging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\logging\stringify.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\logging\dispatcher\dispatcher.h">
+      <Filter>Header Files\logging\dispatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\logging\sinks\interface.h">
+      <Filter>Header Files\logging\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\logging\sinks\stdout.h">
+      <Filter>Header Files\logging\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\logging\win32\utils.h">
+      <Filter>Header Files\logging\win32</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -78,6 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,6 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\src;$(ProjectDir)..\3rd_party\spdlog\include;$(ProjectDir)..\3rd_party\cereal\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,16 +129,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\base\logging\base.cpp" />
+    <ClCompile Include="..\src\base\logging\dispatcher\dispatcher.cpp" />
+    <ClCompile Include="..\src\base\logging\sinks\stdout.cpp" />
+    <ClCompile Include="..\src\base\logging\win32\utils.cpp" />
     <ClCompile Include="..\src\logging.cpp" />
     <ClCompile Include="..\src\logging\win32.cpp" />
     <ClCompile Include="..\src\stack_trace.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\base\common.h" />
+    <ClInclude Include="..\include\base\debugging.h" />
+    <ClInclude Include="..\include\base\exception.h" />
     <ClInclude Include="..\include\base\logging.h" />
+    <ClInclude Include="..\include\base\logging\base.h" />
+    <ClInclude Include="..\include\base\logging\dispatcher\dispatcher.h" />
     <ClInclude Include="..\include\base\logging\exports.h" />
     <ClInclude Include="..\include\base\logging\macros.h" />
+    <ClInclude Include="..\include\base\logging\sinks\stdout.h" />
+    <ClInclude Include="..\include\base\logging\stringify.h" />
     <ClInclude Include="..\include\base\logging\win32.h" />
+    <ClInclude Include="..\include\base\logging\win32\utils.h" />
+    <ClInclude Include="..\src\base\logging\sinks\interface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

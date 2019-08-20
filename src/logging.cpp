@@ -7,6 +7,8 @@
 #include <string.h>
 
 #include <base/logging.h>
+#include <shared_mutex>
+#include <string_view>
 
 namespace Base
 {
@@ -40,7 +42,7 @@ namespace Base
 			public:
 				RuntimeException(const std::string& message)
 					: _message(message) {}
-				RuntimeException(std::string &&message)
+				RuntimeException(std::string&& message)
 					: _message(std::move(message)) {}
 				~RuntimeException() noexcept = default;
 				char const* what() const override
@@ -51,37 +53,209 @@ namespace Base
 				std::string _message;
 			};
 
-			struct LoggingMessageFinalHandler
-			{
-				std::string message;
-				Action action;
-				~LoggingMessageFinalHandler() noexcept(false)
-				{
-					if (action == Action::THROW_FATAL_ERROR)
-					{
-						throw FatalError(std::move(message));
-					}
-					else if (action == Action::THROW_RUNTIME_EXCEPTION)
-					{
-						throw RuntimeException(std::move(message));
-					}
-				}
-			};
-
 			class Sink
 			{
 			public:
-				
+				virtual std::string_view getName() = 0;
+				virtual void write(std::string_view message) = 0;
+				virtual void flush() = 0;
 			};
 			
-			struct LoggingDispatcher : public LoggingMessageFinalHandler
+			class LoggingMessageDispatcher
 			{
 			public:
-				LoggingDispatcher(std::vector<Sink> &sinks)
+				int addSink(Sink* sink)
 				{
-					
+					std::unique_lock<std::shared_mutex> lockGuard(_mutex);
+					int handle;
+					if (_sinks.empty())
+						handle = 0;
+					else
+						handle = _sinks.rbegin()->first + 1;
+					_sinks.emplace_back(handle, std::unique_ptr<Sink>(sink));
+					return handle;
 				}
-				~LoggingDispatcher();
+				void write(std::string_view string)
+				{
+					safe_executor([string](const std::unique_ptr<Sink>& sink)
+						{
+							sink->write(string);
+						});
+				}
+				void removeSink(int handle)
+				{
+					std::unique_ptr<Sink> sinkToRemove;
+					{
+						std::unique_lock<std::shared_mutex> lockGuard(_mutex);
+						for (size_t j = 0; j < _sinks.size(); ++j)
+						{
+							if ((std::ptrdiff_t)_sinks[j].first == handle)
+							{
+								std::swap(sinkToRemove, _sinks[j].second);
+								_sinks.erase(_sinks.begin() + j);
+								break;
+							}
+						}
+					}
+				}
+				void flush()
+				{
+					safe_executor([](const std::unique_ptr<Sink>& sink)
+						{
+							sink->flush();
+						});
+				}
+				~LoggingMessageDispatcher()
+				{
+					for (auto &_sink : _sinks)
+					{
+						auto& sink = _sink.second;
+						try
+						{
+							sink->flush();
+						}
+						catch (...) {}
+					}
+				}
+			private:
+				void safe_executor(const std::function<void(const std::unique_ptr<Sink>&)> &function)
+				{
+					std::vector<std::ptrdiff_t> failedSinks;
+					std::vector<std::string> failedSinkMessages;
+					{
+						std::shared_lock<std::shared_mutex> lockGuard(_mutex);
+						for (auto& _sink : _sinks)
+						{
+							auto& sink = _sink.second;
+							try
+							{
+								function(sink);
+							}
+							catch (std::exception& exception)
+							{
+								failedSinks.push_back((std::ptrdiff_t)sink.get());
+								failedSinkMessages.push_back(fmt::format("Exception thrown when writing to sink {}, message: {}\n", sink->getName(), exception.what()));
+							}
+							catch (...)
+							{
+								failedSinks.push_back((std::ptrdiff_t)sink.get());
+								failedSinkMessages.push_back(fmt::format("Exception thrown when writing to sink {}\n", sink->getName()));
+							}
+						}
+					}
+					if (!failedSinks.empty())
+					{
+						std::vector<std::unique_ptr<Sink>> sinksToRemove;
+						sinksToRemove.reserve(failedSinks.size());
+						std::string errorMessage;
+						{
+							std::unique_lock<std::shared_mutex> lockGuard(_mutex);
+							for (auto failedSinkAddress : failedSinks)
+							{
+								for (size_t j = 0; j < _sinks.size(); ++j)
+								{
+									if ((std::ptrdiff_t)_sinks[j].second.get() == failedSinkAddress)
+									{
+										sinksToRemove.push_back(std::unique_ptr<Sink>());
+										_sinks[j].second.swap(*sinksToRemove.rbegin());
+										_sinks.erase(_sinks.begin() + j);
+										break;
+									}
+								}
+							}
+						}
+						for (auto& exceptionMessage : failedSinkMessages)
+						{
+							errorMessage += exceptionMessage;
+						}
+						for (auto& sink : sinksToRemove)
+						{
+							errorMessage += fmt::format("Sink {} deleted from logging system.\n", sink->getName());
+						}
+						if (!errorMessage.empty())
+							write(errorMessage);
+					}
+				}
+				std::shared_mutex _mutex;
+				std::vector<std::pair<int, std::unique_ptr<Sink>>> _sinks;
+			};
+
+			struct LoggingMessageFinalHandler
+			{
+			public:
+				void setMessage(const std::string& message)
+				{
+					_message = message;
+				}
+				void setMessage(std::string&& message)
+				{
+					_message = std::move(message);
+				}
+				void setAction(Action action)
+				{
+					_action = action;
+				}
+				~LoggingMessageFinalHandler() noexcept(false)
+				{
+					if (_action == Action::THROW_FATAL_ERROR)
+					{
+						throw FatalError(std::move(_message));
+					}
+					else if (_action == Action::THROW_RUNTIME_EXCEPTION)
+					{
+						throw RuntimeException(std::move(_message));
+					}
+				}
+			protected:
+				std::string _message;
+				Action _action;
+			};
+			
+			class FatalErrorLoggingStream : public LoggingMessageFinalHandler
+			{
+			public:
+				std::stringstream& stream()
+				{
+					return _stream;
+				}
+				~FatalErrorLoggingStream()
+				{
+					_stream << std::endl
+						<< "*** Check failure stack trace: ***" << std::endl
+						<< getStackTrace();
+					if (std::uncaught_exceptions()) {
+						setAction(Action::LOGGING_ONLY);
+						setMessage(fmt::format("Fatal error occurred during exception handling.\n{}", _stream.str());
+					}
+					else {
+						setMessage(_stream.str());
+						setAction(Action::THROW_FATAL_ERROR);
+					}
+				}
+			private:
+				std::stringstream _stream;
+			};
+
+			class RuntimeExceptionLoggingStream : public LoggingMessageFinalHandler
+			{
+			public:
+				std::stringstream& stream()
+				{
+					return _stream;
+				}
+				~RuntimeExceptionLoggingStream()
+				{
+					if (std::uncaught_exceptions()) {
+						setAction(Action::LOGGING_ONLY);
+						setMessage(fmt::format("Fatal error occurred during exception handling.\n{}", _stream.str());
+					}
+					else {
+						setMessage(_stream.str());
+						setAction(Action::THROW_RUNTIME_EXCEPTION);
+					}
+				}
+			private:
+				std::stringstream _stream;
 			};
 			
 			const char* get_base_file_name(const char* file_name)
@@ -109,92 +283,22 @@ namespace Base
 				}
 			}
 
-			std::string generateHeader(const char *file, int line, const char *function)
+			std::string generateHeader(const char* file, int line, const char* function)
 			{
 				return fmt::format("[{}:{} {}] ", file, line, function);
 			}
 
-			std::string generateHeader(const char* file, int line, const char* function, const char *exp)
+			std::string generateHeader(const char* file, int line, const char* function, const char* exp)
 			{
 				return fmt::format("[{}:{} {}] Check failed: {} ", file, line, function, exp);
 			}
 
-			std::string generateHeader(const char* file, int line, const char* function, const char *leftExp, const char *op, const char *rightExp)
+			std::string generateHeader(const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
 			{
 				return fmt::format("[{}:{} {}] Check failed: {} {} {} ", file, line, function, leftExp, op, rightExp);
 			}
 
 
-			
-			_BaseLogging::_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
-				: _ExceptionHandlerExecutor(handler), _errorCode(errorCode), _errorCodeType(errorCodeType)
-			{
-				_stream << '[' << get_base_file_name(file) << ':' << line << ' ' << function << "] ";
-			}
-			_BaseLogging::_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function)
-			{
-				_stream << "Check failed: " << exp << ' ';
-			}
-			_BaseLogging::_BaseLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function)
-			{
-				_stream << "Check failed: " << leftExp << ' ' << op << ' ' << rightExp << ' ';
-			}
-
-			std::ostringstream& _BaseLogging::stream()
-			{
-				return _stream;
-			}
-
-			FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function) {}
-			FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, exp) {}
-			FatalErrorLogging::FatalErrorLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, leftExp, op, rightExp) {}
-
-			FatalErrorLogging::~FatalErrorLogging() noexcept(false)
-			{
-				_stream << std::endl
-					<< "*** Check failure stack trace: ***" << std::endl
-					<< getStackTrace();
-				if (std::uncaught_exceptions())
-					logger->critical("Fatal error occurred during exception handling. Message: {}", _stream.str());
-				else {
-					logger->critical(_stream.str());
-					throw FatalError(_stream.str(), _errorCode, _errorCodeType);
-				}
-			}
-
-			RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function) {}
-			RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, exp) {}
-			RuntimeExceptionLogging::RuntimeExceptionLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, leftExp, op, rightExp) {}
-
-			RuntimeExceptionLogging::~RuntimeExceptionLogging() noexcept(false)
-			{
-				if (std::uncaught_exceptions())
-					logger->error("Runtime exception occurred during exception handling. Message: {}", _stream.str());
-				else {
-					logger->warn(_stream.str());
-					throw RuntimeException(_stream.str(), _errorCode, _errorCodeType);
-				}
-			}
-
-			EventLogging::EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function) {}
-			EventLogging::EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* exp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, exp) {}
-			EventLogging::EventLogging(ErrorCodeType errorCodeType, int64_t errorCode, std::function<void(void)> handler, const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp)
-				: _BaseLogging(errorCodeType, errorCode, handler, file, line, function, leftExp, op, rightExp) {}
-
-			EventLogging::~EventLogging() noexcept(false)
-			{
-				logger->info(_stream.str());
-			}
 
 #ifdef _WIN32
 			std::string getStdCApiErrorString(int errnum)
@@ -213,6 +317,6 @@ namespace Base
 			}
 
 #endif
+			}
 		}
 	}
-}
