@@ -19,6 +19,9 @@
     <Filter Include="Header Files\logging">
       <UniqueIdentifier>{f261cef4-1101-40fd-83cc-817baa0bd55f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\logging\detail">
+      <UniqueIdentifier>{c7de5adf-0100-4e5b-9960-9cd7df7991ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\stack_trace.cpp">
@@ -40,6 +43,12 @@
     </ClInclude>
     <ClInclude Include="..\include\base\common.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\logging\exports.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\base\logging\macros.h">
+      <Filter>Header Files\logging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -134,6 +134,8 @@
   <ItemGroup>
     <ClInclude Include="..\include\base\common.h" />
     <ClInclude Include="..\include\base\logging.h" />
+    <ClInclude Include="..\include\base\logging\exports.h" />
+    <ClInclude Include="..\include\base\logging\macros.h" />
     <ClInclude Include="..\include\base\logging\win32.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
