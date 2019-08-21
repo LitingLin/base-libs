@@ -18,8 +18,7 @@ namespace Base
 		virtual bool job_cancel() = 0; // true: exit signal posted; false: not acceptable or not support
 	};
 
-	ATTRIBUTE_INTERFACE
-	class Thread
+	class ATTRIBUTE_INTERFACE Thread
 	{
 	public:
 		Thread();
@@ -59,8 +58,7 @@ namespace Base
 		HANDLE _handle;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class WorkerWrapper
+	class ATTRIBUTE_INTERFACE WorkerWrapper
 	{
 	public:
 		WorkerWrapper(std::unique_ptr<Runnable> runnable, bool crashOnUnexpectedExit = false, bool runImmediately = true, bool enableCrashNotify = false);
@@ -83,8 +81,7 @@ namespace Base
 		Thread _thread;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class ThreadSynchronization
+	class ATTRIBUTE_INTERFACE ThreadSynchronization
 	{
 	public:
 		static void join(Thread *threads, unsigned n, unsigned *i);

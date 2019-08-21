@@ -14,8 +14,7 @@ namespace Base
 	ATTRIBUTE_INTERFACE
 	bool operator<(const GUID& left, const GUID& right);
 
-	ATTRIBUTE_INTERFACE
-	class BaseFragmentedUDP
+	class ATTRIBUTE_INTERFACE BaseFragmentedUDP
 	{
 	public:
 		void cleanup(uint64_t timeout);
@@ -32,8 +31,7 @@ namespace Base
 		std::map<GUID, MessageContext> _message_cache;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class FragmentedUDPServer : public BaseFragmentedUDP
+	class ATTRIBUTE_INTERFACE FragmentedUDPServer : public BaseFragmentedUDP
 	{
 	public:
 		FragmentedUDPServer(std::unique_ptr<UDPServer> udp_server);
@@ -46,8 +44,7 @@ namespace Base
 		std::unique_ptr<UDPServer> _udp_server;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class FragmentedUDPClient : public BaseFragmentedUDP
+	class ATTRIBUTE_INTERFACE FragmentedUDPClient : public BaseFragmentedUDP
 	{
 	public:
 		FragmentedUDPClient(std::unique_ptr<UDPClient> udp_client);

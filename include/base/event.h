@@ -4,8 +4,7 @@
 typedef void * HANDLE;
 
 namespace Base {
-	ATTRIBUTE_INTERFACE
-	class Event
+	class ATTRIBUTE_INTERFACE Event
 	{
 	public:
 		Event();

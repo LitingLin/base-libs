@@ -7,21 +7,7 @@
 
 namespace Base
 {
-	// Use std::mutex instead
-	class __declspec(deprecated) Mutex
-	{
-	public:
-		Mutex();
-		~Mutex();
-		void lock();
-		bool try_lock();
-		void unlock();
-	private:
-		CRITICAL_SECTION _handle;
-	};
-
-	ATTRIBUTE_INTERFACE
-	class NamedMutex
+	class ATTRIBUTE_INTERFACE NamedMutex
 	{
 	public:
 		NamedMutex(const wchar_t *name, bool acl = false);

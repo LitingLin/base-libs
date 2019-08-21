@@ -62,9 +62,8 @@ namespace Base {
 	std::string getCanonicalPath(const std::string&path);
 	ATTRIBUTE_INTERFACE
 	std::wstring getCanonicalPath(const std::wstring& path);
-
-	ATTRIBUTE_INTERFACE
-	class File
+		
+	class ATTRIBUTE_INTERFACE File
 	{
 	public:
 		enum class DesiredAccess
@@ -130,8 +129,7 @@ namespace Base {
         Other
     };
 
-	ATTRIBUTE_INTERFACE
-    class DirectoryIterator
+    class ATTRIBUTE_INTERFACE DirectoryIterator
     {
     public:
         DirectoryIterator(const PLATFORM_STRING_TYPE &path);
@@ -154,9 +152,8 @@ namespace Base {
 		virtual ~IDirectoryFileListGetter() = default;
 		virtual bool getFileList(std::vector<PLATFORM_STRING_TYPE> &fileNames, std::vector<uint64_t> &lastWriteTimes) = 0;
 	};
-
-	ATTRIBUTE_INTERFACE
-	class SequentialDirectoryFileListGetter : public IDirectoryFileListGetter
+		
+	class ATTRIBUTE_INTERFACE SequentialDirectoryFileListGetter : public IDirectoryFileListGetter
 	{
 	public:
         SequentialDirectoryFileListGetter(const PLATFORM_STRING_TYPE &path);
@@ -164,9 +161,8 @@ namespace Base {
 	private:
         PLATFORM_STRING_TYPE _path;
 	};
-
-	ATTRIBUTE_INTERFACE
-	class RandomDirectoryFileListGetter : public IDirectoryFileListGetter
+		
+	class ATTRIBUTE_INTERFACE RandomDirectoryFileListGetter : public IDirectoryFileListGetter
 	{
 	public:
         RandomDirectoryFileListGetter(const PLATFORM_STRING_TYPE &path);

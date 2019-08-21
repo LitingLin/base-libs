@@ -6,8 +6,7 @@
 typedef void *HANDLE;
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
-	class Timer
+	class ATTRIBUTE_INTERFACE Timer
 	{
 	public:
 		enum class TimerState { INACTIVE, ACTIVE, PAUSE };

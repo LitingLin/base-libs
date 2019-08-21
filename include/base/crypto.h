@@ -12,8 +12,7 @@
 
 namespace Base {
 	namespace Crypto {
-		ATTRIBUTE_INTERFACE
-		class BCRYPT_ALG_HANDLE_GUARD
+		class ATTRIBUTE_INTERFACE BCRYPT_ALG_HANDLE_GUARD
 		{
 		public:
 			enum class AlgorithmType
@@ -27,8 +26,7 @@ namespace Base {
 			BCRYPT_ALG_HANDLE handle;
 		};
 		
-		ATTRIBUTE_INTERFACE
-		class SHA256
+		class ATTRIBUTE_INTERFACE SHA256
 		{
 		public:
 			SHA256();
@@ -52,8 +50,7 @@ namespace Base {
 			BCRYPT_KEY_HANDLE _handle;
 		};
 
-		ATTRIBUTE_INTERFACE
-		class AES128ECB
+		class ATTRIBUTE_INTERFACE AES128ECB
 		{
 		public:
 			AES128ECB(const std::vector<unsigned char>& key);
@@ -70,8 +67,7 @@ namespace Base {
 			std::unique_ptr<KeyObjectGuard> _key;
 		};
 
-		ATTRIBUTE_INTERFACE
-		class RNG
+		class ATTRIBUTE_INTERFACE RNG
 		{
 		public:
 			RNG();

@@ -1,7 +1,7 @@
 #pragma once
 
 #if defined _WIN32
-#ifdef COMPILING_DLL
+#if defined COMPILING_DLL || defined _WINDLL
 #define ATTRIBUTE_INTERFACE __declspec(dllexport)
 #else
 #define ATTRIBUTE_INTERFACE

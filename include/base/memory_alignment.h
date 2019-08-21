@@ -12,8 +12,7 @@ namespace Base
 	ATTRIBUTE_INTERFACE
 	bool isAlignedWithSIMDMemoryAlignmentRequirement(const void* ptr);
 
-	ATTRIBUTE_INTERFACE
-	class AlignedMemorySpace
+	class ATTRIBUTE_INTERFACE AlignedMemorySpace
 	{
 	public:
 		AlignedMemorySpace(size_t size, unsigned alignment = getSIMDMemoryAlignmentRequirement());
@@ -35,8 +34,7 @@ namespace Base
 		AlignedMemorySpace _alignedMemorySpace;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class AlignedDynamicRawArray
+	class ATTRIBUTE_INTERFACE AlignedDynamicRawArray
 	{
 	public:
 		AlignedDynamicRawArray();

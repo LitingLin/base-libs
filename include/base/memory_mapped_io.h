@@ -7,8 +7,7 @@
 namespace Base
 {
 	// File backend
-	ATTRIBUTE_INTERFACE
-	class MemoryMappedIO
+	class ATTRIBUTE_INTERFACE MemoryMappedIO
 	{
 	public:
         explicit MemoryMappedIO(File *file, File::DesiredAccess desiredAccess = File::DesiredAccess::Read, uint64_t size = 0, uint64_t offset = 0);
@@ -26,8 +25,7 @@ namespace Base
 		void *_ptr;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class BufferedFileOperator
+	class ATTRIBUTE_INTERFACE BufferedFileOperator
 	{
 	public:
 		constexpr static uint64_t ExpandingSize = 4ULL * 1024ULL * 1024ULL; // 4MB

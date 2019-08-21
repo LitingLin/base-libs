@@ -1,4 +1,5 @@
 #pragma once
+#include <base/common.h>
 #include <vector>
 
 #ifdef _WIN32
@@ -11,7 +12,7 @@
 namespace Base
 {
 #ifdef _WIN32
-	class WindowsImageDecoder
+	class ATTRIBUTE_INTERFACE WindowsImageDecoder
 	{
 	public:
 		WindowsImageDecoder(const unsigned char *data, uint32_t data_size);

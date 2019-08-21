@@ -1,27 +1,6 @@
 #pragma once
 
-namespace Base {
-	namespace Logging {
-		class ATTRIBUTE_INTERFACE Win32ErrorCodeToString
-		{
-		public:
-			Win32ErrorCodeToString(unsigned long errorCode, ...);
-			std::string getString() const;
-			std::wstring getWString() const;
-			~Win32ErrorCodeToString();
-		private:
-			mutable std::string ansi_str;
-			wchar_t* str;
-		};
-
-		std::string getWin32LastErrorString();
-		std::string getWin32ErrorString(DWORD errorCode);
-		std::wstring getHRESULTErrorWString(HRESULT hr);
-		std::string getHRESULTErrorString(HRESULT hr);
-		std::wstring getNtStatusErrorWString(NTSTATUS ntstatus);
-		std::string getNtStatusErrorString(NTSTATUS ntStatus);
-	}
-}
+#include <base/error_codes/win32/stringify.h>
 
 /* ----------------------------- FATAL ERROR ----------------------------- */
 // "Let it crash"

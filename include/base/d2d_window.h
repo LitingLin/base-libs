@@ -26,9 +26,8 @@
 *                                                                 *
 ******************************************************************/
 
-namespace Base {
-	ATTRIBUTE_INTERFACE
-	class D2DWindow
+namespace Base {	
+	class ATTRIBUTE_INTERFACE D2DWindow
 	{
 	public:
 		D2DWindow();

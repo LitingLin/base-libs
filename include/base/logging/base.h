@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 #include <base/common.h>
-#include <base/exception.h>
+#include <base/error_codes.h>
 
 namespace Base
 {
@@ -21,7 +21,7 @@ namespace Base
 			struct LoggingMessageFinalHandler
 			{
 			public:
-				LoggingMessageFinalHandler(int64_t errorCode, ErrorCodeType errorCodeType);
+				LoggingMessageFinalHandler(ErrorCodeType errorCodeType, int64_t errorCode);
 				void setMessage(const std::string& message);
 				void setMessage(std::string&& message);
 				void setAction(Action action);
@@ -29,8 +29,8 @@ namespace Base
 			protected:
 				std::string _message;
 				Action _action;
-				int64_t _errorCode;
 				ErrorCodeType _errorCodeType;
+				int64_t _errorCode;
 			};
 
 		}
@@ -38,7 +38,7 @@ namespace Base
 		class ATTRIBUTE_INTERFACE FatalErrorLoggingStream : public Details::LoggingMessageFinalHandler
 		{
 		public:
-			FatalErrorLoggingStream(int64_t errorCode, ErrorCodeType errorCodeType);
+			FatalErrorLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode);
 			std::stringstream& stream();
 			~FatalErrorLoggingStream();
 		private:
@@ -48,9 +48,19 @@ namespace Base
 		class ATTRIBUTE_INTERFACE RuntimeExceptionLoggingStream : public Details::LoggingMessageFinalHandler
 		{
 		public:
-			RuntimeExceptionLoggingStream(int64_t errorCode, ErrorCodeType errorCodeType);
+			RuntimeExceptionLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode);
 			std::stringstream& stream();
 			~RuntimeExceptionLoggingStream();
+		private:
+			std::stringstream _stream;
+		};
+		
+		class ATTRIBUTE_INTERFACE EventLoggingStream : public Details::LoggingMessageFinalHandler
+		{
+		public:
+			EventLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode);
+			std::stringstream& stream();
+			~EventLoggingStream();
 		private:
 			std::stringstream _stream;
 		};

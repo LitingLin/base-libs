@@ -9,7 +9,7 @@
 
 namespace Base
 {
-    class ImageDecoder
+    class ATTRIBUTE_INTERFACE ImageDecoder
     {
     public:
         void load(const void *buffer, size_t size, ImageFormatType formatType);
@@ -19,9 +19,9 @@ namespace Base
         void decode(void *output);
 
     private:
-        Base::JPEGDecoder _jpegDecoder;
-        Base::PNGDecoder _pngDecoder;
-        Base::WebPDecoder _webpDecoder;
+        JPEGDecoder _jpegDecoder;
+        PNGDecoder _pngDecoder;
+        WebPDecoder _webpDecoder;
 
         ImageFormatType _format;
     };

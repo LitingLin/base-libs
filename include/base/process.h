@@ -13,8 +13,7 @@
 
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
-	class OpenProcessGuard
+	class ATTRIBUTE_INTERFACE OpenProcessGuard
 	{
 	public:
 		OpenProcessGuard(DWORD dwDesiredAccess, DWORD dwProcessId);
@@ -23,9 +22,8 @@ namespace Base
 	private:
 		HANDLE handle;
 	};
-
-	ATTRIBUTE_INTERFACE
-	class Process
+		
+	class ATTRIBUTE_INTERFACE Process
 	{
 	public:
 		Process(const wchar_t *application, const wchar_t *command = nullptr);
@@ -40,8 +38,7 @@ namespace Base
 		HANDLE _processHandle;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class ProcessMonitor
+	class ATTRIBUTE_INTERFACE ProcessMonitor
 	{
 	public:
 		ProcessMonitor();

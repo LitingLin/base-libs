@@ -8,13 +8,13 @@
 #include <Windows.h>
 #endif
 #include <base/common.h>
+#include <stdio.h>
 #include <jpeglib.h>
 #include <cstdint>
 
 namespace Base
-{
-	ATTRIBUTE_INTERFACE
-	class JPEGDecoder
+{	
+	class ATTRIBUTE_INTERFACE JPEGDecoder
 	{
 	public:
 		JPEGDecoder();

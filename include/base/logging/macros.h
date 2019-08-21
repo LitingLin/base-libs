@@ -1,5 +1,77 @@
 #pragma once
 
+#include <base/common.h>
+#include <memory>
+#include <string>
+#include <functional>
+#include <base/logging/base.h>
+
+namespace Base {
+	namespace Logging {
+		namespace Details {
+			template <typename T1, typename T2, typename Op>
+			std::unique_ptr<std::pair<T1, T2>> check_impl(const T1& a, const T2& b, Op op) {
+				if (op(a, b))
+					return nullptr;
+				else
+					return std::make_unique<std::pair<T1, T2>>(a, b);
+			}
+			template <typename Type, template <class Type2 = Type> class Operator>
+			struct _Comparator
+			{
+				_Comparator(const Type& first, const Type& second)
+					: first(first), second(second) {}
+				operator bool()
+				{
+					Operator<> op;
+					return op(first, second);
+				}
+				Type first;
+				Type second;
+			};
+			template <typename Type, template <class Type2 = Type> class Operator>
+			struct _ReverseComparator
+			{
+				_ReverseComparator(const Type& first, const Type& second)
+					: first(first), second(second) {}
+				operator bool()
+				{
+					Operator<> op;
+					return !op(first, second);
+				}
+				Type first;
+				Type second;
+			};
+			struct _StreamTypeVoidify
+			{
+				void operator&(std::ostream&) const {}
+			};
+			
+			ATTRIBUTE_INTERFACE
+			std::string generateHeader(const char* file, int line, const char* function);
+			ATTRIBUTE_INTERFACE
+			std::string generateHeader(const char* file, int line, const char* function, const char* exp);
+			ATTRIBUTE_INTERFACE
+			std::string generateHeader(const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
+
+			template <typename LoggingStream, class ...Args>
+			struct Finalizer : public LoggingStream
+			{
+			public:
+				Finalizer(std::function<void(void)> function, Args... args)
+					: LoggingStream(args...) {
+					if (function)
+						function();
+				}
+			};
+
+			typedef Finalizer<FatalErrorLoggingStream, ErrorCodeType, int64_t> FatalErrorLoggingStreamWithFinalizer;
+			typedef Finalizer<RuntimeExceptionLoggingStream, ErrorCodeType, int64_t> RuntimeExceptionLoggingStreamWithFinalizer;
+			typedef Finalizer<EventLoggingStream, ErrorCodeType, int64_t> EventLoggingStreamWithFinalizer;
+		}
+	}
+}
+
 /* ----------------------------- HELPER MACRO ----------------------------- */
 #define _COMPARATOR_NAME2(PREFIX, LINENUMBER) _PP_CAT(PREFIX, LINENUMBER)
 #define _COMPARATOR_NAME _COMPARATOR_NAME2(COMPARATOR_, __LINE__)
@@ -9,15 +81,21 @@
 #define LOG_GET_RIGHT_EXPRESSION_RC \
 	_values_.second
 
+#define _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS Base::Logging::Details::FatalErrorLoggingStreamWithFinalizer
+#define _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS Base::Logging::Details::RuntimeExceptionLoggingStreamWithFinalizer
+#define _LOG_EVENT_LOGGING_STREAM_CLASS Base::Logging::Details::EventLoggingStreamWithFinalizer
+
+#define _LOG_IMPL_NAMESPACE Base::Logging::Details
+
 /* ----------------------------- GENERIC ----------------------------- */
 #define _LOG_GENERIC(loggingClass, errorCodeType, errorCode, handler) \
-loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__).stream()
+loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__)
 
 #define _LOG_CONDITIONED_GENERIC(condition, loggingClass, errorCodeType, errorCode, handler) \
-(condition) ? (void) 0 : Base::_StreamTypeVoidify() & loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #condition).stream()
+(condition) ? (void) 0 : _LOG_IMPL_NAMESPACE::_StreamTypeVoidify() & loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #condition)
 
 #define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
-if (auto _values_ = Base::_Comparator<decltype(leftExp), functional_op> ((leftExp), (rightExp))) ; else loggingClass(errorCodeType, errorCode, handler, __FILE__, __LINE__, __func__, #leftExp, #op, #rightExp).stream()
+if (auto _values_ = _LOG_IMPL_NAMESPACE::_Comparator<decltype(leftExp), functional_op> ((leftExp), (rightExp))) ; else loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #leftExp, #op, #rightExp)
 
 #define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
 _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to, loggingClass, errorCodeType, errorCode, handler)
@@ -40,17 +118,17 @@ _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, < , std::less, loggingClas
 
 /* ----------------------------- UNRECOVERABLE ERROR ----------------------------- */
 #define NOT_IMPLEMENTED_ERROR \
-_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
+_LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
 
 #define UNREACHABLE_ERROR \
-_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
+_LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
 
 /* ----------------------------- FATAL ERROR ----------------------------- */
 // "Let it crash"
 
 #define FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_FATAL_ERROR, __VA_ARGS__)
 #define _FATAL_ERROR_1(errorCode) \
-_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, errorCode, nullptr)
+_LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, errorCode, nullptr)
 
 // Let it crash, don't catch
 #define _FATAL_ERROR_0() \
@@ -58,14 +136,14 @@ _FATAL_ERROR_1(-1)
 
 #define FATAL_ERROR_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_FATAL_ERROR_HANDLER, __VA_ARGS__)
 #define _FATAL_ERROR_HANDLER_2(errorCode, handler) \
-_LOG_GENERIC(Base::FatalErrorLogging, Base::ErrorCodeType::GENERIC, errorCode, handler)
+_LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _FATAL_ERROR_HANDLER_1(handler) \
 _FATAL_EEROR_HANDLER_2(-1, handler)
 
 
 #define ENSURE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_WITH_HANDLER, __VA_ARGS__)
 #define _ENSURE_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_GENERIC(condition, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_GENERIC(condition, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _ENSURE_WITH_HANDLER_3(condition, errorCode, handler) \
 _ENSURE_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _ENSURE_WITH_HANDLER_2(condition, handler) \
@@ -81,7 +159,7 @@ _ENSURE_2(condition, -1)
 
 #define ENSURE_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_EQ_WITH_HANDLER, __VA_ARGS__)
 #define _ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _ENSURE_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _ENSURE_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -97,7 +175,7 @@ _ENSURE_EQ_3(leftExp, rightExp, -1)
 
 #define ENSURE_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_NE_WITH_HANDLER, __VA_ARGS__)
 #define _ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _ENSURE_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _ENSURE_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -113,7 +191,7 @@ _ENSURE_NE_3(leftExp, rightExp, -1)
 
 #define ENSURE_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_GE_WITH_HANDLER, __VA_ARGS__)
 #define _ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _ENSURE_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _ENSURE_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -129,7 +207,7 @@ _ENSURE_GE_3(leftExp, rightExp, -1)
 
 #define ENSURE_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_GT_WITH_HANDLER, __VA_ARGS__)
 #define _ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _ENSURE_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _ENSURE_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -145,7 +223,7 @@ _ENSURE_GT_3(leftExp, rightExp, -1)
 
 #define ENSURE_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_LE_WITH_HANDLER, __VA_ARGS__)
 #define _ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _ENSURE_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _ENSURE_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -161,7 +239,7 @@ _ENSURE_LE_3(leftExp, rightExp, -1)
 
 #define ENSURE_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_LT_WITH_HANDLER, __VA_ARGS__)
 #define _ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::FatalErrorLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _ENSURE_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _ENSURE_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -187,7 +265,7 @@ _ENSURE_NE_WITH_HANDLER_5(condition, value, Base::ErrorCodeType::STDCAPI, errno,
 // But recoverable
 #define CHECK_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_WITH_HANDLER, __VA_ARGS__)
 #define _CHECK_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_GENERIC(condition, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_GENERIC(condition, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _CHECK_WITH_HANDLER_3(condition, errorCode, handler) \
 _CHECK_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _CHECK_WITH_HANDLER_2(condition, handler) \
@@ -203,7 +281,7 @@ _CHECK_2(condition, -1)
 
 #define CHECK_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_EQ_WITH_HANDLER, __VA_ARGS__)
 #define _CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _CHECK_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _CHECK_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -219,7 +297,7 @@ _CHECK_EQ_3(leftExp, rightExp, -1)
 
 #define CHECK_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_NE_WITH_HANDLER, __VA_ARGS__)
 #define _CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _CHECK_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _CHECK_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -235,7 +313,7 @@ _CHECK_NE_3(leftExp, rightExp, -1)
 
 #define CHECK_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_GE_WITH_HANDLER, __VA_ARGS__)
 #define _CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _CHECK_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _CHECK_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -251,7 +329,7 @@ _CHECK_GE_3(leftExp, rightExp, -1)
 
 #define CHECK_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_GT_WITH_HANDLER, __VA_ARGS__)
 #define _CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _CHECK_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _CHECK_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -267,7 +345,7 @@ _CHECK_GT_3(leftExp, rightExp, -1)
 
 #define CHECK_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_LE_WITH_HANDLER, __VA_ARGS__)
 #define _CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _CHECK_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _CHECK_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -283,7 +361,7 @@ _CHECK_LE_3(leftExp, rightExp, -1)
 
 #define CHECK_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_LT_WITH_HANDLER, __VA_ARGS__)
 #define _CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::RuntimeExceptionLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _CHECK_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _CHECK_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -311,15 +389,15 @@ _CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno,
 CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
 
 #define THROW_RUNTIME_EXCEPTION \
-_LOG_GENERIC(Base::RuntimeExceptionLogging, Base::ErrorCodeType::GENERIC, -1, nullptr)
+_LOG_GENERIC(_LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr)
 
 #define THROW_STDCAPI_RUNTIME_EXCEPTION \
-_LOG_GENERIC(Base::RuntimeExceptionLogging, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+_LOG_GENERIC(_LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
 /* ----------------------------- LOGGING ONLY ----------------------------- */
 #define LOG_IF_FAILED_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_FAILED_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_FAILED_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_GENERIC(condition, Base::EventLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_GENERIC(condition, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _LOG_IF_FAILED_WITH_HANDLER_3(condition, errorCode, handler) \
 _LOG_IF_FAILED_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_FAILED_WITH_HANDLER_2(condition, handler) \
@@ -335,7 +413,7 @@ _LOG_IF_FAILED_2(condition, -1)
 
 #define LOG_IF_NOT_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_EQ_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -351,7 +429,7 @@ _LOG_IF_NOT_EQ_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_NE_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -367,7 +445,7 @@ _LOG_IF_NOT_NE_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GE_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -383,7 +461,7 @@ _LOG_IF_NOT_GE_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GT_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -399,7 +477,7 @@ _LOG_IF_NOT_GT_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LE_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -415,7 +493,7 @@ _LOG_IF_NOT_LE_3(leftExp, rightExp, -1)
 
 #define LOG_IF_NOT_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LT_WITH_HANDLER, __VA_ARGS__)
 #define _LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, Base::EventLogging, errorCodeType, errorCode, handler)
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
 #define _LOG_IF_NOT_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
 _LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
 #define _LOG_IF_NOT_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
@@ -439,7 +517,7 @@ _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, e
 _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
 #define LOGGING_ERROR \
-_LOG_GENERIC(Base::EventLogging, Base::ErrorCodeType::GENERIC, -1, nullptr)
+_LOG_GENERIC(_LOG_EVENT_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr)
 
 #define LOGGING_STDCAPI_ERROR \
-_LOG_GENERIC(Base::EventLogging, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+_LOG_GENERIC(_LOG_EVENT_LOGGING_STREAM_CLASS, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)

@@ -7,8 +7,7 @@
 
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
-	class WebPDecoder
+	class ATTRIBUTE_INTERFACE WebPDecoder
 	{
 	public:
 		void load(const void* pointer, uint64_t size);

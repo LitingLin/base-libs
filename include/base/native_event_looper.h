@@ -19,8 +19,7 @@ namespace Base
 		virtual void callback(uint32_t index) = 0;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class NativeEventLooper
+	class ATTRIBUTE_INTERFACE NativeEventLooper
 	{
 	public:
 		NativeEventLooper();

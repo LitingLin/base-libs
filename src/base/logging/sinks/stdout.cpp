@@ -17,15 +17,25 @@ namespace Base
 		}
 
 #ifdef _WIN32
+		static HANDLE _stdhandle = nullptr;
+		
+		StdOutSink::StdOutSink()
+		{
+			_stdhandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		}
+		
 		void StdOutSink::write(std::string_view message)
 		{
+			if (_stdhandle == nullptr || _stdhandle == INVALID_HANDLE_VALUE)
+				return;
 			std::wstring UTF16Message = Details::UTF8ToUTF16(message);
-			WriteConsoleW()
+			DWORD numberOfCharsWritten;
+			WriteConsoleW(_stdhandle, message.data(), message.size(), &numberOfCharsWritten, NULL);
 		}
 
 		void StdOutSink::flush()
 		{
-		}
+		}		
 #else
 		void StdOutSink::write(std::string_view message)
 		{

@@ -2,14 +2,16 @@
 #include <base/exception.h>
 #include <base/debugging.h>
 
+#include <base/logging/dispatcher/dispatcher.h>
+
 namespace Base
 {
 	namespace Logging
 	{
 		namespace Details
 		{
-			LoggingMessageFinalHandler::LoggingMessageFinalHandler(int64_t errorCode,
-				ErrorCodeType errorCodeType) : _errorCode(errorCode), _errorCodeType(errorCodeType)
+			LoggingMessageFinalHandler::LoggingMessageFinalHandler(ErrorCodeType errorCodeType, int64_t errorCode)
+			: _errorCodeType(errorCodeType), _errorCode(errorCode)
 			{
 			}
 			void LoggingMessageFinalHandler::setMessage(const std::string& message)
@@ -26,6 +28,8 @@ namespace Base
 			}
 			LoggingMessageFinalHandler::~LoggingMessageFinalHandler() noexcept(false)
 			{
+				g_dispatcher.write(_message);
+				
 				if (_action == Action::THROW_FATAL_ERROR)
 				{
 					throw FatalError(std::move(_message), _errorCode, _errorCodeType);
@@ -37,6 +41,8 @@ namespace Base
 			}
 		}
 
+		FatalErrorLoggingStream::FatalErrorLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode)
+			: LoggingMessageFinalHandler(errorCodeType, errorCode) { }
 
 		std::stringstream& FatalErrorLoggingStream::stream()
 		{
@@ -58,6 +64,9 @@ namespace Base
 			}
 		}
 
+		RuntimeExceptionLoggingStream::RuntimeExceptionLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode)
+			: LoggingMessageFinalHandler(errorCodeType, errorCode) { }
+
 		std::stringstream& RuntimeExceptionLoggingStream::stream()
 		{
 			return _stream;
@@ -72,6 +81,20 @@ namespace Base
 				setMessage(_stream.str());
 				setAction(Details::Action::THROW_RUNTIME_EXCEPTION);
 			}
+		}
+
+		EventLoggingStream::EventLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode)
+			: LoggingMessageFinalHandler(errorCodeType, errorCode) { }
+
+		std::stringstream& EventLoggingStream::stream()
+		{
+			return _stream;
+		}
+
+		EventLoggingStream::~EventLoggingStream()
+		{
+			setAction(Details::Action::LOGGING_ONLY);
+			setMessage(_stream.str());			
 		}
 	}
 }

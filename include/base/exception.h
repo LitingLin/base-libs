@@ -1,6 +1,7 @@
 #pragma once
 
 #include <base/common.h>
+#include <base/error_codes.h>
 #include <stdexcept>
 #include <stddef.h>
 
@@ -11,15 +12,7 @@
 #include <bcrypt.h>
 #endif
 
-namespace Base {
-	enum class ErrorCodeType
-	{
-		GENERIC, STDCAPI, SQLITE3, CUDA,
-#ifdef _WIN32
-		WIN32API, HRESULT, NTSTATUS,
-#endif
-	};
-		
+namespace Base {		
 	class ATTRIBUTE_INTERFACE FatalError : public std::exception
 	{
 	public:

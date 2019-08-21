@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\logging">
+      <UniqueIdentifier>{98c1be3f-2dc9-4e47-b9bd-f44aecc8b2ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logging">
+      <UniqueIdentifier>{f261cef4-1101-40fd-83cc-817baa0bd55f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logging\sinks">
+      <UniqueIdentifier>{fe9a9943-e3bc-4dad-a6a8-3943bd8ffcd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logging\dispatcher">
+      <UniqueIdentifier>{955f41a5-c1bb-4443-acd1-6aa563517e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logging\dispatcher">
+      <UniqueIdentifier>{9cda2c80-f435-4e18-ba08-908b52b4de58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logging\sinks">
+      <UniqueIdentifier>{48ac1f98-bd67-4ad9-8bbf-22467e896d83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logging\win32">
+      <UniqueIdentifier>{e1453ad2-eb84-4bfa-b197-cdaacdf507f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logging\win32">
+      <UniqueIdentifier>{6def1945-d5d9-4930-a323-b75c6faf02cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\error_codes">
+      <UniqueIdentifier>{05965411-cf8f-47e6-9e52-5294e993e146}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\error_codes\win32">
+      <UniqueIdentifier>{0ad9ce42-0b67-4c16-8024-5e3bdcc861d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\error_codes">
+      <UniqueIdentifier>{4e7d4785-c771-4894-ae63-1ef68fcf568e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\error_codes\win32">
+      <UniqueIdentifier>{ff60923f-c5cb-484a-9ce0-75076478ccab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\base\logging\base.cpp">
+      <Filter>Source Files\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging\dispatcher\dispatcher.cpp">
+      <Filter>Source Files\logging\dispatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging\sinks\stdout.cpp">
+      <Filter>Source Files\logging\sinks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging\win32\utils.cpp">
+      <Filter>Source Files\logging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging\sinks\file.cpp">
+      <Filter>Source Files\logging\sinks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging\sinks\win32_debugger.cpp">
+      <Filter>Source Files\logging\sinks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging\macros.cpp">
+      <Filter>Source Files\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\error_codes\win32\stringify.cpp">
+      <Filter>Source Files\error_codes\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\error_codes\stringify.cpp">
+      <Filter>Source Files\error_codes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\stack_trace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\exception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\logging\interface.cpp">
+      <Filter>Source Files\logging</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\base\logging\win32.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\macros.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\exception.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\base.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\debugging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\dispatcher\dispatcher.h">
+      <Filter>Header Files\logging\dispatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\sinks\stdout.h">
+      <Filter>Header Files\logging\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\win32\utils.h">
+      <Filter>Header Files\logging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\sinks\file.h">
+      <Filter>Header Files\logging\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\sinks\win32_debugger.h">
+      <Filter>Header Files\logging\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\error_codes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\error_codes\stringify.h">
+      <Filter>Header Files\error_codes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\error_codes\win32\stringify.h">
+      <Filter>Header Files\error_codes\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\sinks\interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\interface.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

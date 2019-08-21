@@ -8,9 +8,8 @@
 #include <cstdint>
 
 namespace Base
-{
-	ATTRIBUTE_INTERFACE
-	class PNGDecoder
+{	
+	class ATTRIBUTE_INTERFACE PNGDecoder
 	{
 	public:
 		PNGDecoder();

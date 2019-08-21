@@ -1,11 +1,13 @@
 #pragma once
 
+#include <base/common.h>
+
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 namespace Base {
-	class AllowAllSecurityATTRIBUTES
+	class ATTRIBUTE_INTERFACE AllowAllSecurityATTRIBUTES
 	{
 	public:
 		AllowAllSecurityATTRIBUTES();

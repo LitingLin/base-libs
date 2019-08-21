@@ -13,8 +13,7 @@
 
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
-	class Registry
+	class ATTRIBUTE_INTERFACE Registry
 	{
 	public:
 		Registry(const wchar_t *prefix, HKEY rootKey = HKEY_CURRENT_USER, bool wow64Redirection = false);
@@ -47,14 +46,13 @@ namespace Base
 		bool wow64Redirection;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class RegistryLocalMachineSoftware : public Registry
+	class ATTRIBUTE_INTERFACE RegistryLocalMachineSoftware : public Registry
 	{
 	public:
 		RegistryLocalMachineSoftware(const wchar_t *orgName, const wchar_t *productName = nullptr, const wchar_t *subkey = nullptr);
 	};
-	ATTRIBUTE_INTERFACE
-	class RegistryCurrentSoftware : public Registry
+	
+	class ATTRIBUTE_INTERFACE RegistryCurrentSoftware : public Registry
 	{
 	public:
 		RegistryCurrentSoftware(const wchar_t* orgName, const wchar_t* productName = nullptr, const wchar_t* subkey = nullptr);

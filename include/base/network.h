@@ -8,8 +8,7 @@
 
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
-    class NetworkAddressInUseException : public RuntimeException
+    class ATTRIBUTE_INTERFACE NetworkAddressInUseException : public RuntimeException
     {
     public:
         NetworkAddressInUseException(const std::string& _Message)
@@ -39,8 +38,7 @@ namespace Base
 		WSADATA wsaData;
 	};
 
-	ATTRIBUTE_INTERFACE
-	class SOCKETGuard
+	class ATTRIBUTE_INTERFACE SOCKETGuard
 	{
 	public:
 		SOCKETGuard();
@@ -72,8 +70,7 @@ namespace Base
 	ATTRIBUTE_INTERFACE
 	sockaddr_in getIPv4UDPSockAddr(const wchar_t* address, uint16_t port);
 
-	ATTRIBUTE_INTERFACE
-	class UDPServer
+	class ATTRIBUTE_INTERFACE UDPServer
 	{
 	public:
 		UDPServer(const wchar_t *bindAddress, uint16_t port);
@@ -92,9 +89,8 @@ namespace Base
 		WSAGuard _WSAGuard;
 		SOCKETGuard socket;
 	};
-
-	ATTRIBUTE_INTERFACE
-	class UDPClient
+		
+	class ATTRIBUTE_INTERFACE UDPClient
 	{
 	public:
 		UDPClient(const wchar_t *serverAddress, uint16_t port);

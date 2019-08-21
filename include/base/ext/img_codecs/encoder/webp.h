@@ -7,12 +7,10 @@
 
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
-	class WebPEncoder
+	class ATTRIBUTE_INTERFACE WebPEncoder
 	{
-	public:
-		ATTRIBUTE_INTERFACE
-		class Container
+	public:		
+		class ATTRIBUTE_INTERFACE Container
 		{
 		public:
 			Container(void* ptr, size_t size);

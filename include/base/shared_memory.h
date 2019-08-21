@@ -7,8 +7,7 @@ typedef void * HANDLE;
 
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
-	class SharedMemory
+	class ATTRIBUTE_INTERFACE SharedMemory
 	{
 	public:
 		SharedMemory();
