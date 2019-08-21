@@ -81,10 +81,9 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
       <DisableSpecificWarnings>4275;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>COMPILING_LOGGING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-    </Link>
+    <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -123,16 +122,16 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\include;$(ProjectDir)..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
       <DisableSpecificWarnings>4275;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>COMPILING_LOGGING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\base\dll_entry.cpp" />
     <ClCompile Include="..\..\src\base\error_codes\stringify.cpp" />
     <ClCompile Include="..\..\src\base\error_codes\win32\stringify.cpp" />
     <ClCompile Include="..\..\src\base\exception.cpp" />
@@ -147,7 +146,6 @@
     <ClCompile Include="..\..\src\base\stack_trace.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\base\common.h" />
     <ClInclude Include="..\..\include\base\debugging.h" />
     <ClInclude Include="..\..\include\base\error_codes.h" />
     <ClInclude Include="..\..\include\base\error_codes\stringify.h" />
@@ -155,6 +153,7 @@
     <ClInclude Include="..\..\include\base\exception.h" />
     <ClInclude Include="..\..\include\base\logging.h" />
     <ClInclude Include="..\..\include\base\logging\base.h" />
+    <ClInclude Include="..\..\include\base\logging\common.h" />
     <ClInclude Include="..\..\include\base\logging\dispatcher\dispatcher.h" />
     <ClInclude Include="..\..\include\base\logging\interface.h" />
     <ClInclude Include="..\..\include\base\logging\macros.h" />

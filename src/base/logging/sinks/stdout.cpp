@@ -30,7 +30,7 @@ namespace Base
 				return;
 			std::wstring UTF16Message = Details::UTF8ToUTF16(message);
 			DWORD numberOfCharsWritten;
-			WriteConsoleW(_stdhandle, message.data(), message.size(), &numberOfCharsWritten, NULL);
+			WriteConsoleW(_stdhandle, UTF16Message.data(), UTF16Message.size(), &numberOfCharsWritten, NULL);
 		}
 
 		void StdOutSink::flush()

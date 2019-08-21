@@ -7,13 +7,11 @@
 
 namespace Base {
 	class File;
-
-	ATTRIBUTE_INTERFACE
-	class IniParser
+		
+	class ATTRIBUTE_INTERFACE IniParser
 	{
-	public:
-		ATTRIBUTE_INTERFACE
-		class SectionIterator
+	public:		
+		class ATTRIBUTE_INTERFACE SectionIterator
 		{
 		public:
 			std::string &getSectionName();

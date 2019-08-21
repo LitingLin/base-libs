@@ -1,18 +1,18 @@
 #pragma once
 
-#include <base/common.h>
+#include <base/logging/common.h>
+#include <base/logging/sinks/interface.h>
 #include <string_view>
 
 namespace Base
 {
 	namespace Logging
 	{
-		class Sink;
-		ATTRIBUTE_INTERFACE
-		int AddSink(Sink* sink);
-		ATTRIBUTE_INTERFACE
+		LOGGING_INTERFACE
+		int addSink(Sink* sink);
+		LOGGING_INTERFACE
 		void removeSink(int handle);
-		ATTRIBUTE_INTERFACE
+		LOGGING_INTERFACE
 		void log(std::string_view message);
 	};
 };

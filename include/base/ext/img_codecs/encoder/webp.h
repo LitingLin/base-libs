@@ -2,15 +2,15 @@
 
 #ifdef HAVE_LIB_WEBP
 
-#include <base/common.h>
+#include <base/ext/img_codecs/common.h>
 #include <cstddef>
 
 namespace Base
 {
-	class ATTRIBUTE_INTERFACE WebPEncoder
+	class IMAGE_CODECS_INTERFACE WebPEncoder
 	{
 	public:		
-		class ATTRIBUTE_INTERFACE Container
+		class IMAGE_CODECS_INTERFACE Container
 		{
 		public:
 			Container(void* ptr, size_t size);

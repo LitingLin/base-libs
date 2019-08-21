@@ -1,6 +1,6 @@
 #pragma once
 
-#include <base/common.h>
+#include <base/logging/common.h>
 #include <memory>
 #include <string>
 #include <functional>
@@ -47,11 +47,11 @@ namespace Base {
 				void operator&(std::ostream&) const {}
 			};
 			
-			ATTRIBUTE_INTERFACE
+			LOGGING_INTERFACE
 			std::string generateHeader(const char* file, int line, const char* function);
-			ATTRIBUTE_INTERFACE
+			LOGGING_INTERFACE
 			std::string generateHeader(const char* file, int line, const char* function, const char* exp);
-			ATTRIBUTE_INTERFACE
+			LOGGING_INTERFACE
 			std::string generateHeader(const char* file, int line, const char* function, const char* leftExp, const char* op, const char* rightExp);
 
 			template <typename LoggingStream, class ...Args>

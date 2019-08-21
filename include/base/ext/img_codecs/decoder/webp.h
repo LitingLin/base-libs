@@ -2,12 +2,12 @@
 
 #ifdef HAVE_LIB_WEBP
 
-#include <base/common.h>
+#include <base/ext/img_codecs/common.h>
 #include <cstdint>
 
 namespace Base
 {
-	class ATTRIBUTE_INTERFACE WebPDecoder
+	class IMAGE_CODECS_INTERFACE WebPDecoder
 	{
 	public:
 		void load(const void* pointer, uint64_t size);

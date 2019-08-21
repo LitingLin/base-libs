@@ -1,6 +1,6 @@
 #pragma once
 
-#include <base/common.h>
+#include <base/logging/common.h>
 #include <base/error_codes.h>
 #include <stdexcept>
 #include <stddef.h>
@@ -13,7 +13,7 @@
 #endif
 
 namespace Base {		
-	class ATTRIBUTE_INTERFACE FatalError : public std::exception
+	class LOGGING_INTERFACE FatalError : public std::exception
 	{
 	public:
 		FatalError(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
@@ -34,7 +34,7 @@ namespace Base {
 		ErrorCodeType _errorCodeType;
 	};
 
-	class ATTRIBUTE_INTERFACE RuntimeException : public std::exception
+	class LOGGING_INTERFACE RuntimeException : public std::exception
 	{
 	public:
 		RuntimeException(const std::string& message, int64_t errorCode, ErrorCodeType errorCodeType);
@@ -56,9 +56,9 @@ namespace Base {
 	};
 
 #ifdef _WIN32
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
     HRESULT getHRESULTFromException(const FatalError& exp);
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 	HRESULT getHRESULTFromException(const RuntimeException& exp);
 #endif
 }

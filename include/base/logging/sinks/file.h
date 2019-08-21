@@ -1,11 +1,12 @@
 #pragma once
 
+#include <base/logging/common.h>
 #include <base/logging/sinks/interface.h>
 
 namespace Base
 {
 	namespace Logging {
-		class FileSink : public Sink
+		class LOGGING_INTERFACE FileSink : public Sink
 		{
 		public:
 			FileSink(std::string_view path);

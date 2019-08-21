@@ -52,6 +52,7 @@
     <ClCompile Include="..\..\src\base\cpu_info\gcc.cpp" />
     <ClCompile Include="..\..\src\base\cpu_info\msvc.cpp" />
     <ClCompile Include="..\..\src\base\d2d_window.cpp" />
+    <ClCompile Include="..\..\src\base\dll_entry.cpp" />
     <ClCompile Include="..\..\src\base\dump_generator.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
     <ClCompile Include="..\..\src\base\event.cpp" />
@@ -126,6 +127,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\include;$(ProjectDir)..\..\src;$(ProjectDir)..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4275;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>COMPILING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -145,6 +147,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\include;$(ProjectDir)..\..\src;$(ProjectDir)..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4275;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>COMPILING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

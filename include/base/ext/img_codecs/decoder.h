@@ -9,7 +9,7 @@
 
 namespace Base
 {
-    class ATTRIBUTE_INTERFACE ImageDecoder
+    class IMAGE_CODECS_INTERFACE ImageDecoder
     {
     public:
         void load(const void *buffer, size_t size, ImageFormatType formatType);

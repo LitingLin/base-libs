@@ -2,14 +2,14 @@
 
 #ifdef HAVE_LIB_PNG
 
-#include <base/common.h>
+#include <base/ext/img_codecs/common.h>
 #include <png.h>
 #include <vector>
 #include <cstdint>
 
 namespace Base
 {	
-	class ATTRIBUTE_INTERFACE PNGDecoder
+	class IMAGE_CODECS_INTERFACE PNGDecoder
 	{
 	public:
 		PNGDecoder();

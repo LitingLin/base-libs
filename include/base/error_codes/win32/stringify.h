@@ -1,6 +1,6 @@
 #pragma once
 
-#include <base/common.h>
+#include <base/logging/common.h>
 #include <string>
 
 #define NOMINMAX
@@ -10,7 +10,7 @@
 
 namespace Base
 {
-	class ATTRIBUTE_INTERFACE Win32ErrorCodeToString
+	class LOGGING_INTERFACE Win32ErrorCodeToString
 	{
 	public:
 		Win32ErrorCodeToString(unsigned long errorCode, ...);
@@ -22,17 +22,17 @@ namespace Base
 		wchar_t* str;
 	};
 
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 	std::string getWin32LastErrorString();
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 	std::string getWin32ErrorString(DWORD errorCode);
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 	std::wstring getHRESULTErrorWString(HRESULT hr);
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 	std::string getHRESULTErrorString(HRESULT hr);
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 	std::wstring getNtStatusErrorWString(NTSTATUS ntstatus);
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 	std::string getNtStatusErrorString(NTSTATUS ntStatus);
 	
 }

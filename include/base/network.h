@@ -1,5 +1,6 @@
 #pragma once
 
+#include <base/common.h>
 #include <ostream>
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -29,7 +30,7 @@ namespace Base
 	ATTRIBUTE_INTERFACE
 	std::ostream& operator<<(std::ostream &os, net_rc rc);
 
-	class WSAGuard
+	class ATTRIBUTE_INTERFACE WSAGuard
 	{
 	public:
 		WSAGuard();

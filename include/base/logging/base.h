@@ -2,7 +2,7 @@
 
 #include <string>
 #include <sstream>
-#include <base/common.h>
+#include <base/logging/common.h>
 #include <base/error_codes.h>
 
 namespace Base
@@ -35,7 +35,7 @@ namespace Base
 
 		}
 
-		class ATTRIBUTE_INTERFACE FatalErrorLoggingStream : public Details::LoggingMessageFinalHandler
+		class LOGGING_INTERFACE FatalErrorLoggingStream : public Details::LoggingMessageFinalHandler
 		{
 		public:
 			FatalErrorLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode);
@@ -45,7 +45,7 @@ namespace Base
 			std::stringstream _stream;
 		};
 
-		class ATTRIBUTE_INTERFACE RuntimeExceptionLoggingStream : public Details::LoggingMessageFinalHandler
+		class LOGGING_INTERFACE RuntimeExceptionLoggingStream : public Details::LoggingMessageFinalHandler
 		{
 		public:
 			RuntimeExceptionLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode);
@@ -55,7 +55,7 @@ namespace Base
 			std::stringstream _stream;
 		};
 		
-		class ATTRIBUTE_INTERFACE EventLoggingStream : public Details::LoggingMessageFinalHandler
+		class LOGGING_INTERFACE EventLoggingStream : public Details::LoggingMessageFinalHandler
 		{
 		public:
 			EventLoggingStream(ErrorCodeType errorCodeType, int64_t errorCode);

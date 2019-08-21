@@ -206,5 +206,8 @@
     <ClCompile Include="..\..\src\base\config\ini_parser.cpp">
       <Filter>Source Files\config</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\dll_entry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -40,7 +40,7 @@ namespace Base {
 			std::unique_ptr<unsigned char[]> _hash;
 		};
 				
-		class KeyObjectGuard
+		class ATTRIBUTE_INTERFACE KeyObjectGuard
 		{
 		public:
 			KeyObjectGuard(BCRYPT_ALG_HANDLE alg_handle, unsigned char* keyObject, ULONG keyObjectSize, unsigned char* key, ULONG keySize);

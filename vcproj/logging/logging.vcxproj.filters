@@ -87,15 +87,15 @@
     <ClCompile Include="..\..\src\base\logging\interface.cpp">
       <Filter>Source Files\logging</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\dll_entry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\base\logging\win32.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\base\logging.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\base\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\base\logging\macros.h">
@@ -134,11 +134,14 @@
     <ClInclude Include="..\..\include\base\error_codes\win32\stringify.h">
       <Filter>Header Files\error_codes\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\sinks\interface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\base\logging\interface.h">
       <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\common.h">
+      <Filter>Header Files\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\logging\sinks\interface.h">
+      <Filter>Header Files\logging\sinks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,14 +7,14 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #endif
-#include <base/common.h>
+#include <base/ext/img_codecs/common.h>
 #include <stdio.h>
 #include <jpeglib.h>
 #include <cstdint>
 
 namespace Base
 {	
-	class ATTRIBUTE_INTERFACE JPEGDecoder
+	class IMAGE_CODECS_INTERFACE JPEGDecoder
 	{
 	public:
 		JPEGDecoder();

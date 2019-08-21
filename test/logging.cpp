@@ -1,6 +1,13 @@
 #include "pch.h"
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_sinks.h>
+#include <base/logging/interface.h>
+#include <base/logging/sinks/stdout.h>
 
-auto logger = spdlog::stdout_color_mt("console");
+class LoggerInitializer
+{
+public:
+	LoggerInitializer()
+	{
+		Base::Logging::addSink(new Base::Logging::StdOutSink());
+	}
+} initializer;

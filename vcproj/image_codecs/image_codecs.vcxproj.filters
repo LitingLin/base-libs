@@ -45,6 +45,9 @@
     <ClInclude Include="..\..\include\base\ext\img_codecs\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\base\ext\img_codecs\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder.cpp">
@@ -61,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\jpeg.cpp">
       <Filter>Source Files\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\dll_entry.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

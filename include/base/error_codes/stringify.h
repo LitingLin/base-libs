@@ -1,10 +1,10 @@
 #pragma once
 
-#include <base/common.h>
+#include <base/logging/common.h>
 #include <string>
 
 namespace Base
 {
-	ATTRIBUTE_INTERFACE
+	LOGGING_INTERFACE
 		std::string getStdCApiErrorString(int errnum);
 }

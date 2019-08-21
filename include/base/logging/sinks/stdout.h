@@ -1,5 +1,6 @@
 #pragma once
 
+#include <base/logging/common.h>
 #include <base/logging/sinks/interface.h>
 
 namespace Base
@@ -7,7 +8,7 @@ namespace Base
 	namespace Logging
 	{
 #ifdef _WIN32
-		class StdOutSink : public Sink
+		class LOGGING_INTERFACE StdOutSink : public Sink
 		{
 		public:
 			StdOutSink();
@@ -16,7 +17,7 @@ namespace Base
 			void flush() override;
 		};
 #else
-		class StdOutSink : public Sink
+		class LOGGING_INTERFACE StdOutSink : public Sink
 		{
 		public:
 			std::string_view getName() override;

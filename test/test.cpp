@@ -514,7 +514,10 @@ TEST(getFileExtension, Case4)
 TEST(Process, LaunchProcess)
 {
 	{
-		Base::Process process(L"cmd.exe", L"/c echo e > 1.txt");
+		{
+			Base::Process process(L"cmd.exe", L"/c echo e > 1.txt");
+			while (process.isActive());
+		}
 		Base::File file(L"1.txt");
 		Base::MemoryMappedIO memory_mapped_io(&file);
 		const char* file_pointer = (const char*)memory_mapped_io.get();
@@ -539,12 +542,12 @@ TEST(Process, TestProcessMonitor)
 
 	Base::waitForObject(monitor.getEventHandle());
 	HANDLE process1_handle = monitor.pickLastExitProcessHandle();
-	EXPECT_EQ(monitor.pickLastExitProcessHandle(), nullptr);
+	EXPECT_EQ(monitor.pickLastExitProcessHandle(), HANDLE(NULL));
 	EXPECT_TRUE(process1_handle);
 	EXPECT_EQ(process1_handle, process1.getHandle());
 }
 
-#include <spdlog/fmt/fmt.h>
+#include <fmt/format.h>
 
 TEST(Process, TestProcessMonitorStressMode)
 {
