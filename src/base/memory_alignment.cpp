@@ -8,6 +8,7 @@
 #else
 #include <stdlib.h>
 #endif
+#include <cstring>
 
 namespace Base
 {

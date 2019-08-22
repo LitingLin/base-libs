@@ -44,7 +44,7 @@ namespace Base
 		return _errorCodeType;
 	}
 
-	char const* FatalError::what() const
+	char const* FatalError::what() const noexcept
 	{
 		return _message.data();
 	}
@@ -92,7 +92,7 @@ namespace Base
 		return _errorCodeType;
 	}
 
-	char const* RuntimeException::what() const
+	char const* RuntimeException::what() const noexcept
 	{
 		return _message.data();
 	}

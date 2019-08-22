@@ -9,6 +9,7 @@
 #else
 #include <sys/mman.h>
 #endif
+#include <cstring>
 
 namespace Base
 {

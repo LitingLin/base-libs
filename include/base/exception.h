@@ -27,7 +27,7 @@ namespace Base {
 #endif
 		ErrorCodeType getErrorCodeType() const;
 		~FatalError() noexcept override = default;
-		char const* what() const override;
+		char const* what() const noexcept override;
 	private:
 		std::string _message;
 		int64_t _errorCode;
@@ -48,7 +48,7 @@ namespace Base {
 #endif
 		ErrorCodeType getErrorCodeType() const;
 		~RuntimeException() noexcept override = default;
-		char const* what() const override;
+		char const* what() const noexcept override;
 	private:
 		std::string _message;
 		int64_t _errorCode;

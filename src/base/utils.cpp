@@ -9,11 +9,14 @@
 #pragma comment(lib, "Rpcrt4.lib")
 #include <base/logging/win32.h>
 #else
+#include <fcntl.h>
+#include <unistd.h>
 #endif
 
 
 #include <string>
 #include <random>
+#include <cstring>
 
 bool operator<(const GUID& left, const GUID& right)
 {

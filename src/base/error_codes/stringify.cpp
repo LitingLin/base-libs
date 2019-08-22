@@ -1,5 +1,7 @@
 #include <base/error_codes/stringify.h>
 
+#include <cstring>
+
 namespace Base {
 #ifdef _WIN32
 	std::string getStdCApiErrorString(int errnum)

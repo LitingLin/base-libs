@@ -1,6 +1,7 @@
 #ifdef HAVE_LIB_PNG
 #include <base/ext/img_codecs/decoder/png.h>
 #include <base/logging.h>
+#include <cstring>
 
 namespace Base
 {

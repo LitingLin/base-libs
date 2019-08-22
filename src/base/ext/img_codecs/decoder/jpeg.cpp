@@ -3,6 +3,8 @@
 #include <base/logging.h>
 #include <base/ext/img_codecs/decoder/jpeg.h>
 
+#include <cstring>
+
 namespace Base
 {
 	void jpegErrorExit(j_common_ptr cinfo)

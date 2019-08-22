@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 #include <base/logging/win32/utils.h>
+#else
+#include <cstdio>
 #endif
 
 namespace Base
@@ -41,7 +43,7 @@ namespace Base
 #else
 		FileSink::FileSink(std::string_view path)
 		{
-			_file = fopen(path.data(), 'w');
+			_file = fopen(path.data(), "w");
 		}
 #endif
 	}
