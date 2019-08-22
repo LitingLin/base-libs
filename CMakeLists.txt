@@ -46,6 +46,7 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/jpeg.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/png.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/webp.h"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/common.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/encoder/webp.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/types.h"
@@ -70,7 +71,6 @@ if(WIN32)
 
             "${CMAKE_CURRENT_LIST_DIR}/src/base/config/ini.c"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/config/ini_parser.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/base/logging/win32.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/com.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/d2d_window.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/dump_generator.cpp"
@@ -98,8 +98,10 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/base/memory_alignment.cpp"
 
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/jpeg.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/jpeg_turbo.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/png.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/webp.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/encoder/webp.cpp"
 
             "${CMAKE_CURRENT_LIST_DIR}/include/base/cpu_info.h"
@@ -114,6 +116,9 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/base/logging/sinks/win32_debugger.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/logging/win32/utils.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/logging/dispatcher/dispatcher.cpp"
+
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/error_codes/stringify.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/error_codes/win32/stringify.cpp"
             )
 else()
     set(SRC_FILES
@@ -151,10 +156,13 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/include/base/error_codes/stringify.h"
 
             "${CMAKE_CURRENT_LIST_DIR}/src/base/exception.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/dll_entry.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/encryption.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/memory_mapped_io.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/jpeg.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/jpeg_turbo.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/png.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/webp.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/encoder/webp.cpp"
@@ -177,14 +185,20 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 include(${CMAKE_CURRENT_LIST_DIR}/3rd_party/fmt.cmake)
-
-find_package(JPEG)
-if(JPEG_FOUND)
-    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG)
-    list(APPEND BASE_INCLUDE_DIRS ${JPEG_INCLUDE_DIR})
-    list(APPEND BASE_LINK_LIBRARIES ${JPEG_LIBRARIES})
+find_package(TurboJPEG)
+if (TURBOJPEG_FOUND)
+    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG_TURBO)
+    list(APPEND BASE_INCLUDE_DIRS ${TURBOJPEG_INCLUDE_DIR})
+    list(APPEND BASE_LINK_LIBRARIES ${TURBOJPEG_LIBRARY})
 else()
-    message(STATUS "Disabled JPEG decoder")
+    find_package(JPEG)
+    if(JPEG_FOUND)
+        list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG)
+        list(APPEND BASE_INCLUDE_DIRS ${JPEG_INCLUDE_DIR})
+        list(APPEND BASE_LINK_LIBRARIES ${JPEG_LIBRARIES})
+    else()
+        message(STATUS "Disabled JPEG decoder")
+    endif()
 endif()
 
 find_package(PNG)
@@ -205,6 +219,7 @@ else()
     message(STATUS "Disabled WEBP codecs")
 endif()
 
+list(APPEND BASE_LINK_LIBRARIES fmt)
 list(APPEND BASE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/include ${FMT_INCLUDE_DIRS})
 if (WIN32)
     list(APPEND BASE_COMPILE_DEFINITIONS UNICODE _UNICODE)
@@ -212,9 +227,12 @@ endif()
 
 option(BUILD_SHARED_LIB "Building shared library" ON)
 
-if (${BUILD_SHARED_LIB})
+if (BUILD_SHARED_LIB)
     add_library(base SHARED ${SRC_FILES})
     target_compile_definitions(base PRIVATE COMPILING_DLL COMPILING_IMAGE_CODECS COMPILING_LOGGING)
+    if (WIN32)
+        target_compile_definitions(base PRIVATE _WINDLL)
+    endif()
     set_target_properties(base PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(base PROPERTIES C_VISIBILITY_PRESET hidden)
 else()
@@ -223,7 +241,7 @@ endif()
 
 target_compile_definitions(base PUBLIC ${BASE_COMPILE_DEFINITIONS})
 target_include_directories(base PUBLIC ${BASE_INCLUDE_DIRS})
-target_link_libraries(base ${BASE_LINK_LIBRARIES})
+target_link_libraries(base ${BASE_LINK_LIBRARIES} fmt)
 add_dependencies(base fmt)
 
 option(INSTALL_BINARY_ONLY "install binary files only" OFF)
@@ -241,7 +259,7 @@ else()
     install(DIRECTORY include/ DESTINATION include)
 endif()
 
-option(BUILD_TEST "Build the tests" ON)
+option(BUILD_TEST "Build the tests" OFF)
 if(BUILD_TEST)
     enable_testing()
     add_subdirectory(test)
