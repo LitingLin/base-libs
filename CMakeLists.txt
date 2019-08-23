@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 message(STATUS ${CMAKE_PREFIX_PATH})
 if(WIN32)
@@ -77,6 +76,7 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/base/crypto.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/event.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/exception.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/encryption.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/fragmented_udp.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/image_decoder.cpp"
@@ -160,7 +160,6 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/include/base/error_codes/stringify.h"
 
             "${CMAKE_CURRENT_LIST_DIR}/src/base/exception.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/base/encryption.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/memory_mapped_io.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder.cpp"
@@ -249,7 +248,7 @@ add_dependencies(base fmt)
 
 option(RELEASE_INSTALL "install binary files only" OFF)
 
-if (${RELEASE_INSTALL} AND ${BUILD_SHARED_LIB})
+if (${RELEASE_INSTALL})
     message(STATUS "RELEASE_INSTALL: ${RELEASE_INSTALL}")
     install(TARGETS base
             RUNTIME DESTINATION .
