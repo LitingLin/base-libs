@@ -123,6 +123,9 @@
     <ClInclude Include="..\..\src\cpu_info\msvc.h">
       <Filter>Source Files\cpu_info</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\base\pragmas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\base\dump_generator.cpp">
