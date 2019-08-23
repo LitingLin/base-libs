@@ -120,6 +120,10 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/base/error_codes/stringify.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/error_codes/win32/stringify.cpp"
             )
+    if (${BUILD_SHARED_LIB})
+        list(APPEND SRC_FILES
+                "${CMAKE_CURRENT_LIST_DIR}/src/base/dll_entry.cpp")
+    endif()
 else()
     set(SRC_FILES
             "${CMAKE_CURRENT_LIST_DIR}/include/base/common.h"
@@ -156,7 +160,6 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/include/base/error_codes/stringify.h"
 
             "${CMAKE_CURRENT_LIST_DIR}/src/base/exception.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/base/dll_entry.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/encryption.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/memory_mapped_io.cpp"
@@ -244,9 +247,10 @@ target_include_directories(base PUBLIC ${BASE_INCLUDE_DIRS})
 target_link_libraries(base ${BASE_LINK_LIBRARIES} fmt)
 add_dependencies(base fmt)
 
-option(INSTALL_BINARY_ONLY "install binary files only" OFF)
+option(RELEASE_INSTALL "install binary files only" OFF)
 
-if (${INSTALL_BINARY_ONLY})
+if (${RELEASE_INSTALL} AND ${BUILD_SHARED_LIB})
+    message(STATUS "RELEASE_INSTALL: ${RELEASE_INSTALL}")
     install(TARGETS base
             RUNTIME DESTINATION .
             LIBRARY DESTINATION .)
@@ -265,6 +269,6 @@ if(BUILD_TEST)
     add_subdirectory(test)
 endif()
 
-set(BASE_COMPILE_DEFINITIONS ${BASE_COMPILE_DEFINITIONS} PARENT_SCOPE)
-set(BASE_INCLUDE_DIRS ${BASE_INCLUDE_DIRS} PARENT_SCOPE)
-set(BASE_LINK_LIBRARIES ${BASE_LINK_LIBRARIES} PARENT_SCOPE)
+set_property(GLOBAL PROPERTY BASE_COMPILE_DEFINITIONS ${BASE_COMPILE_DEFINITIONS})
+set_property(GLOBAL PROPERTY BASE_INCLUDE_DIRS ${BASE_INCLUDE_DIRS})
+set_property(GLOBAL PROPERTY BASE_LINK_LIBRARIES ${BASE_LINK_LIBRARIES})
