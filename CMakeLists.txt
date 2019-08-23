@@ -76,7 +76,6 @@ if(WIN32)
             "${CMAKE_CURRENT_LIST_DIR}/src/base/crypto.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/event.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/exception.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/src/base/encryption.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/fragmented_udp.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/image_decoder.cpp"
