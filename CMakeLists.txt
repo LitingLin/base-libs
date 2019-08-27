@@ -186,6 +186,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 include(${CMAKE_CURRENT_LIST_DIR}/3rd_party/fmt.cmake)
+
 find_package(JPEG)
 if(JPEG_FOUND)
     list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG)
@@ -194,6 +195,7 @@ if(JPEG_FOUND)
 else()
     message(STATUS "Disabled JPEG decoder")
 endif()
+
 find_package(PNG)
 if(PNG_FOUND)
     list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_PNG)
