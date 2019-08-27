@@ -5,10 +5,10 @@ public: \
 ULONG __stdcall AddRef() override { \
 	return InterlockedIncrement(&m_cRef); } \
 ULONG __stdcall Release() override { \
-ULONG cRef = InterlockedDecrement(&m_cRef); \
-if (cRef == 0) \
-	delete this; \
-return cRef; } \
+	ULONG cRef = InterlockedDecrement(&m_cRef); \
+	if (cRef == 0) \
+		delete this; \
+	return cRef; } \
 private: \
 	long m_cRef = 0;
 
@@ -21,10 +21,10 @@ ULONG __stdcall AddRef() override { \
 ULONG __stdcall Release() override { \
 	if (_owner) \
 		return _owner->Release(); \
-ULONG cRef = InterlockedDecrement(&m_cRef); \
-if (cRef == 0) \
-	delete this; \
-return cRef; } \
+	ULONG cRef = InterlockedDecrement(&m_cRef); \
+	if (cRef == 0) \
+		delete this; \
+	return cRef; } \
 private: \
 	IUnknown *_owner; \
 	long m_cRef = 0;
