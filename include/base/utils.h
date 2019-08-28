@@ -22,6 +22,7 @@ typedef struct _GUID {
 
 #endif
 #include <string>
+#include <string_view>
 #include <limits>
 #include <functional>
 
@@ -31,14 +32,14 @@ namespace Base
 {
 #ifdef _WIN32
 	ATTRIBUTE_INTERFACE
-	std::wstring UTF8ToUTF16(const std::string& str);
+	std::wstring UTF8ToUTF16(std::string_view str);
 	ATTRIBUTE_INTERFACE
-	std::string UTF16ToUTF8(const std::wstring& str);
+	std::string UTF16ToUTF8(std::wstring_view str);
 	//std::string toUpperCase(const std::string &str);
 	//std::wstring toUpperCase(const std::wstring &str);
 	//std::string toLowerCase(const std::string &str);
 	ATTRIBUTE_INTERFACE
-	std::wstring toLowerCase(const std::wstring& str);
+	std::wstring toLowerCase(std::wstring_view str);
 	ATTRIBUTE_INTERFACE
 	void GUIDToString(const GUID* guid, wchar_t* str, unsigned str_size);
 	ATTRIBUTE_INTERFACE

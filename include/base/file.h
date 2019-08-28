@@ -17,7 +17,7 @@
 
 namespace Base {
 	ATTRIBUTE_INTERFACE
-    bool isPathExists(const PLATFORM_STRING_TYPE & path);
+    bool isPathExists(PLATFORM_STRING_VIEW_TYPE path);
 #ifdef _WIN32
 	ATTRIBUTE_INTERFACE
 	std::wstring getWorkDirectory();
@@ -34,34 +34,34 @@ namespace Base {
     bool isFileExists(const std::string& path);
 #endif
 	ATTRIBUTE_INTERFACE
-	std::string getParentPath(const std::string& path);
+	std::string getParentPath(std::string_view path);
 	ATTRIBUTE_INTERFACE
-	std::wstring getParentPath(const std::wstring& path);
+	std::wstring getParentPath(std::wstring_view path);
 	ATTRIBUTE_INTERFACE
-	std::string getFileName(const std::string& path);
+	std::string getFileName(std::string_view path);
 	ATTRIBUTE_INTERFACE
-	std::wstring getFileName(const std::wstring& path);
+	std::wstring getFileName(std::wstring_view path);
 	ATTRIBUTE_INTERFACE
-	bool isURI(const std::string& string);
+	bool isURI(std::string_view string);
 	ATTRIBUTE_INTERFACE
-	bool isURI(const std::wstring&string);
+	bool isURI(std::wstring_view string);
 	ATTRIBUTE_INTERFACE
-	bool isDirectory(const std::string& string);
+	bool isDirectory(std::string_view string);
 	ATTRIBUTE_INTERFACE
-	bool isDirectory(const std::wstring&string);
+	bool isDirectory(std::wstring_view string);
 	ATTRIBUTE_INTERFACE
-	std::string appendPath(const std::string&path, const std::string&fileName);
+	std::string appendPath(std::string_view path, std::string_view fileName);
 	ATTRIBUTE_INTERFACE
-	std::wstring appendPath(const std::wstring& path, const std::wstring& fileName);
+	std::wstring appendPath(std::wstring_view path, std::wstring_view fileName);
 
 	ATTRIBUTE_INTERFACE
-	std::string getFileExtension(const std::string&path);
+	std::string getFileExtension(std::string_view path);
 	ATTRIBUTE_INTERFACE
-	std::wstring getFileExtension(const std::wstring& path);
+	std::wstring getFileExtension(std::wstring_view path);
 	ATTRIBUTE_INTERFACE
-	std::string getCanonicalPath(const std::string&path);
+	std::string getCanonicalPath(std::string_view path);
 	ATTRIBUTE_INTERFACE
-	std::wstring getCanonicalPath(const std::wstring& path);
+	std::wstring getCanonicalPath(std::wstring_view path);
 		
 	class ATTRIBUTE_INTERFACE File
 	{
@@ -97,7 +97,7 @@ namespace Base {
 			End
 		};
 
-		File(const PLATFORM_STRING_TYPE &path, DesiredAccess desiredAccess = DesiredAccess::Read,
+		File(PLATFORM_STRING_VIEW_TYPE path, DesiredAccess desiredAccess = DesiredAccess::Read,
 				CreationDisposition creationDisposition = CreationDisposition::OpenExisting);
 		File(const File &) = delete;
 		File(File && other) noexcept;
@@ -132,7 +132,7 @@ namespace Base {
     class ATTRIBUTE_INTERFACE DirectoryIterator
     {
     public:
-        DirectoryIterator(const PLATFORM_STRING_TYPE &path);
+        DirectoryIterator(PLATFORM_STRING_VIEW_TYPE path);
         ~DirectoryIterator();
         bool next(PLATFORM_STRING_TYPE &fileName, FileType *fileType, uint64_t *lastFileWriteTime);
         void reset();
@@ -156,7 +156,7 @@ namespace Base {
 	class ATTRIBUTE_INTERFACE SequentialDirectoryFileListGetter : public IDirectoryFileListGetter
 	{
 	public:
-        SequentialDirectoryFileListGetter(const PLATFORM_STRING_TYPE &path);
+        SequentialDirectoryFileListGetter(PLATFORM_STRING_VIEW_TYPE path);
         bool getFileList(std::vector<PLATFORM_STRING_TYPE> &fileNames, std::vector<uint64_t> &lastWriteTimes) override;
 	private:
         PLATFORM_STRING_TYPE _path;
@@ -165,7 +165,7 @@ namespace Base {
 	class ATTRIBUTE_INTERFACE RandomDirectoryFileListGetter : public IDirectoryFileListGetter
 	{
 	public:
-        RandomDirectoryFileListGetter(const PLATFORM_STRING_TYPE &path);
+        RandomDirectoryFileListGetter(PLATFORM_STRING_VIEW_TYPE path);
         bool getFileList(std::vector<PLATFORM_STRING_TYPE> &fileNames, std::vector<uint64_t> &lastWriteTimes) override;
 	private:
 	    PLATFORM_STRING_TYPE _path;

@@ -33,7 +33,7 @@ namespace Base
 	}
 	
 #ifdef _WIN32
-    std::wstring UTF8ToUTF16(const std::string &str)
+    std::wstring UTF8ToUTF16(std::string_view str)
 	{
 		if (str.empty())
 			return std::wstring();
@@ -42,14 +42,14 @@ namespace Base
 			str_size = std::numeric_limits<int>::max();
 		else
 			str_size = int(str.size());
-		int size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str_size, NULL, NULL);
+		int size = MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, NULL, NULL);
 		std::wstring wideCharString;
 		wideCharString.resize(size);
-		CHECK_NE_WIN32API(MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str_size, &wideCharString[0], size + 1), 0);
+		CHECK_NE_WIN32API(MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, &wideCharString[0], size + 1), 0);
 		return wideCharString;
 	}
 
-	std::string UTF16ToUTF8(const std::wstring &str)
+	std::string UTF16ToUTF8(std::wstring_view str)
 	{
 		if (str.empty())
 			return std::string();
@@ -58,15 +58,15 @@ namespace Base
 			str_size = std::numeric_limits<int>::max();
 		else
 			str_size = int(str.size());
-		int size = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str_size, nullptr, 0, NULL, NULL);
+		int size = WideCharToMultiByte(CP_UTF8, 0, str.data(), str_size, nullptr, 0, NULL, NULL);
 		std::string localMultiByteString;
 		localMultiByteString.resize(size);
-		CHECK_NE_WIN32API(WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str_size, &localMultiByteString[0], size + 1, NULL, NULL), 0);
+		CHECK_NE_WIN32API(WideCharToMultiByte(CP_UTF8, 0, str.data(), str_size, &localMultiByteString[0], size + 1, NULL, NULL), 0);
 		return localMultiByteString;
 	}
-	std::wstring toLowerCase(const std::wstring& str)
+	std::wstring toLowerCase(std::wstring_view str)
 	{
-		std::wstring lowercaseString = str;
+		std::wstring lowercaseString(str);
 
 		CharLowerW((wchar_t*)lowercaseString.data());
 

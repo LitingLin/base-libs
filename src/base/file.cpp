@@ -15,9 +15,9 @@
 namespace Base
 {
 #ifdef WIN32
-	bool isPathExists(const std::wstring& path)
+	bool isPathExists(std::wstring path)
 	{
-		return GetFileAttributes(path.c_str()) != INVALID_FILE_ATTRIBUTES;
+		return GetFileAttributes(path.data()) != INVALID_FILE_ATTRIBUTES;
 	}
 
 	std::wstring getModuleInstanceFullPath(HINSTANCE instance)
@@ -58,19 +58,18 @@ namespace Base
 		return std::wstring(buffer);
 	}
 
-
-	bool isDirectory(const std::wstring& string)
+	bool isDirectory(std::string_view string)
 	{
-		return GetFileAttributesW(string.c_str()) & FILE_ATTRIBUTE_DIRECTORY;
+		return GetFileAttributesA(string.data()) & FILE_ATTRIBUTE_DIRECTORY;
 	}
 
-	bool isDirectory(const std::string& string)
+	bool isDirectory(std::wstring_view string)
 	{
-		return GetFileAttributesA(string.c_str()) & FILE_ATTRIBUTE_DIRECTORY;
+		return GetFileAttributesW(string.data()) & FILE_ATTRIBUTE_DIRECTORY;
 	}
 
 	template <typename CharType> inline
-	std::basic_string<CharType> getFullPathHelper(const std::basic_string<CharType>& path)
+	std::basic_string<CharType> getFullPathHelper(std::basic_string_view<CharType> path)
 	{
 		if (isURI(path))
 			return path;
@@ -79,7 +78,7 @@ namespace Base
 		buffer.resize(MAX_PATH);
 		while (true)
 		{
-			DWORD copied_size = GetFullPathNameW(path.c_str(), (DWORD)buffer.size() + 1, &buffer[0], nullptr);
+			DWORD copied_size = GetFullPathNameW(path.data(), (DWORD)buffer.size() + 1, &buffer[0], nullptr);
 			CHECK_NE_WIN32API(copied_size, 0U);
 			if (copied_size == buffer.size())
 				buffer.resize(buffer.size() * 2);
@@ -93,21 +92,21 @@ namespace Base
 		return res;
 	}
 
-	std::wstring getFullPath(const std::wstring& path)
+	std::wstring getFullPath(std::wstring_view path)
 	{
 		return getFullPathHelper(path);
 	}
 #else
-    bool isPathExists(const std::string& path)
+    bool isPathExists(std::string_view path)
     {
 	    struct stat stat_;
-        return stat(path.c_str(), &stat_) == 0;
+        return stat(path.data(), &stat_) == 0;
     }
 
-    bool isFileExists(const std::string &filePath)
+    bool isFileExists(std::string_view filePath)
     {
 	    struct stat stat_;
-	    if (stat(filePath.c_str(), &stat_) != 0)
+	    if (stat(filePath.data(), &stat_) != 0)
             return false;
         return S_ISREG(stat_.st_mode);
     }
@@ -142,7 +141,7 @@ namespace Base
 
 #ifdef _WIN32
 	template <typename CharType> inline
-	std::basic_string<CharType> getFileNameHelper(const std::basic_string<CharType>& path)
+	std::basic_string<CharType> getFileNameHelper(std::basic_string_view<CharType> path)
 	{
 		size_t backslashpos = path.find_last_of(StaticCharValue<CharType>::backSlash);
 		size_t slashpos = path.find_last_of(StaticCharValue<CharType>::slash);
@@ -168,9 +167,8 @@ namespace Base
 		return path.substr(pos, path.size() - pos);
 	}
 #else
-
     template <typename CharType> inline
-    std::basic_string<CharType> getFileNameHelper(const std::basic_string<CharType>& path)
+    std::basic_string<CharType> getFileNameHelper(std::basic_string_view<CharType> path)
     {
         size_t slashpos = path.find_last_of(StaticCharValue<CharType>::slash);
         if (slashpos == path.npos)
@@ -179,21 +177,19 @@ namespace Base
             slashpos++;
         return path.substr(slashpos, path.size() - slashpos);
     }
-
 #endif
-
-	std::wstring getFileName(const std::wstring& path)
+	std::string getFileName(std::string_view path)
 	{
 		return getFileNameHelper(path);
 	}
 
-	std::string getFileName(const std::string& path)
+	std::wstring getFileName(std::wstring_view path)
 	{
 		return getFileNameHelper(path);
 	}
 
 	template <typename CharType> inline
-	bool isURIHelper(const std::basic_string<CharType>& string)
+	bool isURIHelper(std::basic_string_view<CharType> string)
 	{
 		size_t slash_pos = string.find_first_of(StaticCharValue<CharType>::colon);
         return slash_pos != string.npos && slash_pos < string.size() - 2 &&
@@ -201,19 +197,19 @@ namespace Base
                string[slash_pos + 2] == StaticCharValue<CharType>::slash;
 	}
 
-	bool isURI(const std::wstring& string)
+	bool isURI(std::wstring_view string)
 	{
 		return isURIHelper(string);
 	}
 
-	bool isURI(const std::string& string)
+	bool isURI(std::string_view string)
 	{
 		return isURIHelper(string);
 	}
 
 #ifdef _WIN32
 	template <typename CharType> inline
-	std::basic_string<CharType> appendPathHelper(const std::basic_string<CharType>& path, const std::basic_string<CharType>& fileName)
+	std::basic_string<CharType> appendPathHelper(std::basic_string_view<CharType> path, std::basic_string_view<CharType> fileName)
 	{
 		if (path[path.size() - 1] == StaticCharValue<CharType>::slash || path[path.size() - 1] == StaticCharValue<CharType>::backSlash)
 			return path + fileName;
@@ -222,7 +218,7 @@ namespace Base
 	}
 #else
     template <typename CharType> inline
-    std::basic_string<CharType> appendPathHelper(const std::basic_string<CharType>& path, const std::basic_string<CharType>& fileName)
+    std::basic_string<CharType> appendPathHelper(std::basic_string_view<CharType> path, std::basic_string_view<CharType> fileName)
     {
         if (path[path.size() - 1] == StaticCharValue<CharType>::slash)
             return path + fileName;
@@ -231,19 +227,19 @@ namespace Base
     }
 #endif
 
-	std::string appendPath(const std::string& path, const std::string& fileName)
+	std::string appendPath(std::string_view path, std::string_view fileName)
 	{
 		return appendPathHelper(path, fileName);
 	}
 
-	std::wstring appendPath(const std::wstring& path, const std::wstring &fileName)
+	std::wstring appendPath(std::wstring_view path, std::wstring_view fileName)
 	{
 		return appendPathHelper(path, fileName);
 	}
 
 #ifdef _WIN32
 	template <typename CharType> inline
-	std::basic_string<CharType> getFileExtensionHelper(const std::basic_string<CharType>& path)
+	std::basic_string<CharType> getFileExtensionHelper(std::basic_string_view<CharType> path)
 	{
 		size_t dot_pos = path.find_last_of(StaticCharValue<CharType>::dot);
 		if (dot_pos == path.npos || path.find(StaticCharValue<CharType>::slash, dot_pos + 1) != path.npos || path.find(StaticCharValue<CharType>::backSlash, dot_pos + 1) != path.npos)
@@ -252,7 +248,7 @@ namespace Base
 	}
 #else
     template <typename CharType> inline
-    std::basic_string<CharType> getFileExtensionHelper(const std::basic_string<CharType>& path)
+    std::basic_string<CharType> getFileExtensionHelper(std::basic_string_view<CharType> path)
     {
         size_t dot_pos = path.find_last_of(StaticCharValue<CharType>::dot);
         if (dot_pos == path.npos || path.find(StaticCharValue<CharType>::slash, dot_pos + 1) != path.npos)
@@ -261,19 +257,19 @@ namespace Base
     }
 #endif
 
-	std::string getFileExtension(const std::string& path)
+	std::string getFileExtension(std::string_view path)
 	{
 		return getFileExtensionHelper(path);
 	}
 
-	std::wstring getFileExtension(const std::wstring& path)
+	std::wstring getFileExtension(std::wstring_view path)
 	{
 		return getFileExtensionHelper(path);
 	}
 
 #ifdef _WIN32
 	template <typename CharType> inline
-	std::basic_string<CharType> getCanonicalPathHelper(const std::basic_string<CharType>& path)
+	std::basic_string<CharType> getCanonicalPathHelper(std::basic_string_view<CharType> path)
 	{
         std::basic_string<CharType> buffer;
 		buffer.resize(path.size());
@@ -332,7 +328,7 @@ namespace Base
 	}
 #else
     template <typename CharType> inline
-    std::basic_string<CharType> getCanonicalPathHelper(const std::basic_string<CharType>& path)
+    std::basic_string<CharType> getCanonicalPathHelper(std::basic_string_view<CharType> path)
     {
         std::basic_string<CharType> buffer;
         buffer.resize(path.size());
@@ -385,18 +381,18 @@ namespace Base
     }
 #endif
 
-	std::string getCanonicalPath(const std::string& path)
+	std::string getCanonicalPath(std::string_view path)
 	{
 		return getCanonicalPathHelper(path);
 	}
 
-	std::wstring getCanonicalPath(const std::wstring& path)
+	std::wstring getCanonicalPath(std::wstring_view path)
 	{
 		return getCanonicalPathHelper(path);
 	}
 
 #ifdef _WIN32
-	DirectoryIterator::DirectoryIterator(const std::wstring& path)
+	DirectoryIterator::DirectoryIterator(PLATFORM_STRING_VIEW_TYPE path)
 		: _handle(nullptr), _path(path)
 	{
 	}
@@ -448,8 +444,8 @@ namespace Base
         return ts.tv_sec * (uint64_t)1000000000L + ts.tv_nsec;
     }
 
-    DirectoryIterator::DirectoryIterator(const std::string &path) {
-        _dir = opendir(path.c_str());
+    DirectoryIterator::DirectoryIterator(std::string_view path) {
+        _dir = opendir(path.data());
         CHECK_STDCAPI(_dir);
         _dirfd = dirfd(_dir);
     }
@@ -497,7 +493,7 @@ namespace Base
     }
 #endif
 
-	SequentialDirectoryFileListGetter::SequentialDirectoryFileListGetter(const PLATFORM_STRING_TYPE& path)
+	SequentialDirectoryFileListGetter::SequentialDirectoryFileListGetter(std::wstring_view path)
 		: _path(path)
 	{
 	}
@@ -507,7 +503,7 @@ namespace Base
 		return getDirectoryFileLists(_path, fileNames, lastWriteTimes);
 	}
 
-	RandomDirectoryFileListGetter::RandomDirectoryFileListGetter(const PLATFORM_STRING_TYPE& path)
+	RandomDirectoryFileListGetter::RandomDirectoryFileListGetter(PLATFORM_STRING_VIEW_TYPE path)
 		: _path(path)
 	{
 	}
@@ -560,8 +556,8 @@ namespace Base
 		return false;
 	}
 
-	bool randomPickFile(DirectoryIterator & directoryIterator, PLATFORM_STRING_TYPE & fileName, uint64_t * lastWriteTimePtr,
-		std::vector<PLATFORM_STRING_TYPE> * fileNamesPtr, std::vector<uint64_t> * lastWriteTimesPtr, size_t * indexPtr)
+	bool randomPickFile(DirectoryIterator& directoryIterator, PLATFORM_STRING_TYPE& fileName, uint64_t* lastWriteTimePtr,
+		std::vector<PLATFORM_STRING_TYPE>* fileNamesPtr, std::vector<uint64_t>* lastWriteTimesPtr, size_t* indexPtr)
 	{
 		directoryIterator.reset();
 		std::vector<PLATFORM_STRING_TYPE> fileNames;
@@ -598,7 +594,7 @@ namespace Base
 		return true;
 	}
 
-	bool pickNextFile(DirectoryIterator & directoryIterator, PLATFORM_STRING_TYPE & fileName, uint64_t * lastWriteTimePtr)
+	bool pickNextFile(DirectoryIterator& directoryIterator, PLATFORM_STRING_TYPE& fileName, uint64_t* lastWriteTimePtr)
 	{
 		FileType fileType;
         PLATFORM_STRING_TYPE tempFileName;
@@ -628,7 +624,7 @@ namespace Base
 		}
 	}
 #ifdef _WIN32
-	File::File(const std::wstring& path, DesiredAccess desiredAccess, CreationDisposition creationDisposition)
+	File::File(std::wstring_view path, DesiredAccess desiredAccess, CreationDisposition creationDisposition)
 	{
 		int desiredAccess_ = 0;
 		switch (desiredAccess)
@@ -666,7 +662,7 @@ namespace Base
 		default:
 			UNREACHABLE_ERROR;
 		}
-		_fileHandle = CreateFile(path.c_str(), desiredAccess_, FILE_SHARE_READ, NULL, creationDisposition_, FILE_ATTRIBUTE_NORMAL, NULL);
+		_fileHandle = CreateFile(path.data(), desiredAccess_, FILE_SHARE_READ, NULL, creationDisposition_, FILE_ATTRIBUTE_NORMAL, NULL);
 		CHECK_NE_WIN32API(_fileHandle, INVALID_HANDLE_VALUE);
 	}
 
@@ -788,7 +784,7 @@ namespace Base
 		return _fileHandle;
 	}
 #else
-    File::File(const std::string& path, DesiredAccess desiredAccess,
+    File::File(std::string_view path, DesiredAccess desiredAccess,
                CreationDisposition creationDisposition)
     {
 	    int flag = 0;
@@ -829,9 +825,9 @@ namespace Base
         }
 
 		if (flag & O_CREAT || flag & O_TMPFILE)
-			_fd = ::open(path.c_str(), flag, 0666);
+			_fd = ::open(path.data(), flag, 0666);
 		else
-			_fd = ::open(path.c_str(), flag);
+			_fd = ::open(path.data(), flag);
 	    CHECK_NE_STDCAPI(_fd, -1) << " open() failed with path: " << path << ", flag: " << flag;
     }
 
@@ -912,7 +908,7 @@ namespace Base
 
 #ifdef _WIN32
 	template <typename CharType> inline
-	std::basic_string<CharType> getParentPathHelper(const std::basic_string<CharType>& path)
+	std::basic_string<CharType> getParentPathHelper(std::basic_string_view<CharType> path)
 	{
 		size_t end_pos = path.size();
 
@@ -949,7 +945,7 @@ namespace Base
 	}
 #else
     template <typename CharType> inline
-    std::basic_string<CharType> getParentPathHelper(const std::basic_string<CharType>& path)
+    std::basic_string<CharType> getParentPathHelper(std::basic_string_view<CharType> path)
     {
         size_t end_pos = path.size();
 
@@ -986,12 +982,12 @@ namespace Base
     }
 #endif
 
-	std::string getParentPath(const std::string& path)
+	std::string getParentPath(std::string_view path)
 	{
 		return getParentPathHelper<char>(path);
 	}
 
-	std::wstring getParentPath(const std::wstring& path)
+	std::wstring getParentPath(std::wstring_view path)
 	{
 		return getParentPathHelper<wchar_t>(path);
 	}
