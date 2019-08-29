@@ -34,13 +34,13 @@ namespace Base {
     bool isFileExists(const std::string& path);
 #endif
 	ATTRIBUTE_INTERFACE
-	std::string getParentPath(std::string_view path);
+	std::string getParentPath(const std::string& path);
 	ATTRIBUTE_INTERFACE
-	std::wstring getParentPath(std::wstring_view path);
+	std::wstring getParentPath(const std::wstring& path);
 	ATTRIBUTE_INTERFACE
-	std::string getFileName(std::string_view path);
+	std::string getFileName(const std::string& path);
 	ATTRIBUTE_INTERFACE
-	std::wstring getFileName(std::wstring_view path);
+	std::wstring getFileName(const std::wstring& path);
 	ATTRIBUTE_INTERFACE
 	bool isURI(std::string_view string);
 	ATTRIBUTE_INTERFACE
@@ -50,14 +50,14 @@ namespace Base {
 	ATTRIBUTE_INTERFACE
 	bool isDirectory(std::wstring_view string);
 	ATTRIBUTE_INTERFACE
-	std::string appendPath(std::string_view path, std::string_view fileName);
+	std::string appendPath(const std::string& path, const std::string& fileName);
 	ATTRIBUTE_INTERFACE
-	std::wstring appendPath(std::wstring_view path, std::wstring_view fileName);
+	std::wstring appendPath(const std::wstring& path, const std::wstring& fileName);
 
 	ATTRIBUTE_INTERFACE
-	std::string getFileExtension(std::string_view path);
+	std::string getFileExtension(const std::string& path);
 	ATTRIBUTE_INTERFACE
-	std::wstring getFileExtension(std::wstring_view path);
+	std::wstring getFileExtension(const std::wstring& path);
 	ATTRIBUTE_INTERFACE
 	std::string getCanonicalPath(std::string_view path);
 	ATTRIBUTE_INTERFACE
