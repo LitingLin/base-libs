@@ -10,6 +10,7 @@ namespace Base
 	{
 		CHECK(WebPGetInfo((const uint8_t*)pointer, size, &_width, &_height));
 		_pointer = pointer;
+		_size = size;
 	}
 
 	int WebPDecoder::getWidth()
