@@ -493,7 +493,7 @@ namespace Base
     }
 #endif
 
-	SequentialDirectoryFileListGetter::SequentialDirectoryFileListGetter(std::wstring_view path)
+	SequentialDirectoryFileListGetter::SequentialDirectoryFileListGetter(PLATFORM_STRING_VIEW_TYPE path)
 		: _path(path)
 	{
 	}
