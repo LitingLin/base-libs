@@ -8,7 +8,7 @@ namespace Base
 {
 	void WebPDecoder::load(const void* pointer, uint64_t size)
 	{
-		(WebPGetInfo((const uint8_t*)pointer, size, &_width, &_height));
+		CHECK(WebPGetInfo((const uint8_t*)pointer, size, &_width, &_height));
 		_pointer = pointer;
 		_size = size;
 	}
