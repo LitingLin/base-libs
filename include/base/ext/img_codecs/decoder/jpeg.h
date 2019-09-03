@@ -32,7 +32,18 @@ namespace Base {
 #include <Windows.h>
 #endif
 #include <stdio.h>
+#ifdef _MSC_VER
+#pragma warning(push, 0)
+#elif defined __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+#endif
 #include <jpeglib.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#elif defined __GNUC__
+#pragma GCC diagnostic pop
+#endif
 #include <cstdint>
 
 namespace Base
