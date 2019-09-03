@@ -61,9 +61,9 @@ namespace Base
 	bool StringToGUID(const char* str, unsigned str_size, GUID * guid);
 #endif
 	ATTRIBUTE_INTERFACE
-    bool endsWith(const std::string& string, const std::string& ending);
+    bool endsWith(std::string_view string, std::string_view ending);
 	ATTRIBUTE_INTERFACE
-    bool endsWith(const std::wstring& string, const std::wstring& ending);
+    bool endsWith(std::wstring_view string, std::wstring_view ending);
 	ATTRIBUTE_INTERFACE
 	bool isMemoryZero(void* buf, size_t size);
 	const uint8_t GUID_STRING_SIZE = 39;

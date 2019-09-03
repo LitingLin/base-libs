@@ -278,7 +278,7 @@ namespace Base
 #endif
 
     template <typename CharType> inline
-    bool endsWithHelper(const std::basic_string<CharType> &string, const std::basic_string<CharType> &ending)
+    bool endsWithHelper(std::basic_string_view<CharType> string, std::basic_string_view<CharType> ending)
     {
         if (string.length() >= ending.length())
         {
@@ -290,12 +290,12 @@ namespace Base
         }
     }
 
-    bool endsWith(const std::string& string, const std::string& ending)
+    bool endsWith(std::string_view string, std::string_view ending)
     {
         return endsWithHelper<char>(string, ending);
     }
 
-    bool endsWith(const std::wstring& string, const std::wstring& ending)
+    bool endsWith(std::wstring_view string, std::wstring_view ending)
     {
         return endsWithHelper<wchar_t>(string, ending);
     }
