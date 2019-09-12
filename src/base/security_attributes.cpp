@@ -9,7 +9,7 @@ namespace Base
 	{
 		const WCHAR *pszStringSecurityDescriptor = L"D:(A;;GA;;;WD)(A;;GA;;;AN)S:(ML;;NW;;;ME)";
 
-		ENSURE_WIN32API(ConvertStringSecurityDescriptorToSecurityDescriptor(pszStringSecurityDescriptor, SDDL_REVISION_1, &_descriptor, NULL));
+		L_ENSURE_WIN32API(ConvertStringSecurityDescriptorToSecurityDescriptor(pszStringSecurityDescriptor, SDDL_REVISION_1, &_descriptor, NULL));
 
 		_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
 		_attributes.lpSecurityDescriptor = _descriptor;

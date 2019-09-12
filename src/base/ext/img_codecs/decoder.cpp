@@ -19,7 +19,7 @@ namespace Base
                 _webpDecoder.load(buffer, size);
                 break;
 			default:
-				NOT_IMPLEMENTED_ERROR;
+				L_NOT_IMPLEMENTED_ERROR;
         }
     }
 
@@ -36,7 +36,7 @@ namespace Base
                 return _webpDecoder.getHeight();
                 break;
 			default:
-				NOT_IMPLEMENTED_ERROR;
+				L_NOT_IMPLEMENTED_ERROR;
 				return 0;
         }
     }
@@ -54,7 +54,7 @@ namespace Base
                 return _webpDecoder.getWidth();
                 break;
 			default:
-				NOT_IMPLEMENTED_ERROR;
+				L_NOT_IMPLEMENTED_ERROR;
 				return 0;
         }
     }
@@ -72,7 +72,7 @@ namespace Base
                 return _webpDecoder.getDecompressedSize();
                 break;
 			default:
-				NOT_IMPLEMENTED_ERROR;
+				L_NOT_IMPLEMENTED_ERROR;
 				return 0;
         }
     }
@@ -90,7 +90,7 @@ namespace Base
                 _webpDecoder.decode(output);
                 break;
 			default:
-				NOT_IMPLEMENTED_ERROR;
+				L_NOT_IMPLEMENTED_ERROR;
         }
     }
 }

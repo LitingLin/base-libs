@@ -12,7 +12,7 @@ namespace Base
 		char jpegLastErrorMsg[JMSG_LENGTH_MAX];
 		(*(cinfo->err->format_message)) (cinfo, jpegLastErrorMsg);
 
-		THROW_RUNTIME_EXCEPTION << jpegLastErrorMsg;
+		L_THROW_RUNTIME_EXCEPTION << jpegLastErrorMsg;
 	}
 	
 	JPEGDecoder::JPEGDecoder()
@@ -38,7 +38,7 @@ namespace Base
 	void JPEGDecoder::load(const void* pointer, const uint64_t fileSize)
 	{
 		jpeg_mem_src(&decInfo, (const unsigned char*)pointer, (unsigned long)fileSize);
-		CHECK(jpeg_read_header(&decInfo, true));
+		L_CHECK(jpeg_read_header(&decInfo, true));
 		decInfo.out_color_space = JCS_RGB;
 		decInfo.raw_data_out = false;
 	}
@@ -55,22 +55,22 @@ namespace Base
 
 	uint64_t JPEGDecoder::getDecompressedSize()
 	{
-		CHECK_GT(decInfo.num_components, 0);
+		L_CHECK_GT(decInfo.num_components, 0);
 		return decInfo.image_height * decInfo.image_width * uint64_t(decInfo.num_components);
 	}
 
 	void JPEGDecoder::decode(void* buffer)
 	{
-		CHECK(jpeg_start_decompress(&decInfo));
-		CHECK_GT(decInfo.num_components, 0);
+		L_CHECK(jpeg_start_decompress(&decInfo));
+		L_CHECK_GT(decInfo.num_components, 0);
 
 		size_t rowSize = decInfo.image_width * unsigned(decInfo.num_components);
 		unsigned char* currentBuffer = (unsigned char*)buffer;
 		while (decInfo.output_scanline < decInfo.image_height) {
-			CHECK_EQ(jpeg_read_scanlines(&decInfo, &currentBuffer, 1), 1);
+			L_CHECK_EQ(jpeg_read_scanlines(&decInfo, &currentBuffer, 1), 1);
 			currentBuffer += rowSize;
 		}
-		CHECK(jpeg_finish_decompress(&decInfo));
+		L_CHECK(jpeg_finish_decompress(&decInfo));
 	}
 }
 #endif

@@ -27,7 +27,7 @@ namespace Base
 {
 	bool isMemoryZero(void *buf, size_t size)
 	{
-		CHECK(size);
+		L_CHECK(size);
 		char *buf_ = (char*)buf;
 		return buf_[0] == 0 && memcmp(buf_, buf_ + 1, size - 1) == 0;
 	}
@@ -45,7 +45,7 @@ namespace Base
 		int size = MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, NULL, NULL);
 		std::wstring wideCharString;
 		wideCharString.resize(size);
-		CHECK_NE_WIN32API(MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, &wideCharString[0], size + 1), 0);
+		L_CHECK_NE_WIN32API(MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, &wideCharString[0], size + 1), 0);
 		return wideCharString;
 	}
 
@@ -61,7 +61,7 @@ namespace Base
 		int size = WideCharToMultiByte(CP_UTF8, 0, str.data(), str_size, nullptr, 0, NULL, NULL);
 		std::string localMultiByteString;
 		localMultiByteString.resize(size);
-		CHECK_NE_WIN32API(WideCharToMultiByte(CP_UTF8, 0, str.data(), str_size, &localMultiByteString[0], size + 1, NULL, NULL), 0);
+		L_CHECK_NE_WIN32API(WideCharToMultiByte(CP_UTF8, 0, str.data(), str_size, &localMultiByteString[0], size + 1, NULL, NULL), 0);
 		return localMultiByteString;
 	}
 	std::wstring toLowerCase(std::wstring_view str)
@@ -95,8 +95,8 @@ namespace Base
     }
 	void GUIDToString(const GUID *guid, wchar_t *str, unsigned str_size)
 	{
-		ENSURE_GE(str_size, 39U);
-		ENSURE_EQ(StringFromGUID2(*guid, str, 39), 39);
+		L_ENSURE_GE(str_size, 39U);
+		L_ENSURE_EQ(StringFromGUID2(*guid, str, 39), 39);
 	}
 	bool isRunningOn64bitSystem()
 	{
@@ -112,7 +112,7 @@ namespace Base
 
 	bool StringToGUID(const wchar_t *str, unsigned str_size, GUID *guid)
 	{
-		ENSURE_GE(str_size, 39U);
+		L_ENSURE_GE(str_size, 39U);
 		const HRESULT hr = IIDFromString(str, guid);
 		return SUCCEEDED(hr);
 	}
@@ -120,12 +120,12 @@ namespace Base
     void generateGUID(GUID *guid)
     {
         int fd = open("/proc/sys/kernel/random/uuid", O_RDONLY);
-        ENSURE_NE_STDCAPI(fd, -1);
+        L_ENSURE_NE_STDCAPI(fd, -1);
 
         ScopeGuard scopeGuard = [&]() {close(fd);};
         int bytesRead = read(fd, guid, 16);
-        ENSURE_NE_STDCAPI(bytesRead, -1);
-        ENSURE_EQ(bytesRead, 16);
+        L_ENSURE_NE_STDCAPI(bytesRead, -1);
+        L_ENSURE_EQ(bytesRead, 16);
     }
     void generateGUID(char *str, unsigned str_size)
     {
@@ -175,7 +175,7 @@ namespace Base
     }
     void GUIDToString(const GUID *guid, char *str, unsigned str_size)
     {
-        ENSURE_GE(str_size, 39U);
+        L_ENSURE_GE(str_size, 39U);
         str[0] = '{';
         uint32ToHexString(guid->Data1, str+1);
         str[9] = '-';
@@ -237,7 +237,7 @@ namespace Base
 
     bool StringToGUID(const char *str, unsigned str_size, GUID *guid)
     {
-        ENSURE_GE(str_size, 39U);
+        L_ENSURE_GE(str_size, 39U);
 	    if (str[0]!='{')
 	        return false;
         for (int i=1;i<9;++i)

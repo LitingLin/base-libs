@@ -15,7 +15,7 @@ namespace Base
 			_handle = CreateMutex(security_attributes.get(), FALSE, name);
 		}
 
-		ENSURE_WIN32API(_handle);
+		L_ENSURE_WIN32API(_handle);
 	}
 
 	NamedMutex::~NamedMutex()
@@ -25,7 +25,7 @@ namespace Base
 
 	void NamedMutex::lock()
 	{
-		ENSURE_EQ_WIN32API(WaitForSingleObject(_handle, INFINITE), WAIT_OBJECT_0);
+		L_ENSURE_EQ_WIN32API(WaitForSingleObject(_handle, INFINITE), WAIT_OBJECT_0);
 	}
 
 	bool NamedMutex::try_lock()
@@ -36,7 +36,7 @@ namespace Base
 		else if (rc == WAIT_TIMEOUT)
 			return false;
 		else
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 		return false;
 	}
 

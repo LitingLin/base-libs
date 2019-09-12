@@ -58,7 +58,7 @@ namespace Base
 	{
 		MemoryMappedIO memoryMappedIo(_file);
 		auto fileSize = _file->getSize();
-		CHECK_EQ(ini_parse_string((const char *)memoryMappedIo.get(), fileSize, ini_handler, this), 0);
+		L_CHECK_EQ(ini_parse_string((const char *)memoryMappedIo.get(), fileSize, ini_handler, this), 0);
 	}
 	bool IniParser::SectionIterator::exists(const std::string& name) const
 	{

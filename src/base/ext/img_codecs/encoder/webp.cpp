@@ -26,11 +26,11 @@ namespace Base
 
 	WebPEncoder::Container WebPEncoder::encode(const void* rgb, unsigned width, unsigned height)
 	{
-		CHECK_LE(width * 3ULL, uint64_t(std::numeric_limits<int>::max()));
-		CHECK_LE(height, unsigned(std::numeric_limits<int>::max()));
+		L_CHECK_LE(width * 3ULL, uint64_t(std::numeric_limits<int>::max()));
+		L_CHECK_LE(height, unsigned(std::numeric_limits<int>::max()));
 		uint8_t* output;
 		const size_t size = WebPEncodeRGB((const uint8_t*)rgb, int(width), int(height), 3 * int(width), 80, &output);
-		CHECK(size);
+		L_CHECK(size);
 		return Container(output, size);
 	}
 }

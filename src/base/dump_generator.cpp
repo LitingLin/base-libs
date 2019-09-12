@@ -20,7 +20,7 @@ namespace Base
 {
 	std::vector<uint32_t> getProductProcessIds(const std::wstring &productPathPrefix)
 	{
-		CHECK_LE(productPathPrefix.size(), std::numeric_limits<uint32_t>::max());
+		L_CHECK_LE(productPathPrefix.size(), std::numeric_limits<uint32_t>::max());
 		std::wstring lowerCaseProductPathPrefix = toLowerCase(productPathPrefix);
 		std::vector<uint32_t> processIds = getSystemProcessesIds();
 

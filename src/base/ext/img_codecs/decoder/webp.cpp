@@ -8,9 +8,9 @@ namespace Base
 {
 	void WebPDecoder::load(const void* pointer, uint64_t size)
 	{
-		CHECK(WebPGetInfo((const uint8_t*)pointer, size, &_width, &_height));
-		CHECK_GT(_width, 0);
-		CHECK_GT(_height, 0);
+		L_CHECK(WebPGetInfo((const uint8_t*)pointer, size, &_width, &_height));
+		L_CHECK_GT(_width, 0);
+		L_CHECK_GT(_height, 0);
 		_pointer = pointer;
 		_size = size;
 	}
@@ -32,7 +32,7 @@ namespace Base
 
 	void WebPDecoder::decode(void* buffer)
 	{
-		CHECK_EQ(WebPDecodeRGBInto((const uint8_t*)_pointer, _size, (uint8_t*)buffer, getDecompressedSize(), uint64_t(_width) * 3ULL), (uint8_t*)buffer);
+		L_CHECK_EQ(WebPDecodeRGBInto((const uint8_t*)_pointer, _size, (uint8_t*)buffer, getDecompressedSize(), uint64_t(_width) * 3ULL), (uint8_t*)buffer);
 	}
 }
 #endif

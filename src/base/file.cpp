@@ -27,7 +27,7 @@ namespace Base
 		do {
 			pathBuf.resize(pathBuf.size() + MAX_PATH);
 			copied = GetModuleFileName(instance, &pathBuf.at(0), DWORD(pathBuf.size()));
-			CHECK_NE_WIN32API(copied, 0U);
+			L_CHECK_NE_WIN32API(copied, 0U);
 		} while (copied >= pathBuf.size());
 
 		pathBuf.resize(copied);
@@ -41,7 +41,7 @@ namespace Base
 		DWORD current_directory_size = GetCurrentDirectory(0, nullptr);
 		std::wstring work_directory;
 		work_directory.resize(current_directory_size - 1);
-		ENSURE_WIN32API(GetCurrentDirectory(current_directory_size, &work_directory[0]));
+		L_ENSURE_WIN32API(GetCurrentDirectory(current_directory_size, &work_directory[0]));
 		return work_directory;
 	}
 
@@ -54,7 +54,7 @@ namespace Base
 	{
 		wchar_t buffer[MAX_PATH + 1];
 		DWORD tempPathSize = GetTempPath(MAX_PATH + 1, buffer);
-		ENSURE_NE(tempPathSize, DWORD(0));
+		L_ENSURE_NE(tempPathSize, DWORD(0));
 		return std::wstring(buffer);
 	}
 
@@ -79,7 +79,7 @@ namespace Base
 		while (true)
 		{
 			DWORD copied_size = GetFullPathNameW(path.data(), (DWORD)buffer.size() + 1, &buffer[0], nullptr);
-			CHECK_NE_WIN32API(copied_size, 0U);
+			L_CHECK_NE_WIN32API(copied_size, 0U);
 			if (copied_size == buffer.size())
 				buffer.resize(buffer.size() * 2);
 			else
@@ -400,7 +400,7 @@ namespace Base
 	DirectoryIterator::~DirectoryIterator()
 	{
 		if (_handle)
-			LOG_IF_FAILED_WIN32API(FindClose(_handle));
+			L_LOG_IF_FAILED_WIN32API(FindClose(_handle));
 	}
 
 	bool DirectoryIterator::next(std::wstring& fileName, FileType *fileType, uint64_t *lastFileWriteTime)
@@ -433,7 +433,7 @@ namespace Base
 	void DirectoryIterator::reset()
 	{
 		if (_handle) {
-			LOG_IF_FAILED_WIN32API(FindClose(_handle));
+			L_LOG_IF_FAILED_WIN32API(FindClose(_handle));
 			_handle = nullptr;
 		}
 	}
@@ -446,12 +446,12 @@ namespace Base
 
     DirectoryIterator::DirectoryIterator(std::string_view path) {
         _dir = opendir(path.data());
-        CHECK_STDCAPI(_dir);
+        L_CHECK_STDCAPI(_dir);
         _dirfd = dirfd(_dir);
     }
     DirectoryIterator::~DirectoryIterator()
     {
-        LOG_IF_NOT_EQ_STDCAPI(closedir(_dir), 0);
+        L_LOG_IF_NOT_EQ_STDCAPI(closedir(_dir), 0);
     }
     bool DirectoryIterator::next(std::string &fileName, FileType *fileType, uint64_t *lastFileWriteTime)
     {
@@ -462,7 +462,7 @@ namespace Base
                 if (errno == 0)
                     return false;
                 else
-                    THROW_STDCAPI_RUNTIME_EXCEPTION << "readdir() failed";
+                    L_THROW_STDCAPI_RUNTIME_EXCEPTION << "readdir() failed";
             }
 
             int fd = openat(_dirfd, dirent->d_name, O_RDONLY);
@@ -470,8 +470,8 @@ namespace Base
                 struct stat stat;
                 int rc = fstat(fd, &stat);
                 if (rc != 0) {
-                    LOGGING_STDCAPI_ERROR << "openat() failed." << "file: " << dirent->d_name;
-                    LOG_IF_NOT_EQ_STDCAPI(close(fd), 0);
+                    L_LOG_STDCAPI_ERROR << "openat() failed." << "file: " << dirent->d_name;
+                    L_LOG_IF_NOT_EQ_STDCAPI(close(fd), 0);
                     continue;
                 }
                 if (fileType) {
@@ -483,7 +483,7 @@ namespace Base
                     *lastFileWriteTime = as_nanoseconds(stat.st_mtim);
             }
             fileName = (char *) (dirent->d_name);
-            LOG_IF_NOT_EQ_STDCAPI(close(fd), 0);
+            L_LOG_IF_NOT_EQ_STDCAPI(close(fd), 0);
             return true;
         }
     }
@@ -639,7 +639,7 @@ namespace Base
 			desiredAccess_ = GENERIC_READ | GENERIC_WRITE;
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 		}
 		int creationDisposition_ = 0;
 		switch (creationDisposition)
@@ -660,10 +660,10 @@ namespace Base
 			creationDisposition_ = TRUNCATE_EXISTING;
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 		}
 		_fileHandle = CreateFile(path.data(), desiredAccess_, FILE_SHARE_READ, NULL, creationDisposition_, FILE_ATTRIBUTE_NORMAL, NULL);
-		CHECK_NE_WIN32API(_fileHandle, INVALID_HANDLE_VALUE);
+		L_CHECK_NE_WIN32API(_fileHandle, INVALID_HANDLE_VALUE);
 	}
 
 	File::File(File&& other) noexcept
@@ -675,13 +675,13 @@ namespace Base
 	File::~File()
 	{
 		if (_fileHandle)
-			LOG_IF_FAILED_WIN32API(CloseHandle(_fileHandle));
+			L_LOG_IF_FAILED_WIN32API(CloseHandle(_fileHandle));
 	}
 
 	uint64_t File::getSize() const
 	{
 		LARGE_INTEGER large_integer;
-		CHECK_WIN32API(GetFileSizeEx(_fileHandle, &large_integer));
+		L_CHECK_WIN32API(GetFileSizeEx(_fileHandle, &large_integer));
 		return large_integer.QuadPart;
 	}
 
@@ -703,7 +703,7 @@ namespace Base
 			}
 
 			DWORD sizeRead;
-			CHECK_WIN32API(ReadFile(_fileHandle, buffer_, this_read_size, &sizeRead, nullptr));
+			L_CHECK_WIN32API(ReadFile(_fileHandle, buffer_, this_read_size, &sizeRead, nullptr));
 			totalReadFileSize += sizeRead;
 			buffer_ += this_read_size;
 		}
@@ -728,7 +728,7 @@ namespace Base
 			}
 
 			DWORD sizeWritten;
-			CHECK_WIN32API(WriteFile(_fileHandle, buffer_, currentWriteSize, &sizeWritten, nullptr));
+			L_CHECK_WIN32API(WriteFile(_fileHandle, buffer_, currentWriteSize, &sizeWritten, nullptr));
 			totalWriteFileSize += sizeWritten;
 			buffer_ += currentWriteSize;
 		}
@@ -750,25 +750,26 @@ namespace Base
 			dwMoveMethod = FILE_END;
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
+			dwMoveMethod = 0;
 		}
 		LARGE_INTEGER large_integer;
 		large_integer.QuadPart = offset;
-		CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, dwMoveMethod));
+		L_CHECK_WIN32API(SetFilePointerEx(_fileHandle, large_integer, nullptr, dwMoveMethod));
 	}
 
 	uint64_t File::getPosition() const
 	{
 		LARGE_INTEGER zero = { 0 };
 		LARGE_INTEGER position;
-		CHECK_WIN32API(SetFilePointerEx(_fileHandle, zero, &position, FILE_CURRENT));
+		L_CHECK_WIN32API(SetFilePointerEx(_fileHandle, zero, &position, FILE_CURRENT));
 		return (uint64_t)position.QuadPart;
 	}
 
 	uint64_t File::getLastWriteTime() const
 	{
 		FILETIME lastWriteTime;
-		CHECK_WIN32API(GetFileTime(_fileHandle, nullptr, nullptr, &lastWriteTime));
+		L_CHECK_WIN32API(GetFileTime(_fileHandle, nullptr, nullptr, &lastWriteTime));
 		static_assert(sizeof(uint64_t) == sizeof(FILETIME), "");
 		return *((uint64_t*)(&lastWriteTime));
 	}
@@ -776,7 +777,7 @@ namespace Base
 	void File::setSize(uint64_t size)
 	{
 		setPosition(size);
-		CHECK_WIN32API(SetEndOfFile(_fileHandle));
+		L_CHECK_WIN32API(SetEndOfFile(_fileHandle));
 	}
 
 	HANDLE File::getHANDLE()
@@ -801,7 +802,7 @@ namespace Base
                 flag |= O_RDWR;
                 break;
             default:
-                UNREACHABLE_ERROR;
+                L_UNREACHABLE_ERROR;
         }
 
         switch (creationDisposition)
@@ -821,19 +822,19 @@ namespace Base
                 flag |= O_TRUNC;
                 break;
             default:
-                UNREACHABLE_ERROR;
+                L_UNREACHABLE_ERROR;
         }
 
 		if (flag & O_CREAT || flag & O_TMPFILE)
 			_fd = ::open(path.data(), flag, 0666);
 		else
 			_fd = ::open(path.data(), flag);
-	    CHECK_NE_STDCAPI(_fd, -1) << " open() failed with path: " << path << ", flag: " << flag;
+	    L_CHECK_NE_STDCAPI(_fd, -1) << " open() failed with path: " << path << ", flag: " << flag;
     }
 
     File::~File() {
         if (_fd != -1) {
-            LOG_IF_NOT_EQ_STDCAPI(::close(_fd), 0);
+            L_LOG_IF_NOT_EQ_STDCAPI(::close(_fd), 0);
         }
     }
 
@@ -845,19 +846,19 @@ namespace Base
 
     uint64_t File::getSize() const {
         struct stat64 stat_;
-        CHECK_NE_STDCAPI(::fstat64(_fd, &stat_), -1);
+        L_CHECK_NE_STDCAPI(::fstat64(_fd, &stat_), -1);
         return stat_.st_size;
     }
 
     uint64_t File::read(void *buffer, uint64_t size) const {
         ssize_t bytesRead = ::read(_fd, buffer, size);
-        CHECK_NE_STDCAPI(bytesRead, -1);
+        L_CHECK_NE_STDCAPI(bytesRead, -1);
         return (uint64_t)bytesRead;
     }
 
     uint64_t File::write(const void *buffer, uint64_t size) {
         ssize_t bytesWritten = ::write(_fd, buffer, size);
-        CHECK_NE_STDCAPI(bytesWritten, -1);
+        L_CHECK_NE_STDCAPI(bytesWritten, -1);
         return (uint64_t)bytesWritten;
     }
 
@@ -875,23 +876,23 @@ namespace Base
 			whence = SEEK_END;
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 		}
         off64_t new_off = ::lseek64(_fd, offset, whence);
-        CHECK_NE_STDCAPI(new_off, -1);
-        CHECK_EQ_STDCAPI(new_off, offset);
+        L_CHECK_NE_STDCAPI(new_off, -1);
+        L_CHECK_EQ_STDCAPI(new_off, offset);
     }
 
 	uint64_t File::getPosition() const
 	{
 		off64_t off = ::lseek64(_fd, 0, SEEK_CUR);
-		CHECK_NE_STDCAPI(off, -1);
+		L_CHECK_NE_STDCAPI(off, -1);
 		return off;
 	}
 
     uint64_t File::getLastWriteTime() const {
         struct stat64 stat_;
-        CHECK_NE_STDCAPI(::fstat64(_fd, &stat_), -1);
+        L_CHECK_NE_STDCAPI(::fstat64(_fd, &stat_), -1);
         return as_nanoseconds(stat_.st_mtim);
     }
 
@@ -901,7 +902,7 @@ namespace Base
 
 	void File::setSize(uint64_t size)
 	{
-		CHECK_NE_STDCAPI(ftruncate64(_fd, size), -1);
+		L_CHECK_NE_STDCAPI(ftruncate64(_fd, size), -1);
 	}
 
 #endif

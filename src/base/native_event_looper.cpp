@@ -15,12 +15,12 @@ namespace Base
 		uint32_t numberOfObjects;
 		waitable_object->getNumberOfWaitableObjects(&numberOfObjects);
 		const uint32_t originalSize = static_cast<uint32_t>(_nativeWaitableHandles.size());
-		ENSURE_LE(originalSize + numberOfObjects, uint32_t(MAXIMUM_WAIT_OBJECTS));
+		L_ENSURE_LE(originalSize + numberOfObjects, uint32_t(MAXIMUM_WAIT_OBJECTS));
 		_nativeWaitableHandles.insert(_nativeWaitableHandles.end(), numberOfObjects, nullptr);
 		waitable_object->getWaitableObjects(_nativeWaitableHandles.data() + originalSize);
 		_objects.push_back(waitable_object);
 		const auto rc = _objectNativeHandleCountMapper.insert(std::make_pair(waitable_object, numberOfObjects));
-		CHECK(rc.second);
+		L_CHECK(rc.second);
 	}
 
 	void NativeEventLooper::updateWaitableObject(NativeWaitableObject* waitable_object)

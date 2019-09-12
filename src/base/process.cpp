@@ -37,8 +37,8 @@ namespace Base
 		shellexceptioninfo.lpFile = application;
 		shellexceptioninfo.lpParameters = command;
 		shellexceptioninfo.nShow = SW_SHOWNORMAL;
-		CHECK_WIN32API(ShellExecuteEx(&shellexceptioninfo));
-		CHECK_GE_WIN32API(std::ptrdiff_t(shellexceptioninfo.hInstApp), 32);
+		L_CHECK_WIN32API(ShellExecuteEx(&shellexceptioninfo));
+		L_CHECK_GE_WIN32API(std::ptrdiff_t(shellexceptioninfo.hInstApp), 32);
 		_processHandle = shellexceptioninfo.hProcess;
 	}
 
@@ -72,7 +72,7 @@ namespace Base
 		else if (rc == WAIT_OBJECT_0)
 			return false;
 		else
-			NOT_IMPLEMENTED_ERROR;
+			L_NOT_IMPLEMENTED_ERROR;
 		return false;
 	}
 
@@ -85,14 +85,14 @@ namespace Base
 	unsigned long Process::getExitCode() const
 	{
 		DWORD exit_code;
-		ENSURE_WIN32API(GetExitCodeProcess(_processHandle, &exit_code));
+		L_ENSURE_WIN32API(GetExitCodeProcess(_processHandle, &exit_code));
 		return exit_code;
 	}
 
 	ProcessMonitor::ProcessMonitor()
 	{
 		_finalize_signal = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-		ENSURE_WIN32API(_finalize_signal);
+		L_ENSURE_WIN32API(_finalize_signal);
 	}
 
 	ProcessMonitor::~ProcessMonitor()
@@ -101,7 +101,7 @@ namespace Base
 		{
 			std::lock_guard<std::mutex> lock_guard(_mutex);
 			running_threads = _running_threads;
-			ENSURE_WIN32API(SetEvent(_finalize_signal));
+			L_ENSURE_WIN32API(SetEvent(_finalize_signal));
 		}
 
 		for (auto thread_context : running_threads) {
@@ -109,16 +109,16 @@ namespace Base
 			CloseHandle(thread_context.second);
 		}
 
-		LOG_IF_FAILED_WIN32API(CloseHandle(_finalize_signal));
+		L_LOG_IF_FAILED_WIN32API(CloseHandle(_finalize_signal));
 	}
 
 	void ProcessMonitor::add(HANDLE process_handle)
 	{
 		MonitorWorkerContext *context = new MonitorWorkerContext{ this, process_handle };
 		HANDLE thread_handle = (HANDLE)_beginthreadex(nullptr, 0, monitor_worker, context, 0, nullptr);
-		ENSURE_NE_STDCAPI(std::ptrdiff_t(thread_handle), 0);
+		L_ENSURE_NE_STDCAPI(std::ptrdiff_t(thread_handle), 0);
 		const DWORD tid = GetThreadId(thread_handle);
-		ENSURE_WIN32API(tid);
+		L_ENSURE_WIN32API(tid);
 		_running_threads.insert(std::make_pair(tid, thread_handle));
 	}
 
@@ -158,7 +158,7 @@ namespace Base
 			const auto current_thread_handle_iter = this_ptr->_running_threads.find(tid);			
 			if (current_thread_handle_iter == this_ptr->_running_threads.end()) return 0;
 			HANDLE current_thread_handle = current_thread_handle_iter->second;
-			ENSURE(this_ptr->_running_threads.erase(tid)) << "_running_threads should have the handle";
+			L_ENSURE(this_ptr->_running_threads.erase(tid)) << "_running_threads should have the handle";
 			CloseHandle(current_thread_handle);
 		}
 		return 0;
@@ -172,7 +172,7 @@ namespace Base
 		while (true)
 		{
 			uint32_t gotSize;
-			ENSURE_WIN32API(EnumProcesses((DWORD*)ids.data(), size * sizeof(uint32_t), (DWORD*)&gotSize));
+			L_ENSURE_WIN32API(EnumProcesses((DWORD*)ids.data(), size * sizeof(uint32_t), (DWORD*)&gotSize));
 			gotSize /= sizeof(uint32_t);
 			if (size == gotSize) {
 				if (size > std::numeric_limits<uint32_t>::max() / sizeof(uint32_t) / 2)

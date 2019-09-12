@@ -31,15 +31,15 @@ namespace Base
 		{
 			if (type == AlgorithmType::SHA256)
 			{
-				ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_SHA256_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+				L_ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_SHA256_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 			}
 			else if (type == AlgorithmType::AES)
 			{
-				ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_AES_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+				L_ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_AES_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 			}
 			else if (type == AlgorithmType::RNG)
 			{
-				ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_RNG_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+				L_ENSURE_NTSTATUS(BCryptOpenAlgorithmProvider(&handle, BCRYPT_RNG_ALGORITHM, NULL, 0)) << BCryptOpenAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace Base
 
 		BCRYPT_ALG_HANDLE_GUARD::~BCRYPT_ALG_HANDLE_GUARD()
 		{
-			LOG_IF_FAILED_NTSTATUS(BCryptCloseAlgorithmProvider(handle, 0)) << BCryptCloseAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+			L_LOG_IF_FAILED_NTSTATUS(BCryptCloseAlgorithmProvider(handle, 0)) << BCryptCloseAlgorithmProviderErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 
 		BCRYPT_ALG_HANDLE BCRYPT_ALG_HANDLE_GUARD::getHandle() const
@@ -84,7 +84,7 @@ namespace Base
 		{
 			ULONG cbData = 0;
 			//calculate the size of the buffer to hold the hash object
-			ENSURE_NTSTATUS(BCryptGetProperty(
+			L_ENSURE_NTSTATUS(BCryptGetProperty(
 				_hALG.getHandle(),
 				BCRYPT_OBJECT_LENGTH,
 				(PBYTE)& _cbHashObject,
@@ -95,7 +95,7 @@ namespace Base
 			_hashObject.reset(new unsigned char[_cbHashObject]);
 
 			//calculate the length of the hash
-			ENSURE_NTSTATUS(BCryptGetProperty(
+			L_ENSURE_NTSTATUS(BCryptGetProperty(
 				_hALG.getHandle(),
 				BCRYPT_HASH_LENGTH,
 				(PBYTE)& _cbHash,
@@ -137,11 +137,11 @@ namespace Base
 		public:
 			HashObjectGuard(BCRYPT_ALG_HANDLE alg_handle, unsigned char* hash_object, DWORD hash_object_size)
 			{
-				ENSURE_NTSTATUS(BCryptCreateHash(alg_handle, &hash_handle, hash_object, hash_object_size, NULL, 0, 0)) << BCryptCreateHashErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+				L_ENSURE_NTSTATUS(BCryptCreateHash(alg_handle, &hash_handle, hash_object, hash_object_size, NULL, 0, 0)) << BCryptCreateHashErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 			}
 			~HashObjectGuard()
 			{
-				LOG_IF_FAILED_NTSTATUS(BCryptDestroyHash(hash_handle)) << BCryptDestroyHashErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+				L_LOG_IF_FAILED_NTSTATUS(BCryptDestroyHash(hash_handle)) << BCryptDestroyHashErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 			}
 			BCRYPT_HASH_HANDLE getHandle() const
 			{
@@ -178,7 +178,7 @@ namespace Base
 
 		std::vector<unsigned char> SHA256::hash(const std::vector<unsigned char>& data) const
 		{
-			CHECK_LT(data.size(), std::numeric_limits<ULONG>::max());
+			L_CHECK_LT(data.size(), std::numeric_limits<ULONG>::max());
 			return hash(data.data(), (ULONG)data.size());
 		}
 
@@ -187,14 +187,14 @@ namespace Base
 			HashObjectGuard hash_object(_hALG.getHandle(), _hashObject.get(), _cbHashObject);
 
 			//hash some data
-			ENSURE_NTSTATUS(BCryptHashData(
+			L_ENSURE_NTSTATUS(BCryptHashData(
 				hash_object.getHandle(),
 				(PBYTE)data,
 				size,
 				0)) << BCryptHashDataErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
 			//close the hash
-			ENSURE_NTSTATUS(BCryptFinishHash(
+			L_ENSURE_NTSTATUS(BCryptFinishHash(
 				hash_object.getHandle(),
 				_hash.get(),
 				_cbHash,
@@ -222,9 +222,9 @@ namespace Base
 		AES128ECB::AES128ECB(const std::vector<unsigned char>& key)
 			: _hALG(BCRYPT_ALG_HANDLE_GUARD::AlgorithmType::AES)
 		{
-			CHECK_LT(key.size(), std::numeric_limits<ULONG>::max());
+			L_CHECK_LT(key.size(), std::numeric_limits<ULONG>::max());
 			ULONG cbData = 0;
-			ENSURE_NTSTATUS(BCryptGetProperty(
+			L_ENSURE_NTSTATUS(BCryptGetProperty(
 				_hALG.getHandle(),
 				BCRYPT_OBJECT_LENGTH,
 				(PBYTE)& _cbKeyObject,
@@ -233,7 +233,7 @@ namespace Base
 				0)) << BCryptGetPropertyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 			_keyObject.reset(new unsigned char[_cbKeyObject]);
 
-			ENSURE_NTSTATUS(BCryptGetProperty(
+			L_ENSURE_NTSTATUS(BCryptGetProperty(
 				_hALG.getHandle(),
 				BCRYPT_BLOCK_LENGTH,
 				(PBYTE)& _cbBlockLen,
@@ -241,7 +241,7 @@ namespace Base
 				&cbData,
 				0)) << BCryptGetPropertyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 
-			ENSURE_NTSTATUS(BCryptSetProperty(_hALG.getHandle(),
+			L_ENSURE_NTSTATUS(BCryptSetProperty(_hALG.getHandle(),
 				BCRYPT_CHAINING_MODE,
 				(PBYTE)BCRYPT_CHAIN_MODE_ECB,
 				sizeof(BCRYPT_CHAIN_MODE_ECB),
@@ -276,7 +276,7 @@ namespace Base
 
 		KeyObjectGuard::KeyObjectGuard(BCRYPT_ALG_HANDLE alg_handle, unsigned char* keyObject, ULONG keyObjectSize, unsigned char* key, ULONG keySize)
 		{
-			ENSURE_NTSTATUS(BCryptGenerateSymmetricKey(
+			L_ENSURE_NTSTATUS(BCryptGenerateSymmetricKey(
 				alg_handle,
 				&_handle,
 				keyObject,
@@ -289,7 +289,7 @@ namespace Base
 
 		KeyObjectGuard::~KeyObjectGuard()
 		{
-			LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+			L_LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 		}
 
 		BCRYPT_KEY_HANDLE KeyObjectGuard::getHandle()
@@ -334,7 +334,7 @@ namespace Base
 		public:
 			KeyObjectGuard_Import(BCRYPT_ALG_HANDLE alg_handle, unsigned char* keyObject, ULONG keyObjectSize, unsigned char* blob, ULONG blobSize)
 			{
-				ENSURE_NTSTATUS(BCryptImportKey(
+				L_ENSURE_NTSTATUS(BCryptImportKey(
 					alg_handle,
 					NULL,
 					BCRYPT_OPAQUE_KEY_BLOB,
@@ -348,7 +348,7 @@ namespace Base
 			}
 			~KeyObjectGuard_Import()
 			{
-				LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
+				L_LOG_IF_FAILED_NTSTATUS(BCryptDestroyKey(_handle)) << BCryptDestroyKeyErrorString(LOG_GET_LEFT_EXPRESSION_RC);
 			}
 			BCRYPT_KEY_HANDLE getHandle()
 			{
@@ -380,7 +380,7 @@ namespace Base
 		{
 			ULONG cbCipherText = 0;
 
-			ENSURE_NTSTATUS(BCryptEncrypt(
+			L_ENSURE_NTSTATUS(BCryptEncrypt(
 				_key->getHandle(),
 				(PBYTE)data.data(),
 				(ULONG)data.size(),
@@ -396,7 +396,7 @@ namespace Base
 			encryptedData.resize(cbCipherText);
 
 			ULONG cbData = 0;
-			ENSURE_NTSTATUS(BCryptEncrypt(
+			L_ENSURE_NTSTATUS(BCryptEncrypt(
 				_key->getHandle(),
 				(PBYTE)data.data(),
 				(ULONG)data.size(),
@@ -414,7 +414,7 @@ namespace Base
 		void AES128ECB::encrypt(const unsigned char* data, unsigned char* buf, ULONG size)
 		{
 			ULONG cbData = 0;
-			ENSURE_NTSTATUS(BCryptEncrypt(
+			L_ENSURE_NTSTATUS(BCryptEncrypt(
 				_key->getHandle(),
 				(PBYTE)data,
 				size,
@@ -449,10 +449,10 @@ namespace Base
 
 		std::vector<unsigned char> AES128ECB::decrypt(const std::vector<unsigned char>& data)
 		{
-			CHECK_LT(data.size(), std::numeric_limits<ULONG>::max());
+			L_CHECK_LT(data.size(), std::numeric_limits<ULONG>::max());
 			ULONG cbPlainText = 0;
 
-			ENSURE_NTSTATUS(BCryptDecrypt(
+			L_ENSURE_NTSTATUS(BCryptDecrypt(
 				_key->getHandle(),
 				(PBYTE)data.data(),
 				(ULONG)data.size(),
@@ -468,7 +468,7 @@ namespace Base
 			decryptedData.resize(cbPlainText);
 
 			ULONG cbData;
-			ENSURE_NTSTATUS(BCryptDecrypt(
+			L_ENSURE_NTSTATUS(BCryptDecrypt(
 				_key->getHandle(),
 				(PBYTE)data.data(),
 				(ULONG)data.size(),
@@ -485,7 +485,7 @@ namespace Base
 		void AES128ECB::decrypt(const unsigned char* data, unsigned char* buf, ULONG size)
 		{
 			ULONG cbData;
-			ENSURE_NTSTATUS(BCryptDecrypt(
+			L_ENSURE_NTSTATUS(BCryptDecrypt(
 				_key->getHandle(),
 				(PBYTE)data,
 				size,
@@ -524,7 +524,7 @@ namespace Base
 		{
 			std::vector<unsigned char> randomNumbers;
 			randomNumbers.resize(size);
-			ENSURE_NTSTATUS(BCryptGenRandom(
+			L_ENSURE_NTSTATUS(BCryptGenRandom(
 				_hALG.getHandle(),
 				(PBYTE)randomNumbers.data(),
 				size,
@@ -535,45 +535,45 @@ namespace Base
 
 		std::string Base64Encode(const std::vector<unsigned char>& data)
 		{
-			CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
+			L_CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 			DWORD size;
-			ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, NULL, &size));
+			L_ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, NULL, &size));
 			std::string base64;
 			base64.resize(size - 1);
-			ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, (char*)base64.c_str(), &size));
+			L_ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, (char*)base64.c_str(), &size));
 			return base64;
 		}
 
 		std::vector<unsigned char> Base64Decode(const std::string& data)
 		{
-			CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
+			L_CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 			DWORD size;
-			CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_BASE64, NULL, &size, NULL, NULL));
+			L_CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_BASE64, NULL, &size, NULL, NULL));
 			std::vector<unsigned char> plaindata;
 			plaindata.resize(size);
-			CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_BASE64, (PBYTE)plaindata.data(), &size, NULL, NULL));
+			L_CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_BASE64, (PBYTE)plaindata.data(), &size, NULL, NULL));
 			return plaindata;
 		}
 
 		std::string BinaryToHexadecimalString(const std::vector<unsigned char>& data)
 		{
-			CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
+			L_CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 			DWORD size;
-			ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_HEXRAW | CRYPT_STRING_NOCRLF, NULL, &size));
+			L_ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_HEXRAW | CRYPT_STRING_NOCRLF, NULL, &size));
 			std::string hex;
 			hex.resize(size - 1);
-			ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_HEXRAW | CRYPT_STRING_NOCRLF, (char*)hex.c_str(), &size));
+			L_ENSURE_WIN32API(CryptBinaryToStringA((PBYTE)data.data(), (DWORD)data.size(), CRYPT_STRING_HEXRAW | CRYPT_STRING_NOCRLF, (char*)hex.c_str(), &size));
 			return hex;
 		}
 
 		std::vector<unsigned char> HexadecimalStringToBinary(const std::string& data)
 		{
-			CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
+			L_CHECK_LT(data.size(), std::numeric_limits<DWORD>::max());
 			DWORD size;
-			CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_HEXRAW, NULL, &size, NULL, NULL));
+			L_CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_HEXRAW, NULL, &size, NULL, NULL));
 			std::vector<unsigned char> plaindata;
 			plaindata.resize(size);
-			CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_HEXRAW, (PBYTE)plaindata.data(), &size, NULL, NULL));
+			L_CHECK_WIN32API(CryptStringToBinaryA(data.c_str(), (DWORD)data.size(), CRYPT_STRING_HEXRAW, (PBYTE)plaindata.data(), &size, NULL, NULL));
 			return plaindata;
 		}
 	}

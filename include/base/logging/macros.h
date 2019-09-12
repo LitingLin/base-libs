@@ -117,407 +117,407 @@ _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, < , std::less, loggingClas
 
 
 /* ----------------------------- UNRECOVERABLE ERROR ----------------------------- */
-#define NOT_IMPLEMENTED_ERROR \
+#define L_NOT_IMPLEMENTED_ERROR \
 _LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
 
-#define UNREACHABLE_ERROR \
+#define L_UNREACHABLE_ERROR \
 _LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr) << "Unknown internal error. "
 
 /* ----------------------------- FATAL ERROR ----------------------------- */
 // "Let it crash"
 
-#define FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_FATAL_ERROR, __VA_ARGS__)
-#define _FATAL_ERROR_1(errorCode) \
+#define L_FATAL_ERROR(...) _PP_MACRO_OVERLOAD(_L_FATAL_ERROR, __VA_ARGS__)
+#define _L_FATAL_ERROR_1(errorCode) \
 _LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, errorCode, nullptr)
 
 // Let it crash, don't catch
-#define _FATAL_ERROR_0() \
-_FATAL_ERROR_1(-1)
+#define _L_FATAL_ERROR_0() \
+_L_FATAL_ERROR_1(-1)
 
-#define FATAL_ERROR_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_FATAL_ERROR_HANDLER, __VA_ARGS__)
-#define _FATAL_ERROR_HANDLER_2(errorCode, handler) \
-_LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _FATAL_ERROR_HANDLER_1(handler) \
-_FATAL_EEROR_HANDLER_2(-1, handler)
+#define L_FATAL_ERROR_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_FATAL_ERROR_WITH_FINALIZER, __VA_ARGS__)
+#define _L_FATAL_ERROR_WITH_FINALIZER_2(errorCode, finalizer) \
+_LOG_GENERIC(_LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_FATAL_ERROR_WITH_FINALIZER_1(finalizer) \
+_L_FATAL_ERROR_WITH_FINALIZER_2(-1, finalizer)
 
 
-#define ENSURE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_WITH_HANDLER, __VA_ARGS__)
-#define _ENSURE_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_GENERIC(condition, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _ENSURE_WITH_HANDLER_3(condition, errorCode, handler) \
-_ENSURE_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _ENSURE_WITH_HANDLER_2(condition, handler) \
-_ENSURE_WITH_HANDLER_3(condition, -1, handler)
+#define L_ENSURE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_ENSURE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_ENSURE_WITH_FINALIZER_4(condition, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_GENERIC(condition, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_ENSURE_WITH_FINALIZER_3(condition, errorCode, finalizer) \
+_L_ENSURE_WITH_FINALIZER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_ENSURE_WITH_FINALIZER_2(condition, finalizer) \
+_L_ENSURE_WITH_FINALIZER_3(condition, -1, finalizer)
 
-#define ENSURE(...) _PP_MACRO_OVERLOAD(_ENSURE, __VA_ARGS__)
-#define _ENSURE_3(condition, errorCodeType, errorCode) \
-_ENSURE_WITH_HANDLER_4(condition, errorCodeType, errorCode, nullptr)
-#define _ENSURE_2(condition, errorCode) \
-_ENSURE_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
-#define _ENSURE_1(condition) \
-_ENSURE_2(condition, -1)
+#define L_ENSURE(...) _PP_MACRO_OVERLOAD(_L_ENSURE, __VA_ARGS__)
+#define _L_ENSURE_3(condition, errorCodeType, errorCode) \
+_L_ENSURE_WITH_FINALIZER_4(condition, errorCodeType, errorCode, nullptr)
+#define _L_ENSURE_2(condition, errorCode) \
+_L_ENSURE_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_ENSURE_1(condition) \
+_L_ENSURE_2(condition, -1)
 
-#define ENSURE_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_EQ_WITH_HANDLER, __VA_ARGS__)
-#define _ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _ENSURE_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _ENSURE_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_ENSURE_EQ_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_ENSURE_EQ_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_ENSURE_EQ_WITH_FINALIZER, __VA_ARGS__)
+#define _L_ENSURE_EQ_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_ENSURE_EQ_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_ENSURE_EQ_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_ENSURE_EQ_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_ENSURE_EQ_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define ENSURE_EQ(...) _PP_MACRO_OVERLOAD(_ENSURE_EQ, __VA_ARGS__)
-#define _ENSURE_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
-_ENSURE_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _ENSURE_EQ_3(leftExp, rightExp, errorCode) \
-_ENSURE_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _ENSURE_EQ_2(leftExp, rightExp) \
-_ENSURE_EQ_3(leftExp, rightExp, -1)
+#define L_ENSURE_EQ(...) _PP_MACRO_OVERLOAD(_L_ENSURE_EQ, __VA_ARGS__)
+#define _L_ENSURE_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_ENSURE_EQ_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_ENSURE_EQ_3(leftExp, rightExp, errorCode) \
+_L_ENSURE_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_ENSURE_EQ_2(leftExp, rightExp) \
+_L_ENSURE_EQ_3(leftExp, rightExp, -1)
 
-#define ENSURE_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_NE_WITH_HANDLER, __VA_ARGS__)
-#define _ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _ENSURE_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _ENSURE_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_ENSURE_NE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_ENSURE_NE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_ENSURE_NE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_ENSURE_NE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_ENSURE_NE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_ENSURE_NE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_ENSURE_NE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_ENSURE_NE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define ENSURE_NE(...) _PP_MACRO_OVERLOAD(_ENSURE_NE, __VA_ARGS__)
-#define _ENSURE_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_ENSURE_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _ENSURE_NE_3(leftExp, rightExp, errorCode) \
-_ENSURE_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _ENSURE_NE_2(leftExp, rightExp) \
-_ENSURE_NE_3(leftExp, rightExp, -1)
+#define L_ENSURE_NE(...) _PP_MACRO_OVERLOAD(_L_ENSURE_NE, __VA_ARGS__)
+#define _L_ENSURE_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_ENSURE_NE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_ENSURE_NE_3(leftExp, rightExp, errorCode) \
+_L_ENSURE_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_ENSURE_NE_2(leftExp, rightExp) \
+_L_ENSURE_NE_3(leftExp, rightExp, -1)
 
-#define ENSURE_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_GE_WITH_HANDLER, __VA_ARGS__)
-#define _ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _ENSURE_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _ENSURE_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_ENSURE_GE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_ENSURE_GE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_ENSURE_GE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_ENSURE_GE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_ENSURE_GE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_ENSURE_GE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_ENSURE_GE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_ENSURE_GE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define ENSURE_GE(...) _PP_MACRO_OVERLOAD(_ENSURE_GE, __VA_ARGS__)
-#define _ENSURE_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_ENSURE_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _ENSURE_GE_3(leftExp, rightExp, errorCode) \
-_ENSURE_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _ENSURE_GE_2(leftExp, rightExp) \
-_ENSURE_GE_3(leftExp, rightExp, -1)
+#define L_ENSURE_GE(...) _PP_MACRO_OVERLOAD(_L_ENSURE_GE, __VA_ARGS__)
+#define _L_ENSURE_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_ENSURE_GE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_ENSURE_GE_3(leftExp, rightExp, errorCode) \
+_L_ENSURE_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_ENSURE_GE_2(leftExp, rightExp) \
+_L_ENSURE_GE_3(leftExp, rightExp, -1)
 
-#define ENSURE_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_GT_WITH_HANDLER, __VA_ARGS__)
-#define _ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _ENSURE_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _ENSURE_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_ENSURE_GT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define ENSURE_GT_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_ENSURE_GT_WITH_FINALIZER, __VA_ARGS__)
+#define _L_ENSURE_GT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_ENSURE_GT_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_ENSURE_GT_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_ENSURE_GT_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_ENSURE_GT_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define ENSURE_GT(...) _PP_MACRO_OVERLOAD(_ENSURE_GT, __VA_ARGS__)
-#define _ENSURE_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
-_ENSURE_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _ENSURE_GT_3(leftExp, rightExp, errorCode) \
-_ENSURE_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _ENSURE_GT_2(leftExp, rightExp) \
-_ENSURE_GT_3(leftExp, rightExp, -1)
+#define L_ENSURE_GT(...) _PP_MACRO_OVERLOAD(_L_ENSURE_GT, __VA_ARGS__)
+#define _L_ENSURE_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_ENSURE_GT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_ENSURE_GT_3(leftExp, rightExp, errorCode) \
+_L_ENSURE_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_ENSURE_GT_2(leftExp, rightExp) \
+_L_ENSURE_GT_3(leftExp, rightExp, -1)
 
-#define ENSURE_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_LE_WITH_HANDLER, __VA_ARGS__)
-#define _ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _ENSURE_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _ENSURE_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_ENSURE_LE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_ENSURE_LE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_ENSURE_LE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_ENSURE_LE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_ENSURE_LE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_ENSURE_LE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_ENSURE_LE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_ENSURE_LE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define ENSURE_LE(...) _PP_MACRO_OVERLOAD(_ENSURE_LE, __VA_ARGS__)
-#define _ENSURE_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_ENSURE_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _ENSURE_LE_3(leftExp, rightExp, errorCode) \
-_ENSURE_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _ENSURE_LE_2(leftExp, rightExp) \
-_ENSURE_LE_3(leftExp, rightExp, -1)
+#define L_ENSURE_LE(...) _PP_MACRO_OVERLOAD(_L_ENSURE_LE, __VA_ARGS__)
+#define _L_ENSURE_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_ENSURE_LE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_ENSURE_LE_3(leftExp, rightExp, errorCode) \
+_L_ENSURE_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_ENSURE_LE_2(leftExp, rightExp) \
+_L_ENSURE_LE_3(leftExp, rightExp, -1)
 
-#define ENSURE_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_ENSURE_LT_WITH_HANDLER, __VA_ARGS__)
-#define _ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _ENSURE_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _ENSURE_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_ENSURE_LT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_ENSURE_LT_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_ENSURE_LT_WITH_FINALIZER, __VA_ARGS__)
+#define _L_ENSURE_LT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_FATAL_ERROR_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_ENSURE_LT_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_ENSURE_LT_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_ENSURE_LT_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_ENSURE_LT_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define ENSURE_LT(...) _PP_MACRO_OVERLOAD(_ENSURE_LT, __VA_ARGS__)
-#define _ENSURE_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
-_ENSURE_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _ENSURE_LT_3(leftExp, rightExp, errorCode) \
-_ENSURE_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _ENSURE_LT_2(leftExp, rightExp) \
-_ENSURE_LT_3(leftExp, rightExp, -1)
+#define L_ENSURE_LT(...) _PP_MACRO_OVERLOAD(_L_ENSURE_LT, __VA_ARGS__)
+#define _L_ENSURE_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_ENSURE_LT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_ENSURE_LT_3(leftExp, rightExp, errorCode) \
+_L_ENSURE_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_ENSURE_LT_2(leftExp, rightExp) \
+_L_ENSURE_LT_3(leftExp, rightExp, -1)
 
-#define ENSURE_STDCAPI_WITH_HANDLER(condition, handler) \
-_ENSURE_EQ_WITH_HANDLER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+#define L_ENSURE_STDCAPI_WITH_FINALIZER(condition, finalizer) \
+_L_ENSURE_EQ_WITH_FINALIZER_5(condition, 0, Base::ErrorCodeType::STDCAPI, errno, finalizer) << Base::getStdCApiErrorString(errno)
 #define ENSURE_STDCAPI(condition) \
-ENSURE_STDCAPI_WITH_HANDLER(condition, nullptr)
+L_ENSURE_STDCAPI_WITH_FINALIZER(condition, nullptr)
 
-#define ENSURE_NE_STDCAPI(condition, value) \
-_ENSURE_NE_WITH_HANDLER_5(condition, value, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+#define L_ENSURE_NE_STDCAPI(condition, value) \
+_L_ENSURE_NE_WITH_FINALIZER_5(condition, value, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
 /* ----------------------------- UNEXPECTED ERROR ----------------------------- */
 // But recoverable
-#define CHECK_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_WITH_HANDLER, __VA_ARGS__)
-#define _CHECK_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_GENERIC(condition, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _CHECK_WITH_HANDLER_3(condition, errorCode, handler) \
-_CHECK_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _CHECK_WITH_HANDLER_2(condition, handler) \
-_CHECK_WITH_HANDLER_3(condition, -1, handler)
+#define L_CHECK_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_CHECK_WITH_FINALIZER, __VA_ARGS__)
+#define _L_CHECK_WITH_FINALIZER_4(condition, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_GENERIC(condition, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_CHECK_WITH_FINALIZER_3(condition, errorCode, finalizer) \
+_L_CHECK_WITH_FINALIZER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_CHECK_WITH_FINALIZER_2(condition, finalizer) \
+_L_CHECK_WITH_FINALIZER_3(condition, -1, finalizer)
 
-#define CHECK(...) _PP_MACRO_OVERLOAD(_CHECK, __VA_ARGS__)
-#define _CHECK_3(condition, errorCodeType, errorCode) \
-_CHECK_WITH_HANDLER_4(condition, errorCodeType, errorCode, nullptr)
-#define _CHECK_2(condition, errorCode) \
-_CHECK_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
-#define _CHECK_1(condition) \
-_CHECK_2(condition, -1)
+#define L_CHECK(...) _PP_MACRO_OVERLOAD(_L_CHECK, __VA_ARGS__)
+#define _L_CHECK_3(condition, errorCodeType, errorCode) \
+_L_CHECK_WITH_FINALIZER_4(condition, errorCodeType, errorCode, nullptr)
+#define _L_CHECK_2(condition, errorCode) \
+_L_CHECK_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_CHECK_1(condition) \
+_L_CHECK_2(condition, -1)
 
-#define CHECK_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_EQ_WITH_HANDLER, __VA_ARGS__)
-#define _CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _CHECK_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _CHECK_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_CHECK_EQ_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_CHECK_EQ_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_CHECK_EQ_WITH_FINALIZER, __VA_ARGS__)
+#define _L_CHECK_EQ_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_CHECK_EQ_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_CHECK_EQ_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_CHECK_EQ_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_CHECK_EQ_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define CHECK_EQ(...) _PP_MACRO_OVERLOAD(_CHECK_EQ, __VA_ARGS__)
-#define _CHECK_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
-_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _CHECK_EQ_3(leftExp, rightExp, errorCode) \
-_CHECK_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _CHECK_EQ_2(leftExp, rightExp) \
-_CHECK_EQ_3(leftExp, rightExp, -1)
+#define L_CHECK_EQ(...) _PP_MACRO_OVERLOAD(_L_CHECK_EQ, __VA_ARGS__)
+#define _L_CHECK_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_CHECK_EQ_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_CHECK_EQ_3(leftExp, rightExp, errorCode) \
+_L_CHECK_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_CHECK_EQ_2(leftExp, rightExp) \
+_L_CHECK_EQ_3(leftExp, rightExp, -1)
 
-#define CHECK_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_NE_WITH_HANDLER, __VA_ARGS__)
-#define _CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _CHECK_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _CHECK_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_CHECK_NE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_CHECK_NE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_CHECK_NE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_CHECK_NE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_CHECK_NE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_CHECK_NE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_CHECK_NE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_CHECK_NE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define CHECK_NE(...) _PP_MACRO_OVERLOAD(_CHECK_NE, __VA_ARGS__)
-#define _CHECK_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _CHECK_NE_3(leftExp, rightExp, errorCode) \
-_CHECK_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _CHECK_NE_2(leftExp, rightExp) \
-_CHECK_NE_3(leftExp, rightExp, -1)
+#define L_CHECK_NE(...) _PP_MACRO_OVERLOAD(_L_CHECK_NE, __VA_ARGS__)
+#define _L_CHECK_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_CHECK_NE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_CHECK_NE_3(leftExp, rightExp, errorCode) \
+_L_CHECK_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_CHECK_NE_2(leftExp, rightExp) \
+_L_CHECK_NE_3(leftExp, rightExp, -1)
 
-#define CHECK_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_GE_WITH_HANDLER, __VA_ARGS__)
-#define _CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _CHECK_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _CHECK_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_CHECK_GE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_CHECK_GE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_CHECK_GE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_CHECK_GE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_CHECK_GE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_CHECK_GE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_CHECK_GE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_CHECK_GE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define CHECK_GE(...) _PP_MACRO_OVERLOAD(_CHECK_GE, __VA_ARGS__)
-#define _CHECK_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_CHECK_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _CHECK_GE_3(leftExp, rightExp, errorCode) \
-_CHECK_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _CHECK_GE_2(leftExp, rightExp) \
-_CHECK_GE_3(leftExp, rightExp, -1)
+#define L_CHECK_GE(...) _PP_MACRO_OVERLOAD(_L_CHECK_GE, __VA_ARGS__)
+#define _L_CHECK_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_CHECK_GE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_CHECK_GE_3(leftExp, rightExp, errorCode) \
+_L_CHECK_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_CHECK_GE_2(leftExp, rightExp) \
+_L_CHECK_GE_3(leftExp, rightExp, -1)
 
-#define CHECK_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_GT_WITH_HANDLER, __VA_ARGS__)
-#define _CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _CHECK_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _CHECK_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_CHECK_GT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_CHECK_GT_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_CHECK_GT_WITH_FINALIZER, __VA_ARGS__)
+#define _L_CHECK_GT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_CHECK_GT_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_CHECK_GT_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_CHECK_GT_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_CHECK_GT_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define CHECK_GT(...) _PP_MACRO_OVERLOAD(_CHECK_GT, __VA_ARGS__)
-#define _CHECK_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
-_CHECK_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _CHECK_GT_3(leftExp, rightExp, errorCode) \
-_CHECK_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _CHECK_GT_2(leftExp, rightExp) \
-_CHECK_GT_3(leftExp, rightExp, -1)
+#define L_CHECK_GT(...) _PP_MACRO_OVERLOAD(_L_CHECK_GT, __VA_ARGS__)
+#define _L_CHECK_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_CHECK_GT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_CHECK_GT_3(leftExp, rightExp, errorCode) \
+_L_CHECK_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_CHECK_GT_2(leftExp, rightExp) \
+_L_CHECK_GT_3(leftExp, rightExp, -1)
 
-#define CHECK_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_LE_WITH_HANDLER, __VA_ARGS__)
-#define _CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _CHECK_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _CHECK_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_CHECK_LE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_CHECK_LE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_CHECK_LE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_CHECK_LE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_CHECK_LE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_CHECK_LE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_CHECK_LE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_CHECK_LE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define CHECK_LE(...) _PP_MACRO_OVERLOAD(_CHECK_LE, __VA_ARGS__)
-#define _CHECK_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_CHECK_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _CHECK_LE_3(leftExp, rightExp, errorCode) \
-_CHECK_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _CHECK_LE_2(leftExp, rightExp) \
-_CHECK_LE_3(leftExp, rightExp, -1)
+#define L_CHECK_LE(...) _PP_MACRO_OVERLOAD(_L_CHECK_LE, __VA_ARGS__)
+#define _L_CHECK_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_CHECK_LE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_CHECK_LE_3(leftExp, rightExp, errorCode) \
+_L_CHECK_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_CHECK_LE_2(leftExp, rightExp) \
+_L_CHECK_LE_3(leftExp, rightExp, -1)
 
-#define CHECK_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_CHECK_LT_WITH_HANDLER, __VA_ARGS__)
-#define _CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _CHECK_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _CHECK_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_CHECK_LT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_CHECK_LT_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_CHECK_LT_WITH_FINALIZER, __VA_ARGS__)
+#define _L_CHECK_LT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_CHECK_LT_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_CHECK_LT_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_CHECK_LT_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_CHECK_LT_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define CHECK_LT(...) _PP_MACRO_OVERLOAD(_CHECK_LT, __VA_ARGS__)
-#define _CHECK_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
-_CHECK_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _CHECK_LT_3(leftExp, rightExp, errorCode) \
-_CHECK_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _CHECK_LT_2(leftExp, rightExp) \
-_CHECK_LT_3(leftExp, rightExp, -1)
+#define L_CHECK_LT(...) _PP_MACRO_OVERLOAD(_L_CHECK_LT, __VA_ARGS__)
+#define _L_CHECK_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_CHECK_LT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_CHECK_LT_3(leftExp, rightExp, errorCode) \
+_L_CHECK_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_CHECK_LT_2(leftExp, rightExp) \
+_L_CHECK_LT_3(leftExp, rightExp, -1)
 
-#define CHECK_STDCAPI_WITH_HANDLER(condition, handler) \
-_CHECK_WITH_HANDLER_4(condition, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
-#define CHECK_STDCAPI(condition) \
-CHECK_STDCAPI_WITH_HANDLER(condition, nullptr)
-#define CHECK_NE_STDCAPI_WITH_HANDLER(leftExp, rightExp, handler) \
-_CHECK_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
-#define CHECK_NE_STDCAPI(leftExp, rightExp) \
-CHECK_NE_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
-#define CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, handler) \
-_CHECK_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
-#define CHECK_EQ_STDCAPI(leftExp, rightExp) \
-CHECK_EQ_STDCAPI_WITH_HANDLER(leftExp, rightExp, nullptr)
+#define L_CHECK_STDCAPI_WITH_FINALIZER(condition, finalizer) \
+_L_CHECK_WITH_FINALIZER_4(condition, Base::ErrorCodeType::STDCAPI, errno, finalizer) << Base::getStdCApiErrorString(errno)
+#define L_CHECK_STDCAPI(condition) \
+L_CHECK_STDCAPI_WITH_FINALIZER(condition, nullptr)
+#define L_CHECK_NE_STDCAPI_WITH_FINALIZER(leftExp, rightExp, finalizer) \
+_L_CHECK_NE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, finalizer) << Base::getStdCApiErrorString(errno)
+#define L_CHECK_NE_STDCAPI(leftExp, rightExp) \
+L_CHECK_NE_STDCAPI_WITH_FINALIZER(leftExp, rightExp, nullptr)
+#define L_CHECK_EQ_STDCAPI_WITH_FINALIZER(leftExp, rightExp, finalizer) \
+_L_CHECK_EQ_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, finalizer) << Base::getStdCApiErrorString(errno)
+#define L_CHECK_EQ_STDCAPI(leftExp, rightExp) \
+L_CHECK_EQ_STDCAPI_WITH_FINALIZER(leftExp, rightExp, nullptr)
 
-#define THROW_RUNTIME_EXCEPTION \
+#define L_THROW_RUNTIME_EXCEPTION \
 _LOG_GENERIC(_LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr)
 
-#define THROW_STDCAPI_RUNTIME_EXCEPTION \
+#define L_THROW_STDCAPI_RUNTIME_EXCEPTION \
 _LOG_GENERIC(_LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
 /* ----------------------------- LOGGING ONLY ----------------------------- */
-#define LOG_IF_FAILED_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_FAILED_WITH_HANDLER, __VA_ARGS__)
-#define _LOG_IF_FAILED_WITH_HANDLER_4(condition, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_GENERIC(condition, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _LOG_IF_FAILED_WITH_HANDLER_3(condition, errorCode, handler) \
-_LOG_IF_FAILED_WITH_HANDLER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _LOG_IF_FAILED_WITH_HANDLER_2(condition, handler) \
-_LOG_IF_FAILED_WITH_HANDLER_3(condition, -1, handler)
+#define L_LOG_IF_FAILED_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_FAILED_WITH_FINALIZER, __VA_ARGS__)
+#define _L_LOG_IF_FAILED_WITH_FINALIZER_4(condition, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_GENERIC(condition, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_LOG_IF_FAILED_WITH_FINALIZER_3(condition, errorCode, finalizer) \
+_L_LOG_IF_FAILED_WITH_FINALIZER_4(condition, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_LOG_IF_FAILED_WITH_FINALIZER_2(condition, finalizer) \
+_L_LOG_IF_FAILED_WITH_FINALIZER_3(condition, -1, finalizer)
 
-#define LOG_IF_FAILED(...) _PP_MACRO_OVERLOAD(_LOG_IF_FAILED, __VA_ARGS__)
-#define _LOG_IF_FAILED_3(condition, errorCodeType, errorCode) \
-_LOG_IF_FAILED_WITH_HANDLER_4(condition, errorCodeType, errorCode, nullptr)
-#define _LOG_IF_FAILED_2(condition, errorCode) \
-_LOG_IF_FAILED_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
-#define _LOG_IF_FAILED_1(condition) \
-_LOG_IF_FAILED_2(condition, -1)
+#define L_LOG_IF_FAILED(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_FAILED, __VA_ARGS__)
+#define _L_LOG_IF_FAILED_3(condition, errorCodeType, errorCode) \
+_L_LOG_IF_FAILED_WITH_FINALIZER_4(condition, errorCodeType, errorCode, nullptr)
+#define _L_LOG_IF_FAILED_2(condition, errorCode) \
+_L_LOG_IF_FAILED_3(condition, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_LOG_IF_FAILED_1(condition) \
+_L_LOG_IF_FAILED_2(condition, -1)
 
-#define LOG_IF_NOT_EQ_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_EQ_WITH_HANDLER, __VA_ARGS__)
-#define _LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _LOG_IF_NOT_EQ_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _LOG_IF_NOT_EQ_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_LOG_IF_NOT_EQ_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_LOG_IF_NOT_EQ_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_EQ_WITH_FINALIZER, __VA_ARGS__)
+#define _L_LOG_IF_NOT_EQ_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_LOG_IF_NOT_EQ_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_LOG_IF_NOT_EQ_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_LOG_IF_NOT_EQ_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_LOG_IF_NOT_EQ_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define LOG_IF_NOT_EQ(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_EQ, __VA_ARGS__)
-#define _LOG_IF_NOT_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
-_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _LOG_IF_NOT_EQ_3(leftExp, rightExp, errorCode) \
-_LOG_IF_NOT_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _LOG_IF_NOT_EQ_2(leftExp, rightExp) \
-_LOG_IF_NOT_EQ_3(leftExp, rightExp, -1)
+#define L_LOG_IF_NOT_EQ(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_EQ, __VA_ARGS__)
+#define _L_LOG_IF_NOT_EQ_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_LOG_IF_NOT_EQ_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_LOG_IF_NOT_EQ_3(leftExp, rightExp, errorCode) \
+_L_LOG_IF_NOT_EQ_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_LOG_IF_NOT_EQ_2(leftExp, rightExp) \
+_L_LOG_IF_NOT_EQ_3(leftExp, rightExp, -1)
 
-#define LOG_IF_NOT_NE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_NE_WITH_HANDLER, __VA_ARGS__)
-#define _LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _LOG_IF_NOT_NE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _LOG_IF_NOT_NE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_LOG_IF_NOT_NE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_LOG_IF_NOT_NE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_NE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_LOG_IF_NOT_NE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_NE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_LOG_IF_NOT_NE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_LOG_IF_NOT_NE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_LOG_IF_NOT_NE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_LOG_IF_NOT_NE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define LOG_IF_NOT_NE(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_NE, __VA_ARGS__)
-#define _LOG_IF_NOT_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _LOG_IF_NOT_NE_3(leftExp, rightExp, errorCode) \
-_LOG_IF_NOT_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _LOG_IF_NOT_NE_2(leftExp, rightExp) \
-_LOG_IF_NOT_NE_3(leftExp, rightExp, -1)
+#define L_LOG_IF_NOT_NE(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_NE, __VA_ARGS__)
+#define _L_LOG_IF_NOT_NE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_LOG_IF_NOT_NE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_LOG_IF_NOT_NE_3(leftExp, rightExp, errorCode) \
+_L_LOG_IF_NOT_NE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_LOG_IF_NOT_NE_2(leftExp, rightExp) \
+_L_LOG_IF_NOT_NE_3(leftExp, rightExp, -1)
 
-#define LOG_IF_NOT_GE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GE_WITH_HANDLER, __VA_ARGS__)
-#define _LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _LOG_IF_NOT_GE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _LOG_IF_NOT_GE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_LOG_IF_NOT_GE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_LOG_IF_NOT_GE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_GE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_LOG_IF_NOT_GE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_GE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_LOG_IF_NOT_GE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_LOG_IF_NOT_GE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_LOG_IF_NOT_GE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_LOG_IF_NOT_GE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define LOG_IF_NOT_GE(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GE, __VA_ARGS__)
-#define _LOG_IF_NOT_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_LOG_IF_NOT_GE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _LOG_IF_NOT_GE_3(leftExp, rightExp, errorCode) \
-_LOG_IF_NOT_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _LOG_IF_NOT_GE_2(leftExp, rightExp) \
-_LOG_IF_NOT_GE_3(leftExp, rightExp, -1)
+#define L_LOG_IF_NOT_GE(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_GE, __VA_ARGS__)
+#define _L_LOG_IF_NOT_GE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_LOG_IF_NOT_GE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_LOG_IF_NOT_GE_3(leftExp, rightExp, errorCode) \
+_L_LOG_IF_NOT_GE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_LOG_IF_NOT_GE_2(leftExp, rightExp) \
+_L_LOG_IF_NOT_GE_3(leftExp, rightExp, -1)
 
-#define LOG_IF_NOT_GT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GT_WITH_HANDLER, __VA_ARGS__)
-#define _LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _LOG_IF_NOT_GT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _LOG_IF_NOT_GT_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_LOG_IF_NOT_GT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_LOG_IF_NOT_GT_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_GT_WITH_FINALIZER, __VA_ARGS__)
+#define _L_LOG_IF_NOT_GT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_GT_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_LOG_IF_NOT_GT_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_LOG_IF_NOT_GT_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_LOG_IF_NOT_GT_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_LOG_IF_NOT_GT_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define LOG_IF_NOT_GT(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_GT, __VA_ARGS__)
-#define _LOG_IF_NOT_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
-_LOG_IF_NOT_GT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _LOG_IF_NOT_GT_3(leftExp, rightExp, errorCode) \
-_LOG_IF_NOT_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _LOG_IF_NOT_GT_2(leftExp, rightExp) \
-_LOG_IF_NOT_GT_3(leftExp, rightExp, -1)
+#define L_LOG_IF_NOT_GT(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_GT, __VA_ARGS__)
+#define _L_LOG_IF_NOT_GT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_LOG_IF_NOT_GT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_LOG_IF_NOT_GT_3(leftExp, rightExp, errorCode) \
+_L_LOG_IF_NOT_GT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_LOG_IF_NOT_GT_2(leftExp, rightExp) \
+_L_LOG_IF_NOT_GT_3(leftExp, rightExp, -1)
 
-#define LOG_IF_NOT_LE_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LE_WITH_HANDLER, __VA_ARGS__)
-#define _LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _LOG_IF_NOT_LE_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _LOG_IF_NOT_LE_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_LOG_IF_NOT_LE_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_LOG_IF_NOT_LE_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_LE_WITH_FINALIZER, __VA_ARGS__)
+#define _L_LOG_IF_NOT_LE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_LE_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_LOG_IF_NOT_LE_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_LOG_IF_NOT_LE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_LOG_IF_NOT_LE_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_LOG_IF_NOT_LE_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define LOG_IF_NOT_LE(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LE, __VA_ARGS__)
-#define _LOG_IF_NOT_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
-_LOG_IF_NOT_LE_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _LOG_IF_NOT_LE_3(leftExp, rightExp, errorCode) \
-_LOG_IF_NOT_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _LOG_IF_NOT_LE_2(leftExp, rightExp) \
-_LOG_IF_NOT_LE_3(leftExp, rightExp, -1)
+#define L_LOG_IF_NOT_LE(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_LE, __VA_ARGS__)
+#define _L_LOG_IF_NOT_LE_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_LOG_IF_NOT_LE_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_LOG_IF_NOT_LE_3(leftExp, rightExp, errorCode) \
+_L_LOG_IF_NOT_LE_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_LOG_IF_NOT_LE_2(leftExp, rightExp) \
+_L_LOG_IF_NOT_LE_3(leftExp, rightExp, -1)
 
-#define LOG_IF_NOT_LT_WITH_HANDLER(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LT_WITH_HANDLER, __VA_ARGS__)
-#define _LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, handler) \
-_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, handler)
-#define _LOG_IF_NOT_LT_WITH_HANDLER_4(leftExp, rightExp, errorCode, handler) \
-_LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, handler)
-#define _LOG_IF_NOT_LT_WITH_HANDLER_3(leftExp, rightExp, handler) \
-_LOG_IF_NOT_LT_WITH_HANDLER_4(leftExp, rightExp, -1, handler)
+#define L_LOG_IF_NOT_LT_WITH_FINALIZER(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_LT_WITH_FINALIZER, __VA_ARGS__)
+#define _L_LOG_IF_NOT_LT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, finalizer) \
+_LOG_CONDITIONED_BINARY_OP_LT_GENERIC(leftExp, rightExp, _LOG_EVENT_LOGGING_STREAM_CLASS, errorCodeType, errorCode, finalizer)
+#define _L_LOG_IF_NOT_LT_WITH_FINALIZER_4(leftExp, rightExp, errorCode, finalizer) \
+_L_LOG_IF_NOT_LT_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode, finalizer)
+#define _L_LOG_IF_NOT_LT_WITH_FINALIZER_3(leftExp, rightExp, finalizer) \
+_L_LOG_IF_NOT_LT_WITH_FINALIZER_4(leftExp, rightExp, -1, finalizer)
 
-#define LOG_IF_NOT_LT(...) _PP_MACRO_OVERLOAD(_LOG_IF_NOT_LT, __VA_ARGS__)
-#define _LOG_IF_NOT_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
-_LOG_IF_NOT_LT_WITH_HANDLER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
-#define _LOG_IF_NOT_LT_3(leftExp, rightExp, errorCode) \
-_LOG_IF_NOT_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
-#define _LOG_IF_NOT_LT_2(leftExp, rightExp) \
-_LOG_IF_NOT_LT_3(leftExp, rightExp, -1)
+#define L_LOG_IF_NOT_LT(...) _PP_MACRO_OVERLOAD(_L_LOG_IF_NOT_LT, __VA_ARGS__)
+#define _L_LOG_IF_NOT_LT_4(leftExp, rightExp, errorCodeType, errorCode) \
+_L_LOG_IF_NOT_LT_WITH_FINALIZER_5(leftExp, rightExp, errorCodeType, errorCode, nullptr)
+#define _L_LOG_IF_NOT_LT_3(leftExp, rightExp, errorCode) \
+_L_LOG_IF_NOT_LT_4(leftExp, rightExp, Base::ErrorCodeType::GENERIC, errorCode)
+#define _L_LOG_IF_NOT_LT_2(leftExp, rightExp) \
+_L_LOG_IF_NOT_LT_3(leftExp, rightExp, -1)
 
-#define LOG_IF_FAILED_STDCAPI_WITH_HANDLER(condition, handler) \
-_LOG_IF_FAILED_WITH_HANDLER_4(condition, Base::ErrorCodeType::STDCAPI, errno, handler) << Base::getStdCApiErrorString(errno)
+#define L_LOG_IF_FAILED_STDCAPI_WITH_FINALIZER(condition, finalizer) \
+_L_LOG_IF_FAILED_WITH_FINALIZER_4(condition, Base::ErrorCodeType::STDCAPI, errno, finalizer) << Base::getStdCApiErrorString(errno)
 
-#define LOG_IF_NOT_EQ_STDCAPI(leftExp, rightExp) \
-_LOG_IF_NOT_EQ_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+#define L_LOG_IF_NOT_EQ_STDCAPI(leftExp, rightExp) \
+_L_LOG_IF_NOT_EQ_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
-#define LOG_IF_NOT_NE_STDCAPI(leftExp, rightExp) \
-_LOG_IF_NOT_NE_WITH_HANDLER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
+#define L_LOG_IF_NOT_NE_STDCAPI(leftExp, rightExp) \
+_L_LOG_IF_NOT_NE_WITH_FINALIZER_5(leftExp, rightExp, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)
 
-#define LOGGING_ERROR \
+#define L_LOG_ERROR \
 _LOG_GENERIC(_LOG_EVENT_LOGGING_STREAM_CLASS, Base::ErrorCodeType::GENERIC, -1, nullptr)
 
-#define LOGGING_STDCAPI_ERROR \
+#define L_LOG_STDCAPI_ERROR \
 _LOG_GENERIC(_LOG_EVENT_LOGGING_STREAM_CLASS, Base::ErrorCodeType::STDCAPI, errno, nullptr) << Base::getStdCApiErrorString(errno)

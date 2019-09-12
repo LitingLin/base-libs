@@ -38,14 +38,14 @@ namespace Base
 #endif
 			LODWORD(size),                // maximum object size (low-order DWORD)
 			name);                 // name of mapping object
-		CHECK_WIN32API(_hMapFile);
+		L_CHECK_WIN32API(_hMapFile);
 
 		_ptr = (char*)MapViewOfFile(_hMapFile,
 			FILE_MAP_ALL_ACCESS,
 			0,
 			0,
 			size);
-		CHECK_WIN32API(_ptr);
+		L_CHECK_WIN32API(_ptr);
 	}
 
 	void SharedMemory::open(const wchar_t* name)
@@ -54,7 +54,7 @@ namespace Base
 			FILE_MAP_ALL_ACCESS,   // read/write access
 			FALSE,                 // do not inherit the name
 			name);
-		CHECK_WIN32API(_hMapFile);
+		L_CHECK_WIN32API(_hMapFile);
 
 		_ptr = (char*)MapViewOfFile(
 			_hMapFile,
@@ -63,18 +63,18 @@ namespace Base
 			0,
 			0);
 
-		CHECK_WIN32API(_ptr);
+		L_CHECK_WIN32API(_ptr);
 	}
 
 	void SharedMemory::close()
 	{
 		if (_ptr) {
-			LOG_IF_FAILED_WIN32API(UnmapViewOfFile(_ptr));
+			L_LOG_IF_FAILED_WIN32API(UnmapViewOfFile(_ptr));
 			_ptr = nullptr;
 		}
 
 		if (_hMapFile) {
-			LOG_IF_FAILED_WIN32API(CloseHandle(_hMapFile));
+			L_LOG_IF_FAILED_WIN32API(CloseHandle(_hMapFile));
 			_hMapFile = nullptr;
 		}
 	}

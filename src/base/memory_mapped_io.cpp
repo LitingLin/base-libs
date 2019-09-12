@@ -28,13 +28,13 @@ namespace Base
 			pageProtect = PAGE_READWRITE;
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 			pageProtect = 0;
 		}
 		static_assert(sizeof(ULARGE_INTEGER) == sizeof(size), "");
 		ULARGE_INTEGER* pSize = (ULARGE_INTEGER*)&size;
 		_hFileMapping = CreateFileMapping(_file->getHANDLE(), NULL, pageProtect, pSize->HighPart, pSize->LowPart, NULL);
-		CHECK_WIN32API(_hFileMapping);
+		L_CHECK_WIN32API(_hFileMapping);
 		DWORD mapDesiredAccess;
 		switch (desiredAccess)
 		{
@@ -48,25 +48,25 @@ namespace Base
 			mapDesiredAccess = FILE_MAP_ALL_ACCESS;
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 			mapDesiredAccess = 0;
 		}
 
 		ULARGE_INTEGER* pOffset = (ULARGE_INTEGER*)&offset;
 		_ptr = MapViewOfFileEx(_hFileMapping, mapDesiredAccess, pOffset->HighPart, pOffset->LowPart, 0, NULL);		
-		CHECK_WIN32API_WITH_HANDLER(_ptr, [this] { LOG_IF_FAILED_WIN32API(CloseHandle(_hFileMapping)); });
+		L_CHECK_WIN32API_WITH_FINALIZER(_ptr, [this] { L_LOG_IF_FAILED_WIN32API(CloseHandle(_hFileMapping)); });
 	}
 	
 	MemoryMappedIO::~MemoryMappedIO()
 	{
-		LOG_IF_FAILED_WIN32API(UnmapViewOfFile(_ptr));
-		LOG_IF_FAILED_WIN32API(CloseHandle(_hFileMapping));
+		L_LOG_IF_FAILED_WIN32API(UnmapViewOfFile(_ptr));
+		L_LOG_IF_FAILED_WIN32API(CloseHandle(_hFileMapping));
 	}
 #else
     MemoryMappedIO::MemoryMappedIO(File* file, File::DesiredAccess desiredAccess, uint64_t size, uint64_t offset)
         : _file(file)
     {
-	    CHECK(size > 0 || _file->getSize() >= offset);
+	    L_CHECK(size > 0 || _file->getSize() >= offset);
 	    int prot;
 		int flag;
 	    switch (desiredAccess)
@@ -84,19 +84,19 @@ namespace Base
 				flag = MAP_SHARED;
                 break;
             default:
-                UNREACHABLE_ERROR;
+                L_UNREACHABLE_ERROR;
         }
 		if (size == 0) {
 			size = _file->getSize() - offset;
-			CHECK(size);
+			L_CHECK(size);
 		}
         _ptr = mmap(nullptr, size, prot, flag, _file->getFileDescriptor(), offset);
-        CHECK_NE_STDCAPI(_ptr, MAP_FAILED) << ". Details: ( size: " << size << ", prot: " << prot << ", fd: " << _file->getFileDescriptor() << ", offset: " << offset << ")";
+        L_CHECK_NE_STDCAPI(_ptr, MAP_FAILED) << ". Details: ( size: " << size << ", prot: " << prot << ", fd: " << _file->getFileDescriptor() << ", offset: " << offset << ")";
         _size = size;
     }
 
     MemoryMappedIO::~MemoryMappedIO(){
-        LOG_IF_NOT_NE_STDCAPI(munmap(_ptr, _size), -1);
+        L_LOG_IF_NOT_NE_STDCAPI(munmap(_ptr, _size), -1);
     }
 #endif
 	void* MemoryMappedIO::get()
@@ -114,7 +114,7 @@ namespace Base
 	{
 	    if (desiredAccess == File::DesiredAccess::Read)
 	    {
-	        CHECK(_actualFileSize);
+	        L_CHECK(_actualFileSize);
 	    }
 		else if (desiredAccess == File::DesiredAccess::ReadAndWrite || desiredAccess == File::DesiredAccess::Write)
 		{
@@ -198,7 +198,7 @@ namespace Base
 			_position = _actualFileSize;
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 		}
 	}
 

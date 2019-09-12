@@ -11,12 +11,12 @@ namespace Base
 	Timer::Timer() : _period_ms(0), _delay(0), _pause_time(0), _activated_time(0), _state(TimerState::INACTIVE)
 	{
 		_handle = CreateWaitableTimer(nullptr, FALSE, nullptr);
-		CHECK_WIN32API(_handle);
+		L_CHECK_WIN32API(_handle);
 	}
 
 	Timer::~Timer()
 	{
-		LOG_IF_FAILED_WIN32API(CloseHandle(_handle));
+		L_LOG_IF_FAILED_WIN32API(CloseHandle(_handle));
 	}
 
 	void Timer::activate(uint32_t period, uint64_t delay)
@@ -26,8 +26,8 @@ namespace Base
 
 		LARGE_INTEGER large_integer;
 		large_integer.QuadPart = -int64_t(delay);
-		CHECK_LE(period, (uint32_t)std::numeric_limits<LONG>::max());
-		CHECK_WIN32API(SetWaitableTimer(_handle, &large_integer, (LONG)period, nullptr, nullptr, FALSE));
+		L_CHECK_LE(period, (uint32_t)std::numeric_limits<LONG>::max());
+		L_CHECK_WIN32API(SetWaitableTimer(_handle, &large_integer, (LONG)period, nullptr, nullptr, FALSE));
 		_activated_time = GetTickCount64();
 		_state = TimerState::ACTIVE;
 	}
@@ -35,7 +35,7 @@ namespace Base
 	void Timer::inactivate()
 	{
 		if (_state == TimerState::ACTIVE)
-			CHECK_WIN32API(CancelWaitableTimer(_handle));
+			L_CHECK_WIN32API(CancelWaitableTimer(_handle));
 		_state = TimerState::INACTIVE;
 	}
 
@@ -44,7 +44,7 @@ namespace Base
 		if (_state == TimerState::ACTIVE)
 		{
 			_pause_time = GetTickCount64();
-			CHECK_WIN32API(CancelWaitableTimer(_handle));
+			L_CHECK_WIN32API(CancelWaitableTimer(_handle));
 			_state = TimerState::PAUSE;
 		}
 	}

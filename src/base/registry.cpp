@@ -11,20 +11,20 @@ namespace Base
 		{
 			if (wow64Redirection)
 			{
-				CHECK_EQ_WIN32API(RegCreateKeyEx(key, subkey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
+				L_CHECK_EQ_WIN32API(RegCreateKeyEx(key, subkey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,
 					NULL, &keyHandle, nullptr),
 					ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 			}
 			else
 			{
-				CHECK_EQ_WIN32API(RegCreateKeyEx(key, subkey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY,
+				L_CHECK_EQ_WIN32API(RegCreateKeyEx(key, subkey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY,
 					NULL, &keyHandle, nullptr),
 					ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 			}
 		}
 		~HKEYGuard()
 		{
-			CHECK_EQ_WIN32API(RegCloseKey(keyHandle), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+			L_CHECK_EQ_WIN32API(RegCloseKey(keyHandle), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		HKEY get() const
 		{
@@ -58,7 +58,7 @@ namespace Base
 		{
 			if (keyHandle != nullptr) 
 			{
-				CHECK_EQ_WIN32API(RegCloseKey(keyHandle), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+				L_CHECK_EQ_WIN32API(RegCloseKey(keyHandle), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 			}
 		}
 		bool is_open()
@@ -96,7 +96,7 @@ namespace Base
 		~HKEYGuard_OpenExisting()
 		{
 			if (keyHandle != nullptr) {
-				CHECK_EQ_WIN32API(RegCloseKey(keyHandle), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+				L_CHECK_EQ_WIN32API(RegCloseKey(keyHandle), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 			}
 		}
 		bool is_open()
@@ -182,9 +182,9 @@ namespace Base
 		LONG rc = RegQueryValueEx(keyHandle, name, NULL, NULL, NULL, &strLenInBytes);
 		if (rc == ERROR_FILE_NOT_FOUND)
 			return false;
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		str.resize(strLenInBytes / sizeof(wchar_t) - 1);
-		CHECK_EQ_WIN32API(RegQueryValueEx(keyHandle, name, NULL, NULL, (LPBYTE)&str[0], &strLenInBytes),
+		L_CHECK_EQ_WIN32API(RegQueryValueEx(keyHandle, name, NULL, NULL, (LPBYTE)&str[0], &strLenInBytes),
 			ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		return true;
 	}
@@ -197,7 +197,7 @@ namespace Base
 			regsam |= KEY_WOW64_64KEY;
 		if (RegOpenKeyEx(rootKey, prefix.c_str(), 0, regsam, &keyHANDLE) == ERROR_SUCCESS)
 		{
-			CHECK_EQ_WIN32API(RegCloseKey(keyHANDLE), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+			L_CHECK_EQ_WIN32API(RegCloseKey(keyHANDLE), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 			return true;
 		}
 		else
@@ -213,7 +213,7 @@ namespace Base
 		if (RegOpenKeyEx(rootKey, prefix.c_str(), 0, regsam, &keyHANDLE) == ERROR_SUCCESS)
 		{
 			LONG rc = RegQueryValueEx(keyHANDLE, name, nullptr, NULL, NULL, NULL);
-			CHECK_EQ_WIN32API(RegCloseKey(keyHANDLE), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+			L_CHECK_EQ_WIN32API(RegCloseKey(keyHANDLE), ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 			if (rc != ERROR_SUCCESS)
 				return false;
 			return true;
@@ -283,14 +283,14 @@ namespace Base
 	void Registry::setDWORD(const wchar_t* name, uint32_t value) const
 	{
 		HKEYGuard keyHandle(rootKey, prefix.c_str(), wow64Redirection);
-		CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_DWORD, (const BYTE*)&value, sizeof(uint32_t)),
+		L_CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_DWORD, (const BYTE*)&value, sizeof(uint32_t)),
 			ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
 	void Registry::setQWORD(const wchar_t* name, uint64_t value) const
 	{
 		HKEYGuard keyHandle(rootKey, prefix.c_str(), wow64Redirection);
-		CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_QWORD, (const BYTE*)&value, sizeof(uint64_t)),
+		L_CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_QWORD, (const BYTE*)&value, sizeof(uint64_t)),
 			ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
@@ -302,14 +302,14 @@ namespace Base
 	void Registry::setString(const wchar_t* name, const wchar_t* str, uint32_t strLenInCharacters) const
 	{
 		HKEYGuard keyHandle(rootKey, prefix.c_str(), wow64Redirection);
-		CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_SZ, (const BYTE*)str, (strLenInCharacters + 1) * sizeof(wchar_t)),
+		L_CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_SZ, (const BYTE*)str, (strLenInCharacters + 1) * sizeof(wchar_t)),
 			ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
 	void Registry::setBlob(const wchar_t* name, const std::vector<unsigned char>& blob) const
 	{
 		HKEYGuard keyHandle(rootKey, prefix.c_str(), wow64Redirection);
-		CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_BINARY, (const BYTE*)blob.data(), (uint32_t)blob.size()),
+		L_CHECK_EQ_WIN32API(RegSetValueEx(keyHandle, name, 0, REG_BINARY, (const BYTE*)blob.data(), (uint32_t)blob.size()),
 			ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 	}
 
@@ -323,7 +323,7 @@ namespace Base
 		if (rc == ERROR_FILE_NOT_FOUND)
 			return false;
 
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 
 		return true;
 	}
@@ -338,7 +338,7 @@ namespace Base
 		if (rc == ERROR_FILE_NOT_FOUND)
 			return false;
 
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 
 		return true;
 	}
@@ -352,7 +352,7 @@ namespace Base
 		if (rc == ERROR_FILE_NOT_FOUND || rc == ERROR_MORE_DATA)
 			return false;
 
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 
 		*strLenInCharacters = *strLenInCharacters / sizeof(wchar_t) - 1;
 		return true;
@@ -367,9 +367,9 @@ namespace Base
 		LONG rc = RegQueryValueEx(keyHandle, name, NULL, NULL, NULL, &strLenInBytes);
 		if (rc == ERROR_FILE_NOT_FOUND)
 			return false;
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		blob.resize(strLenInBytes);
-		CHECK_EQ_WIN32API(RegQueryValueEx(keyHandle, name, NULL, NULL, (LPBYTE)&blob[0], &strLenInBytes),
+		L_CHECK_EQ_WIN32API(RegQueryValueEx(keyHandle, name, NULL, NULL, (LPBYTE)&blob[0], &strLenInBytes),
 			ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		return true;
 	}
@@ -384,10 +384,10 @@ namespace Base
 			if (rc == ERROR_FILE_NOT_FOUND)
 				return false;
 
-			CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+			L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		}
 		BOOL isWow64;
-		ENSURE_WIN32API(IsWow64Process(GetCurrentProcess(), &isWow64));
+		L_ENSURE_WIN32API(IsWow64Process(GetCurrentProcess(), &isWow64));
 		REGSAM regsam;
 		if (wow64Redirection && isWow64)
 			regsam = KEY_WOW64_32KEY;
@@ -397,7 +397,7 @@ namespace Base
 		if (rc == ERROR_FILE_NOT_FOUND)
 			return false;
 
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 
 		return true;
 	}
@@ -411,7 +411,7 @@ namespace Base
 		if (rc == ERROR_FILE_NOT_FOUND)
 			return false;
 
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		return true;
 	}
 
@@ -421,7 +421,7 @@ namespace Base
 		LONG rc = RegDeleteValue(keyHandle, name);
 		if (rc == ERROR_FILE_NOT_FOUND)
 			return false;
-		CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
+		L_CHECK_EQ_WIN32API(rc, ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 
 		return true;
 	}
@@ -441,7 +441,7 @@ namespace Base
 	{
 		HKEYGuard keyHandle(rootKey, prefix.c_str(), wow64Redirection);
 		Event event;
-		CHECK_EQ_WIN32API(RegNotifyChangeKeyValue(keyHandle, TRUE, REG_NOTIFY_CHANGE_LAST_SET, event.getHandle(), TRUE),
+		L_CHECK_EQ_WIN32API(RegNotifyChangeKeyValue(keyHandle, TRUE, REG_NOTIFY_CHANGE_LAST_SET, event.getHandle(), TRUE),
 			ERROR_SUCCESS, LOG_GET_LEFT_EXPRESSION_RC);
 		return event;
 	}

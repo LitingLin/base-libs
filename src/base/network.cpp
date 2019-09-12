@@ -9,12 +9,12 @@ namespace Base
 {
 	WSAGuard::WSAGuard()
 	{
-		ENSURE_EQ_WIN32API(WSAStartup(MAKEWORD(2, 2), &wsaData), 0);
+		L_ENSURE_EQ_WIN32API(WSAStartup(MAKEWORD(2, 2), &wsaData), 0);
 	}
 
 	WSAGuard::~WSAGuard()
 	{
-		LOG_IF_NOT_EQ_WIN32API(WSACleanup(), 0);
+		L_LOG_IF_NOT_EQ_WIN32API(WSACleanup(), 0);
 	}
 
 	class AddrInfoGuard
@@ -22,7 +22,7 @@ namespace Base
 	public:
 		AddrInfoGuard(const wchar_t *serverAddress, const wchar_t *service, const ADDRINFOW *hint)
 		{
-			CHECK_EQ_WIN32API(GetAddrInfo(serverAddress, service, hint, &_result), 0);
+			L_CHECK_EQ_WIN32API(GetAddrInfo(serverAddress, service, hint, &_result), 0);
 		}
 		const ADDRINFOW *get()
 		{
@@ -66,7 +66,7 @@ namespace Base
 			os << "unreachable";
 			break;
 		default:
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 			break;
 		}
 		return os;
@@ -91,19 +91,19 @@ namespace Base
 	{
 		destroy();
 		_socket = ::socket(af, type, protocol);
-		CHECK_NE_WIN32API(_socket, INVALID_SOCKET);
+		L_CHECK_NE_WIN32API(_socket, INVALID_SOCKET);
 	}
 
 	void SOCKETGuard::setopt(int level, int optname, bool value)
 	{
 		BOOL option = value;
-		CHECK_EQ_WIN32API(::setsockopt(_socket, level, optname, (char*)&option, sizeof(BOOL)), 0)
+		L_CHECK_EQ_WIN32API(::setsockopt(_socket, level, optname, (char*)&option, sizeof(BOOL)), 0)
 			<< "level: " << level << ", optname: " << optname << ", value: " << value;
 	}
 
 	void SOCKETGuard::ioctl(long cmd, unsigned long *argp)
 	{
-		CHECK_EQ_WIN32API(::ioctlsocket(_socket, cmd, argp), 0);
+		L_CHECK_EQ_WIN32API(::ioctlsocket(_socket, cmd, argp), 0);
 	}
 
 	net_rc SOCKETGuard::connect(const sockaddr * name, int namelen)
@@ -119,7 +119,7 @@ namespace Base
 			return;
 		if (WSAGetLastError() == WSAEADDRINUSE)
 			throw NetworkAddressInUseException(getWin32LastErrorString());
-		CHECK_EQ_WIN32API(WSAGetLastError(), 0);
+		L_CHECK_EQ_WIN32API(WSAGetLastError(), 0);
 	}
 
 	net_rc SOCKETGuard::recvfrom(char *buf, int len, sockaddr *from, int *fromlen, int *recvlen)
@@ -168,13 +168,13 @@ namespace Base
 		else if (select_type == select_t::except)
 			exceptfds_ptr = &fds;
 		else
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 
 		struct timeval timeval;
 		timeval.tv_sec = timeout / 1000;
 		timeval.tv_usec = timeout % 1000;
 		int rc = ::select(0, readfds_ptr, writefds_ptr, exceptfds_ptr, &timeval);
-		CHECK_NE_WIN32API(rc, SOCKET_ERROR);
+		L_CHECK_NE_WIN32API(rc, SOCKET_ERROR);
 		return rc > 0;
 	}
 
@@ -182,7 +182,7 @@ namespace Base
 	{
 		sockaddr_in addr;
 		int addr_len = sizeof(sockaddr);
-		CHECK_EQ_WIN32API(getsockname(_socket, (sockaddr*)&addr, &addr_len), 0);
+		L_CHECK_EQ_WIN32API(getsockname(_socket, (sockaddr*)&addr, &addr_len), 0);
 		return addr.sin_port;
 	}
 
@@ -194,10 +194,10 @@ namespace Base
 	void SOCKETGuard::destroy()
 	{
 		if (_readEvent != WSA_INVALID_EVENT) {
-			LOG_IF_FAILED_WIN32API(CloseHandle(_readEvent));
+			L_LOG_IF_FAILED_WIN32API(CloseHandle(_readEvent));
 		}
 		if (_socket != INVALID_SOCKET) {
-			LOG_IF_NOT_EQ_WIN32API(closesocket(_socket), 0);
+			L_LOG_IF_NOT_EQ_WIN32API(closesocket(_socket), 0);
 		}
 	}
 
@@ -205,8 +205,8 @@ namespace Base
 	{
 		if (!_readEvent) {
 			_readEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-			ENSURE_WIN32API(_readEvent);
-			ENSURE_EQ_WIN32API(WSAEventSelect(_socket, _readEvent, FD_READ), 0);
+			L_ENSURE_WIN32API(_readEvent);
+			L_ENSURE_EQ_WIN32API(WSAEventSelect(_socket, _readEvent, FD_READ), 0);
 		}
 		return _readEvent;
 	}
@@ -228,7 +228,7 @@ namespace Base
 		else if (WSAErrorCode == WSAENETUNREACH)
 			return net_rc::unreachable;
 		else
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 
 		return net_rc::ok;
 	}
@@ -254,7 +254,7 @@ namespace Base
 		if (socketrc == SOCKET_ERROR)
 		{
 			int errorCode = WSAGetLastError();
-			CHECK_WIN32API(WSAErrorIsAcceptable(errorCode)) << "error in WSA function " << func_name << ".\n";
+			L_CHECK_WIN32API(WSAErrorIsAcceptable(errorCode)) << "error in WSA function " << func_name << ".\n";
 			rc = WSAErrorCodeToReturnCode(errorCode);
 		}
 		return rc;
@@ -276,7 +276,7 @@ namespace Base
 	void parseIPv4SockAddr(const struct sockaddr *sockaddr, uint16_t *port, in_addr *addr)
 	{
 		const sockaddr_in *sockaddr_ptr = (const sockaddr_in *)sockaddr;
-		ENSURE_EQ(sockaddr_ptr->sin_family, AF_INET);
+		L_ENSURE_EQ(sockaddr_ptr->sin_family, AF_INET);
 		*port = sockaddr_ptr->sin_port;
 		*addr = sockaddr_ptr->sin_addr;
 	}
@@ -331,7 +331,7 @@ namespace Base
 		net_rc rc = socket.recvfrom(buf, len, (sockaddr *)from, fromlen, recvlen);
 		if (rc == net_rc::wouldblock)
 			return false;
-		CHECK_EQ_WIN32API(rc, net_rc::ok);
+		L_CHECK_EQ_WIN32API(rc, net_rc::ok);
 		return true;
 	}
 
@@ -372,7 +372,7 @@ namespace Base
 		net_rc rc = socket.sendto(buf, len, (const sockaddr *)to, tolen, sendlen);
 		if (rc == net_rc::wouldblock)
 			return false;
-		CHECK_EQ_WIN32API(rc, net_rc::ok);
+		L_CHECK_EQ_WIN32API(rc, net_rc::ok);
 		return true;
 	}
 
@@ -401,7 +401,7 @@ namespace Base
 		bindAddr.s_addr = INADDR_ANY;
 		sockaddr bindaddr = buildIPv4SockAddr(0, bindAddr);
 		socket.bind(&bindaddr, sizeof(bindaddr));
-		CHECK_LE(result->ai_addrlen, (size_t)std::numeric_limits<int>::max());
+		L_CHECK_LE(result->ai_addrlen, (size_t)std::numeric_limits<int>::max());
 		socket.connect(result->ai_addr, (int)result->ai_addrlen);
 	}
 
@@ -423,7 +423,7 @@ namespace Base
 		const net_rc rc = socket.recv(data, size, recvlen);
 		if (rc == net_rc::wouldblock)
 			return false;
-		CHECK_EQ_WIN32API(rc, net_rc::ok);
+		L_CHECK_EQ_WIN32API(rc, net_rc::ok);
 		return true;
 	}
 
@@ -445,7 +445,7 @@ namespace Base
 		const net_rc rc = socket.send(data, size, sendlen);
 		if (rc == net_rc::wouldblock)
 			return false;
-		CHECK_EQ_WIN32API(rc, net_rc::ok);
+		L_CHECK_EQ_WIN32API(rc, net_rc::ok);
 		return true;
 	}
 

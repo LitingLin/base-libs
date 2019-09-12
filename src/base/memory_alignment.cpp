@@ -17,10 +17,10 @@ namespace Base
 		void* ptr;
 #ifdef _WIN32
 		ptr = _aligned_malloc(size, alignment);
-		CHECK_STDCAPI(ptr);
+		L_CHECK_STDCAPI(ptr);
 #else
 		ptr = aligned_alloc(alignment, size);
-		CHECK_STDCAPI(ptr);
+		L_CHECK_STDCAPI(ptr);
 #endif
 		return ptr;
 	}

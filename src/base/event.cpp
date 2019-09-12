@@ -10,7 +10,7 @@ namespace Base
 	Event::Event()
 	{
 		_event_handle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-		ENSURE_WIN32API(_event_handle);
+		L_ENSURE_WIN32API(_event_handle);
 	}
 
 	Event::Event(Event&& e) noexcept
@@ -22,17 +22,17 @@ namespace Base
 	Event::~Event()
 	{
 		if (_event_handle)
-			LOG_IF_FAILED_WIN32API(CloseHandle(_event_handle));
+			L_LOG_IF_FAILED_WIN32API(CloseHandle(_event_handle));
 	}
 
 	void Event::set()
 	{
-		ENSURE_WIN32API(SetEvent(_event_handle));
+		L_ENSURE_WIN32API(SetEvent(_event_handle));
 	}
 
 	void Event::reset()
 	{
-		ENSURE_WIN32API(ResetEvent(_event_handle));
+		L_ENSURE_WIN32API(ResetEvent(_event_handle));
 	}
 
 	void Event::join() const

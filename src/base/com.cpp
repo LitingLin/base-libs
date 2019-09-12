@@ -97,7 +97,7 @@ namespace Base
 
 	COMInitializer::COMInitializer()
 	{
-		ENSURE_HR(CoInitialize(nullptr));
+		L_ENSURE_HR(CoInitialize(nullptr));
 	}
 
 	COMInitializer::~COMInitializer()

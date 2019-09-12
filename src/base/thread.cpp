@@ -25,7 +25,7 @@ namespace Base
 				join();
 			}
 			catch (...) {}
-			LOG_IF_FAILED_WIN32API(CloseHandle(_handle));
+			L_LOG_IF_FAILED_WIN32API(CloseHandle(_handle));
 		}
 	}
 
@@ -47,22 +47,22 @@ namespace Base
 		else
 			_handle = reinterpret_cast<HANDLE>(_beginthreadex(NULL, 0, start_routine, this, CREATE_SUSPENDED, NULL));
 
-		ENSURE_NE_STDCAPI(reinterpret_cast<uintptr_t>(_handle), 0);
+		L_ENSURE_NE_STDCAPI(reinterpret_cast<uintptr_t>(_handle), 0);
 	}
 
 	void Thread::run()
 	{
-		ENSURE_NE_WIN32API(ResumeThread(_handle), (DWORD)-1);
+		L_ENSURE_NE_WIN32API(ResumeThread(_handle), (DWORD)-1);
 	}
 
 	void Thread::pause()
 	{
-		ENSURE_NE_WIN32API(SuspendThread(_handle), (DWORD)-1);
+		L_ENSURE_NE_WIN32API(SuspendThread(_handle), (DWORD)-1);
 	}
 
 	void Thread::join() const
 	{
-		ENSURE_EQ_WIN32API(WaitForSingleObjectEx(_handle, INFINITE, FALSE), WAIT_OBJECT_0);
+		L_ENSURE_EQ_WIN32API(WaitForSingleObjectEx(_handle, INFINITE, FALSE), WAIT_OBJECT_0);
 	}
 
 	bool Thread::join(uint32_t timeout) const
@@ -70,7 +70,7 @@ namespace Base
 		uint32_t rc = WaitForSingleObject(_handle, timeout);
 		if (rc == WAIT_TIMEOUT)
 			return false;
-		ENSURE_EQ_WIN32API(rc, WAIT_OBJECT_0);
+		L_ENSURE_EQ_WIN32API(rc, WAIT_OBJECT_0);
 		return true;
 	}
 
@@ -98,7 +98,7 @@ namespace Base
 		else if (rc == WAIT_TIMEOUT)
 			return true;
 		else {
-			UNREACHABLE_ERROR;
+			L_UNREACHABLE_ERROR;
 			return false;
 		}
 	}
@@ -238,8 +238,8 @@ namespace Base
 	{
 		std::vector<HANDLE> handles = getHandles(threads, n);
 		uint32_t rc = WaitForMultipleObjects(n, &handles[0], FALSE, INFINITE);
-		ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
-		ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
+		L_ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
+		L_ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
 		*i = rc - WAIT_OBJECT_0;
 	}
 
@@ -249,8 +249,8 @@ namespace Base
 		uint32_t rc = WaitForMultipleObjects(n, &handles[0], FALSE, timeout);
 		if (rc == WAIT_TIMEOUT)
 			return false;
-		ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
-		ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
+		L_ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
+		L_ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
 		*i = rc - WAIT_OBJECT_0;
 		return true;
 	}
@@ -259,8 +259,8 @@ namespace Base
 	{
 		std::vector<HANDLE> handles = getHandles(threads, n);
 		uint32_t rc = WaitForMultipleObjects(n, &handles[0], TRUE, INFINITE);
-		ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
-		ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
+		L_ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
+		L_ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
 	}
 
 	bool ThreadSynchronization::joinAll(Thread* threads, unsigned n, uint32_t timeout)
@@ -269,15 +269,15 @@ namespace Base
 		uint32_t rc = WaitForMultipleObjects(n, &handles[0], TRUE, timeout);
 		if (rc == WAIT_TIMEOUT)
 			return false;
-		ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
-		ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
+		L_ENSURE_GE_WIN32API(rc, WAIT_OBJECT_0);
+		L_ENSURE_LE_WIN32API(rc, WAIT_OBJECT_0 + n - 1);
 		return true;
 	}
 
 	std::vector<HANDLE> ThreadSynchronization::getHandles(Thread* threads, unsigned n)
 	{
-		ENSURE_NE(n, 0U);
-		ENSURE_LE(n, unsigned(MAXIMUM_WAIT_OBJECTS));
+		L_ENSURE_NE(n, 0U);
+		L_ENSURE_LE(n, unsigned(MAXIMUM_WAIT_OBJECTS));
 		std::vector<HANDLE> handles;
 		handles.reserve(n);
 		for (unsigned i = 0; i < n; ++i)

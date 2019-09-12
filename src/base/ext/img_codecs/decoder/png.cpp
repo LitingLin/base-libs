@@ -8,12 +8,12 @@ namespace Base
 	void png_error(png_structp png_ptr, png_const_charp message)
 	{
 		(png_ptr);
-		THROW_RUNTIME_EXCEPTION << message;
+		L_THROW_RUNTIME_EXCEPTION << message;
 	}
 	void png_warning(png_structp png_ptr, png_const_charp message)
 	{
 		(png_ptr);
-		LOGGING_ERROR << message;
+		L_LOG_ERROR << message;
 	}
 
 	PNGDecoder::PNGDecoder()
@@ -80,14 +80,14 @@ namespace Base
 			png_destroy_read_struct(&_png_ptr, &_info_ptr, nullptr);
 
 		_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-		CHECK(_png_ptr) << "png_create_read_struct()";
+		L_CHECK(_png_ptr) << "png_create_read_struct()";
 		_info_ptr = png_create_info_struct(_png_ptr);
-		CHECK_WITH_HANDLER(_info_ptr, [&]() {png_destroy_read_struct(&_png_ptr, nullptr, nullptr); _png_ptr = nullptr; }) << "png_create_info_struct()";
+		L_CHECK_WITH_FINALIZER(_info_ptr, [&]() {png_destroy_read_struct(&_png_ptr, nullptr, nullptr); _png_ptr = nullptr; }) << "png_create_info_struct()";
 		_sourceImage = (unsigned char*)image;
 
-		CHECK_GE(size, 8) << "Invalid image";
+		L_CHECK_GE(size, 8) << "Invalid image";
 
-		CHECK_EQ(png_sig_cmp(_sourceImage, 0, 8), 0) << "Invalid image";
+		L_CHECK_EQ(png_sig_cmp(_sourceImage, 0, 8), 0) << "Invalid image";
 		_currentImagePosition = _sourceImage;
 		png_set_read_fn(_png_ptr, &_currentImagePosition, readDataCallback);
 
