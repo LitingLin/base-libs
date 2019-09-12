@@ -56,9 +56,9 @@ namespace Base
 		JPEGDecoder(JPEGDecoder&& object) noexcept;
 		~JPEGDecoder();
 		void load(const void* pointer, uint64_t size);
-		int getWidth();
-		int getHeight();
-		int getDecompressedSize();
+		[[nodiscard]] unsigned getWidth();
+		[[nodiscard]] unsigned getHeight();
+		[[nodiscard]] uint64_t getDecompressedSize();
 		void decode(void* buffer);
 	private:
 		const unsigned char* _pointer;

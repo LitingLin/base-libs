@@ -18,12 +18,12 @@ namespace Base
 			Container(Container&&) = delete;
 			~Container();
 			void* get();
-			size_t size();
+			[[nodiscard]] size_t size();
 		private:
 			void* _ptr;
 			size_t _size;
 		};
-		Container encode(const void* rgb, int width, int height);
+		[[nodiscard]] Container encode(const void* rgb, unsigned width, unsigned height);
 	};
 }
 

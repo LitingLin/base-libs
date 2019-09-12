@@ -17,9 +17,9 @@ namespace Base
 		PNGDecoder(PNGDecoder&& object) noexcept;
 		~PNGDecoder();
 		void load(const void* image, uint64_t size);
-		int getWidth() const;
-		int getHeight() const;
-		int getDecompressedSize();
+		[[nodiscard]] unsigned getWidth() const;
+		[[nodiscard]] unsigned getHeight() const;
+		[[nodiscard]] uint64_t getDecompressedSize();
 		void decode(void* buffer);
 	private:
 		unsigned char* _sourceImage;

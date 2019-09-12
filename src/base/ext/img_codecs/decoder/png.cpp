@@ -39,19 +39,19 @@ namespace Base
 			png_destroy_read_struct(&_png_ptr, &_info_ptr, (png_infopp)NULL);
 	}
 
-	int PNGDecoder::getWidth() const
+	unsigned PNGDecoder::getWidth() const
 	{
 		return _image_width;
 	}
 
-	int PNGDecoder::getHeight() const
+	unsigned PNGDecoder::getHeight() const
 	{
 		return _image_height;
 	}
 
-	int PNGDecoder::getDecompressedSize()
+	uint64_t PNGDecoder::getDecompressedSize()
 	{
-		return _image_width * _image_height * 3;
+		return uint64_t(_image_width) * uint64_t(_image_height) * 3ULL;
 	}
 
 	void PNGDecoder::decode(void* buffer)

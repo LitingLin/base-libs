@@ -43,26 +43,28 @@ namespace Base
 		decInfo.raw_data_out = false;
 	}
 
-	int JPEGDecoder::getWidth()
+	unsigned JPEGDecoder::getWidth()
 	{
 		return decInfo.image_width;
 	}
 
-	int JPEGDecoder::getHeight()
+	unsigned JPEGDecoder::getHeight()
 	{
 		return decInfo.image_height;
 	}
 
-	int JPEGDecoder::getDecompressedSize()
+	uint64_t JPEGDecoder::getDecompressedSize()
 	{
-		return decInfo.image_height * decInfo.image_width * decInfo.num_components;
+		CHECK_GT(decInfo.num_components, 0);
+		return decInfo.image_height * decInfo.image_width * uint64_t(decInfo.num_components);
 	}
 
 	void JPEGDecoder::decode(void* buffer)
 	{
 		CHECK(jpeg_start_decompress(&decInfo));
+		CHECK_GT(decInfo.num_components, 0);
 
-		size_t rowSize = decInfo.image_width * decInfo.num_components;
+		size_t rowSize = decInfo.image_width * unsigned(decInfo.num_components);
 		unsigned char* currentBuffer = (unsigned char*)buffer;
 		while (decInfo.output_scanline < decInfo.image_height) {
 			CHECK_EQ(jpeg_read_scanlines(&decInfo, &currentBuffer, 1), 1);

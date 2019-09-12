@@ -1,5 +1,7 @@
 #include <base/ext/img_codecs/decoder.h>
 
+#include <base/logging.h>
+
 namespace Base
 {
     void ImageDecoder::load(const void *buffer, size_t size, ImageFormatType formatType)
@@ -16,10 +18,12 @@ namespace Base
             case ImageFormatType::WEBP:
                 _webpDecoder.load(buffer, size);
                 break;
+			default:
+				NOT_IMPLEMENTED_ERROR;
         }
     }
 
-    int ImageDecoder::getHeight() {
+	unsigned ImageDecoder::getHeight() {
         switch (_format)
         {
             case ImageFormatType::JPEG:
@@ -31,10 +35,13 @@ namespace Base
             case ImageFormatType::WEBP:
                 return _webpDecoder.getHeight();
                 break;
+			default:
+				NOT_IMPLEMENTED_ERROR;
+				return 0;
         }
     }
 
-    int ImageDecoder::getWidth() {
+	unsigned ImageDecoder::getWidth() {
         switch (_format)
         {
             case ImageFormatType::JPEG:
@@ -46,10 +53,13 @@ namespace Base
             case ImageFormatType::WEBP:
                 return _webpDecoder.getWidth();
                 break;
+			default:
+				NOT_IMPLEMENTED_ERROR;
+				return 0;
         }
     }
 
-    int ImageDecoder::getDecompressedSize() {
+	uint64_t ImageDecoder::getDecompressedSize() {
         switch (_format)
         {
             case ImageFormatType::JPEG:
@@ -61,6 +71,9 @@ namespace Base
             case ImageFormatType::WEBP:
                 return _webpDecoder.getDecompressedSize();
                 break;
+			default:
+				NOT_IMPLEMENTED_ERROR;
+				return 0;
         }
     }
 
@@ -76,6 +89,8 @@ namespace Base
             case ImageFormatType::WEBP:
                 _webpDecoder.decode(output);
                 break;
+			default:
+				NOT_IMPLEMENTED_ERROR;
         }
     }
 }

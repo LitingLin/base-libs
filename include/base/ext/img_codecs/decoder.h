@@ -13,9 +13,9 @@ namespace Base
     {
     public:
         void load(const void *buffer, size_t size, ImageFormatType formatType);
-        int getHeight();
-        int getWidth();
-        int getDecompressedSize();
+		[[nodiscard]] unsigned getHeight();
+		[[nodiscard]] unsigned getWidth();
+		[[nodiscard]] uint64_t getDecompressedSize();
         void decode(void *output);
 
     private:
