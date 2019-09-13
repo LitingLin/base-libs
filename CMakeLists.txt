@@ -242,10 +242,11 @@ add_dependencies(base fmt)
 option(RELEASE_INSTALL "install binary files only" OFF)
 
 if (${RELEASE_INSTALL})
-    message(STATUS "RELEASE_INSTALL: ${RELEASE_INSTALL}")
-    install(TARGETS base
-            RUNTIME DESTINATION .
-            LIBRARY DESTINATION .)
+    if (${BUILD_SHARED_LIBS})
+        install(TARGETS base
+                RUNTIME DESTINATION .
+                LIBRARY DESTINATION .)
+    endif()
 else()
     install(TARGETS base fmt
             RUNTIME DESTINATION bin
