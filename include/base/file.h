@@ -28,7 +28,7 @@ namespace Base {
 	ATTRIBUTE_INTERFACE
 	std::wstring getTempPath();
 	ATTRIBUTE_INTERFACE
-	std::wstring getFullPath(const std::wstring& path);
+	std::wstring getFullPath(std::wstring_view path);
 #else
 	ATTRIBUTE_INTERFACE
     bool isFileExists(const std::string& path);
