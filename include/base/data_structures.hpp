@@ -28,14 +28,15 @@ namespace Base {
 		iterator end();
 		size_t capacity() const;
 	private:
+		std::allocator<Type> _allocator;
 		size_t _reserved;
 		size_t _size;
-		AlignedSpan<Type> _alignedSpan;
+		Type* _ptr;
 	};
 
 	template <typename Type>
 	FixedVector<Type>::FixedVector(size_t reserved)
-		: _reserved(reserved), _size(0), _alignedSpan(reserved)
+		: _reserved(reserved), _size(0), _ptr(_allocator.allocate(_reserved))
 	{
 	}
 
@@ -44,8 +45,9 @@ namespace Base {
 	{
 		for (size_t i = _size; i > 0; --i)
 		{
-			_alignedSpan.get()[i - 1].~Type();
+			_ptr[i - 1].~Type();
 		}
+		_allocator.deallocate(_ptr, _reserved);
 	}
 
 	template <typename Type>
@@ -54,7 +56,8 @@ namespace Base {
 	{
 		if (_size >= _reserved)
 			throw std::out_of_range("can not exceed reserved size");
-		new (_alignedSpan.get() + _size++) Type(std::forward<Args>(args)...);
+		new (_ptr + _size) Type(std::forward<Args>(args)...);
+		++_size;
 	}
 
 	template <typename Type>
@@ -63,8 +66,8 @@ namespace Base {
 	{
 		if (index >= _size)
 			throw std::out_of_range("");
-		_alignedSpan.get()[index].~Type();
-		new (_alignedSpan.get()  + index) Type(std::forward<Args>(args)...);
+		_ptr[index].~Type();
+		new (_ptr + index) Type(std::forward<Args>(args)...);
 	}
 
 	template <typename Type>
@@ -72,7 +75,7 @@ namespace Base {
 	{
 		if (_size == 0)
 			throw std::out_of_range("");
-		_alignedSpan.get()[_size - 1].~Type();
+		_ptr[_size - 1].~Type();
 		--_size;
 	}
 
@@ -81,7 +84,7 @@ namespace Base {
 	{
 		if (index >= _size)
 			throw std::out_of_range("");
-		return _alignedSpan.get()[index];
+		return _ptr[index];
 	}
 
 	template <typename Type>
@@ -89,7 +92,7 @@ namespace Base {
 	{
 		if (index >= _size)
 			throw std::out_of_range("");
-		return _alignedSpan.get()[index];
+		return _ptr[index];
 	}
 
 	template <typename Type>
@@ -101,25 +104,25 @@ namespace Base {
 	template <typename Type>
 	typename FixedVector<Type>::const_iterator FixedVector<Type>::begin() const
 	{
-		return _alignedSpan.get();
+		return _ptr;
 	}
 
 	template <typename Type>
 	typename FixedVector<Type>::iterator FixedVector<Type>::begin()
 	{
-		return _alignedSpan.get();
+		return _ptr;
 	}
 
 	template <typename Type>
 	typename FixedVector<Type>::const_iterator FixedVector<Type>::end() const
 	{
-		return _alignedSpan.get() + _size;
+		return _ptr + _size;
 	}
 
 	template <typename Type>
 	typename FixedVector<Type>::iterator FixedVector<Type>::end()
 	{
-		return _alignedSpan.get() + _size;
+		return _ptr + _size;
 	}
 
 	template <typename Type>
@@ -148,15 +151,16 @@ namespace Base {
 		size_t capacity() const;
 	private:
 		void shrink_index();
-		AlignedSpan<Type> _alignedSpan;
+		std::allocator<Type> _allocator;
 		size_t _capacity;
 		size_t _front_index;
 		size_t _back_index;
+		Type* _ptr;
 	};
 
 	template <typename Type>
 	CircularQueue<Type>::CircularQueue(size_t capacity)
-		: _alignedSpan(capacity), _capacity(capacity), _front_index(0), _back_index(0)
+		: _capacity(capacity), _front_index(0), _back_index(0), _ptr(_allocator.allocate(_capacity))
 	{
 	}
 
@@ -164,6 +168,7 @@ namespace Base {
 	CircularQueue<Type>::~CircularQueue()
 	{
 		clear();
+		_allocator.deallocate(_ptr, _capacity);
 	}
 
 	template <typename Type>
@@ -172,7 +177,7 @@ namespace Base {
 		if (_back_index - _front_index == _capacity)
 			throw std::runtime_error("queue is full");
 
-		new (_alignedSpan.get() + _back_index % _capacity) Type(item);
+		new (_ptr + (_back_index % _capacity)) Type(item);
 		_back_index++;
 
 		shrink_index();
@@ -184,7 +189,7 @@ namespace Base {
 		if (_back_index - _front_index == _capacity)
 			throw std::runtime_error("queue is full");
 
-		new (_alignedSpan.get() + _back_index % _capacity) Type(std::move(item));
+		new (_ptr + (_back_index % _capacity)) Type(std::move(item));
 		_back_index++;
 
 		shrink_index();
@@ -196,7 +201,7 @@ namespace Base {
 		if (_back_index == _front_index)
 			throw std::runtime_error("queue is empty");
 
-		return std::move(_alignedSpan.get()[(_front_index++) % _capacity]);
+		return std::move(_ptr[(_front_index++) % _capacity]);
 	}
 
 	template <typename Type>
@@ -209,42 +214,42 @@ namespace Base {
 	Type& CircularQueue<Type>::front()
 	{
 		if (_back_index == _front_index) throw std::runtime_error("queue is empty");
-		return _alignedSpan.get()[_front_index % _capacity];
+		return _ptr[_front_index % _capacity];
 	}
 
 	template <typename Type>
 	Type& CircularQueue<Type>::back()
 	{
 		if (_back_index == _front_index) throw std::runtime_error("queue is empty");
-		return _alignedSpan.get()[(_back_index - 1) % _capacity];
+		return _ptr[(_back_index - 1) % _capacity];
 	}
 
 	template <typename Type>
 	const Type& CircularQueue<Type>::front() const
 	{
 		if (_back_index == _front_index) throw std::runtime_error("queue is empty");
-		return _alignedSpan.get()[_front_index % _capacity];
+		return _ptr[_front_index % _capacity];
 	}
 
 	template <typename Type>
 	const Type& CircularQueue<Type>::back() const
 	{
 		if (_back_index == _front_index) throw std::runtime_error("queue is empty");
-		return _alignedSpan.get()[(_back_index - 1) % _capacity];
+		return _ptr[(_back_index - 1) % _capacity];
 	}
 
 	template<typename Type>
 	Type& CircularQueue<Type>::operator[](size_t index)
 	{
 		if (index >= size()) throw std::out_of_range("index out of range");
-		return _alignedSpan.get()[(_front_index + index) % _capacity];
+		return _ptr[(_front_index + index) % _capacity];
 	}
 
 	template<typename Type>
 	const Type& CircularQueue<Type>::operator[](size_t index) const
 	{
 		if (index >= size()) throw std::out_of_range("index out of range");
-		return _alignedSpan.get()[(_front_index + index) % _capacity];
+		return _ptr[(_front_index + index) % _capacity];
 	}
 
 	template<typename Type>
@@ -252,7 +257,7 @@ namespace Base {
 	{
 		for (size_t i = _front_index; i < _back_index; ++i)
 		{
-			_alignedSpan.get()[i % _capacity].~Type();
+			_ptr[i % _capacity].~Type();
 		}
 		_back_index = 0;
 		_front_index = 0;

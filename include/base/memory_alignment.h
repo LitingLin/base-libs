@@ -33,7 +33,7 @@ namespace Base
 	private:
 		AlignedMemorySpace _alignedMemorySpace;
 	};
-
+		
 	class ATTRIBUTE_INTERFACE AlignedDynamicRawArray
 	{
 	public:

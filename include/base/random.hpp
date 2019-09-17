@@ -59,6 +59,6 @@ namespace Base
 			return distribution(_engine);
 		}
 	private:
-		std::default_random_engine _engine;
+		std::mt19937 _engine;
 	};
 }
