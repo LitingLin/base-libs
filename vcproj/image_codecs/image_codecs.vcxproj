@@ -16,6 +16,8 @@
     <ClInclude Include="..\..\include\base\ext\img_codecs\decoder\jpeg.h" />
     <ClInclude Include="..\..\include\base\ext\img_codecs\decoder\png.h" />
     <ClInclude Include="..\..\include\base\ext\img_codecs\decoder\webp.h" />
+    <ClInclude Include="..\..\include\base\ext\img_codecs\encoder.h" />
+    <ClInclude Include="..\..\include\base\ext\img_codecs\encoder\jpeg.h" />
     <ClInclude Include="..\..\include\base\ext\img_codecs\encoder\webp.h" />
     <ClInclude Include="..\..\include\base\ext\img_codecs\types.h" />
   </ItemGroup>
@@ -25,6 +27,8 @@
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\jpeg.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\png.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\webp.cpp" />
+    <ClCompile Include="..\..\src\base\ext\img_codecs\encoder.cpp" />
+    <ClCompile Include="..\..\src\base\ext\img_codecs\encoder\jpeg.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\encoder\webp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -59,9 +63,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\intel_media_sdk.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\intel_media_sdk.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

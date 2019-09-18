@@ -6,32 +6,22 @@
 
 namespace Base
 {
-	WebPEncoder::Container::Container(void* ptr, size_t size)
-		: _ptr(ptr), _size(size) { }
+	WebPEncoder::WebPImageContainer::WebPImageContainer(void* ptr, size_t size)
+		: EncodedImageContainer(ptr, size) { }
 
-	WebPEncoder::Container::~Container()
+	WebPEncoder::WebPImageContainer::~WebPImageContainer()
 	{
 		WebPFree(_ptr);
 	}
 
-	void* WebPEncoder::Container::get()
-	{
-		return _ptr;
-	}
-
-	size_t WebPEncoder::Container::size()
-	{
-		return _size;
-	}
-
-	WebPEncoder::Container WebPEncoder::encode(const void* rgb, unsigned width, unsigned height)
+	WebPEncoder::WebPImageContainer WebPEncoder::encode(const void* rgb, unsigned width, unsigned height)
 	{
 		L_CHECK_LE(width * 3ULL, uint64_t(std::numeric_limits<int>::max()));
 		L_CHECK_LE(height, unsigned(std::numeric_limits<int>::max()));
 		uint8_t* output;
 		const size_t size = WebPEncodeRGB((const uint8_t*)rgb, int(width), int(height), 3 * int(width), 80, &output);
 		L_CHECK(size);
-		return Container(output, size);
+		return WebPImageContainer(output, size);
 	}
 }
 #endif

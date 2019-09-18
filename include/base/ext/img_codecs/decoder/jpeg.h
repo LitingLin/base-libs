@@ -69,3 +69,19 @@ namespace Base
 	};
 }
 #endif
+
+#ifdef HAVE_INTEL_MEDIA_SDK
+#include <mfxvideo.h> /* SDK functions in C */
+#include <mfxvideo++.h> /* Optional for C++ development */
+#include <mfxjpeg.h>
+
+namespace Base{
+	
+class IMAGE_CODECS_INTERFACE IntelGraphicsJpegDecoder
+{
+public:
+private:
+
+};
+}
+#endif

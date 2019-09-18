@@ -48,6 +48,12 @@
     <ClInclude Include="..\..\include\base\ext\img_codecs\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\base\ext\img_codecs\encoder\jpeg.h">
+      <Filter>Header Files\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\base\ext\img_codecs\encoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder.cpp">
@@ -66,6 +72,12 @@
       <Filter>Source Files\Decoder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\dll_entry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\ext\img_codecs\encoder\jpeg.cpp">
+      <Filter>Source Files\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\ext\img_codecs\encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

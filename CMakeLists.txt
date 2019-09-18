@@ -139,12 +139,14 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/include/base/utils.h"
 
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder.h"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/encoder.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/common.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/types.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/jpeg.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/png.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/decoder/webp.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/encoder/webp.h"
+            "${CMAKE_CURRENT_LIST_DIR}/include/base/ext/img_codecs/encoder/jpeg.h"
 
             "${CMAKE_CURRENT_LIST_DIR}/include/base/logging/base.h"
             "${CMAKE_CURRENT_LIST_DIR}/include/base/logging/common.h"
@@ -162,11 +164,13 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/src/base/file.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/memory_mapped_io.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/encoder.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/jpeg.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/jpeg_turbo.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/png.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/decoder/webp.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/encoder/webp.cpp"
+            "${CMAKE_CURRENT_LIST_DIR}/src/base/ext/img_codecs/encoder/jpeg.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/stack_trace.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/utils.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/src/base/memory_alignment.cpp"
@@ -187,14 +191,58 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 include(${CMAKE_CURRENT_LIST_DIR}/3rd_party/fmt.cmake)
 
-find_package(JPEG)
-if(JPEG_FOUND)
-    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG)
-    list(APPEND BASE_INCLUDE_DIRS ${JPEG_INCLUDE_DIR})
-    list(APPEND BASE_LINK_LIBRARIES ${JPEG_LIBRARIES})
-else()
-    message(STATUS "Disabled JPEG decoder")
-endif()
+include(ExternalProject)
+ExternalProject_Add(mozjpeg
+        PREFIX ${CMAKE_BINARY_DIR}/mozjpeg
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR} -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        -DENABLE_SHARED=FALSE -DWITH_TURBOJPEG=FALSE -DPNG_SUPPORTED=FALSE -DWITH_JPEG8=1
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+        -DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}
+        -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
+        -DCMAKE_C_FLAGS_MINSIZEREL=${CMAKE_C_FLAGS_MINSIZEREL}
+        -DCMAKE_C_FLAGS_RELWITHDEBINFO=${CMAKE_C_FLAGS_RELWITHDEBINFO}
+        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+        -DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}
+        -DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}
+        -DCMAKE_CXX_FLAGS_MINSIZEREL=${CMAKE_CXX_FLAGS_MINSIZEREL}
+        -DCMAKE_CXX_FLAGS_RELWITHDEBINFO=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}
+        -DCMAKE_STATIC_LINKER_FLAGS=${CMAKE_STATIC_LINKER_FLAGS}
+        -DCMAKE_STATIC_LINKER_FLAGS_DEBUG=${CMAKE_STATIC_LINKER_FLAGS_DEBUG}
+        -DCMAKE_STATIC_LINKER_FLAGS_RELEASE=${CMAKE_STATIC_LINKER_FLAGS_RELEASE}
+        -DCMAKE_STATIC_LINKER_FLAGS_MINSIZEREL=${CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL}
+        -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
+        -DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}
+        -DCMAKE_MODULE_LINKER_FLAGS_DEBUG=${CMAKE_MODULE_LINKER_FLAGS_DEBUG}
+        -DCMAKE_MODULE_LINKER_FLAGS_RELEASE=${CMAKE_MODULE_LINKER_FLAGS_RELEASE}
+        -DCMAKE_MODULE_LINKER_FLAGS_MINSIZEREL=${CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL}
+        -DCMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO=${CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO}
+        -DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}
+        -DCMAKE_EXE_LINKER_FLAGS_DEBUG=${CMAKE_EXE_LINKER_FLAGS_DEBUG}
+        -DCMAKE_EXE_LINKER_FLAGS_RELEASE=${CMAKE_EXE_LINKER_FLAGS_RELEASE}
+        -DCMAKE_EXE_LINKER_FLAGS_MINSIZEREL=${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL}
+        -DCMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO=${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}
+        -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
+        -DCMAKE_SHARED_LINKER_FLAGS_DEBUG=${CMAKE_SHARED_LINKER_FLAGS_DEBUG}
+        -DCMAKE_SHARED_LINKER_FLAGS_RELEASE=${CMAKE_SHARED_LINKER_FLAGS_RELEASE}
+        -DCMAKE_SHARED_LINKER_FLAGS_MINSIZEREL=${CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL}
+        -DCMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO=${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}
+        SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/3rd_party/mozjpeg
+        )
+
+list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG)
+list(APPEND BASE_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/include)
+list(APPEND BASE_LINK_DIRECTORIES ${CMAKE_BINARY_DIR}/lib)
+list(APPEND BASE_LINK_LIBRARIES jpeg-static)
+
+#find_package(JPEG)
+#if(JPEG_FOUND)
+#    list(APPEND BASE_COMPILE_DEFINITIONS HAVE_LIB_JPEG)
+#    list(APPEND BASE_INCLUDE_DIRS ${JPEG_INCLUDE_DIR})
+#    list(APPEND BASE_LINK_LIBRARIES ${JPEG_LIBRARIES})
+#else()
+#    message(STATUS "Disabled JPEG decoder")
+#endif()
 
 find_package(PNG)
 if(PNG_FOUND)
@@ -236,8 +284,9 @@ endif()
 
 target_compile_definitions(base PUBLIC ${BASE_COMPILE_DEFINITIONS})
 target_include_directories(base PUBLIC ${BASE_INCLUDE_DIRS})
+target_link_directories(base PUBLIC ${BASE_LINK_DIRECTORIES})
 target_link_libraries(base ${BASE_LINK_LIBRARIES} fmt)
-add_dependencies(base fmt)
+add_dependencies(base fmt mozjpeg)
 
 option(RELEASE_INSTALL "install binary files only" OFF)
 
@@ -264,4 +313,5 @@ endif()
 
 set_property(GLOBAL PROPERTY BASE_COMPILE_DEFINITIONS ${BASE_COMPILE_DEFINITIONS})
 set_property(GLOBAL PROPERTY BASE_INCLUDE_DIRS ${BASE_INCLUDE_DIRS})
+set_property(GLOBAL PROPERTY BASE_LINK_DIRECTORIES ${BASE_LINK_DIRECTORIES})
 set_property(GLOBAL PROPERTY BASE_LINK_LIBRARIES ${BASE_LINK_LIBRARIES})
