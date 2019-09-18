@@ -22,6 +22,9 @@
     <Filter Include="Source Files\cpu_info">
       <UniqueIdentifier>{f4124d01-664e-4633-bf60-44465cdc1441}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\cpu_info">
+      <UniqueIdentifier>{e3abb44e-8290-485c-8834-0031ae797a64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\base\file.h">
@@ -120,8 +123,8 @@
     <ClInclude Include="..\..\include\base\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\cpu_info\msvc.h">
-      <Filter>Source Files\cpu_info</Filter>
+    <ClInclude Include="..\..\src\base\cpu_info\msvc.h">
+      <Filter>Header Files\cpu_info</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

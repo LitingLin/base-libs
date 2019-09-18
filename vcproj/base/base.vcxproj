@@ -43,7 +43,7 @@
     <ClInclude Include="..\..\include\base\time.h" />
     <ClInclude Include="..\..\include\base\timer.h" />
     <ClInclude Include="..\..\include\base\utils.h" />
-    <ClInclude Include="..\..\src\cpu_info\msvc.h" />
+    <ClInclude Include="..\..\src\base\cpu_info\msvc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\base\com.cpp" />
