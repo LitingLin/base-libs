@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\src\base\dll_entry.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\jpeg.cpp" />
+    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\jpeg_intel_media_sdk.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\png.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\webp.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\encoder.cpp" />

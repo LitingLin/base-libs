@@ -80,5 +80,8 @@
     <ClCompile Include="..\..\src\base\ext\img_codecs\encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\jpeg_intel_media_sdk.cpp">
+      <Filter>Source Files\Decoder</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
