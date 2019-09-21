@@ -4,70 +4,48 @@
 
 namespace Base
 {
-	typedef struct {
-		mfxU16 width, height;
-		mfxU8* base;
-	} mid_struct;
-	mfxStatus fa_alloc(mfxHDL pthis, mfxFrameAllocRequest* request, mfxFrameAllocResponse* response)
+	IntelGraphicsJpegDecoder::IntelGraphicsJpegDecoder()
+		: _currentHandle(0)
 	{
-		if (!(request->Type & MFX_MEMTYPE_SYSTEM_MEMORY))
-			return MFX_ERR_UNSUPPORTED;
-		if (request->Info.FourCC != MFX_FOURCC_NV12)
-			return MFX_ERR_UNSUPPORTED;
-		response->NumFrameActual = request->NumFrameMin;
-		for (int i = 0; i < request->NumFrameMin; i++) {
-			mid_struct* mmid = (mid_struct*)malloc(sizeof(mid_struct));
-			mmid->width = ALIGN32(request->Info.Width);
-			mmid->height = ALIGN32(request->Info.Height);
-			mmid->base = (mfxU8*)malloc(mmid->width * mmid->height * 3 / 2);
-			response->mids[i] = mmid;
-		}
-		return MFX_ERR_NONE;
+		mfxVersion version;
+		version.Major = 1;
+		version.Minor = 0;
+		L_CHECK_EQ(MFXInit(MFX_IMPL_HARDWARE, &version, &_session), MFX_ERR_NONE);
 	}
-	mfxStatus fa_lock(mfxHDL pthis, mfxMemId mid, mfxFrameData* ptr) {
-		mid_struct* mmid = (mid_struct*)mid;
-		ptr->pitch = mmid->width;
-		ptr->Y = mmid->base;
-		ptr->U = ptr->Y + mmid->width * mmid->height;
-		ptr->V = ptr->U + 1;
-		return MFX_ERR_NONE;
-	}
-	mfxStatus fa_unlock(mfxHDL pthis, mfxMemId mid, mfxFrameData* ptr) {
-		if (ptr) ptr->Y = ptr->U = ptr->V = ptr->A = 0;
-		return MFX_ERR_NONE;
-	}
-	mfxStatus fa_gethdl(mfxHDL pthis, mfxMemId mid, mfxHDL* handle) {
-		return MFX_ERR_UNSUPPORTED;
-	}
-	mfxStatus fa_free(mfxHDL pthis, mfxFrameAllocResponse* response) {
-		for (int i = 0; i < response->NumFrameActual; i++) {
-			mid_struct* mmid = (mid_struct*)response->mids[i];
-			free(mmid->base); free(mid);
-		}
-		return MFX_ERR_NONE;
-	}
-	
-	void IntelGraphicsJpegDecoder::decode()
+
+	IntelGraphicsJpegDecoder::~IntelGraphicsJpegDecoder()
 	{
-		mfxSession _session;
-		mfxVersion _version;
-		_version.Major = 1;
-		_version.Minor = 0;
-		L_CHECK_EQ(MFXInit(MFX_IMPL_HARDWARE, &_version, &_session), ;
+		L_LOG_IF_NOT_EQ(MFXClose(_session), MFX_ERR_NONE);
+	}
 
-
-		MFXVideoDECODE_DecodeHeader();
+	void IntelGraphicsJpegDecoder::load(const void* data, size_t size)
+	{
+		mfxBitstream bitstream;
+		memset(&bitstream, 0, sizeof(bitstream));
+		bitstream.DecodeTimeStamp = MFX_TIMESTAMP_UNKNOWN;
+		bitstream.TimeStamp = MFX_TIMESTAMP_UNKNOWN;
+		bitstream.Data = (mfxU8*)data;
+		bitstream.DataLength = size;
+		bitstream.MaxLength = size;
+		bitstream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
 
 		mfxVideoParam param;
-		memset(&param, 0, sizeof(param));
-		param.AsyncDepth = 1;
-		param.mfx.FrameInfo.FourCC = MFX_FOURCC_NV12;
-		param.IOPattern = MFX_IOPATTERN_IN_SYSTEM_MEMORY | MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
-		param.
+		L_CHECK_EQ(MFXVideoDECODE_DecodeHeader(_session, &bitstream, &param), MFX_ERR_NONE);
+		L_CHECK_EQ(MFXVideoDECODE_Init(_session, &param), MFX_ERR_NONE);
+		mfxFrameSurface1 buffer;
+		memset(&buffer, 0, sizeof(mfxFrameSurface1));
 
-		MFXVideoDECODE_Init();
+		
 
-			MFXClose(_session);
+		
+		mfxFrameSurface1* output;
+		L_CHECK_EQ(MFXVideoDECODE_DecodeFrameAsync(_session, &bitstream, &buffer, &output, &_syncPoint), MFX_ERR_NONE);
+		L_CHECK_EQ(output, &buffer);
+	}
+	void IntelGraphicsJpegDecoder::decode(void* buffer)
+	{
+		MFXVideoCORE_SyncOperation(_session, _syncPoint, INFINITE);
+		MFXVideoDECODE_Close(_session);
 	}
 
 }

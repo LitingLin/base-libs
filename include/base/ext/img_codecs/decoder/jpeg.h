@@ -71,17 +71,37 @@ namespace Base
 #endif
 
 #ifdef HAVE_INTEL_MEDIA_SDK
+#include <base/memory_alignment.h>
 #include <mfxvideo.h> /* SDK functions in C */
 #include <mfxjpeg.h>
+
+extern "C" {
+#include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
+}
 
 namespace Base{
 	
 class IMAGE_CODECS_INTERFACE IntelGraphicsJpegDecoder
 {
 public:
-	void decode();
-private:
+	IntelGraphicsJpegDecoder();
+	~IntelGraphicsJpegDecoder();
+	// 32-bytes(256bits) aligned
+	void load(const void* data, size_t size);
 
+	void decode(void *buffer);
+private:
+	mfxSession _session;
+	Base::AlignedDynamicRawArray _buffer;
+	mfxSyncPoint _syncPoint;
+	int _currentHandle;
 };
 }
+#endif
+
+#ifdef HAVE_NVJPEG
+#include <nvjpeg.h>
+
+
 #endif

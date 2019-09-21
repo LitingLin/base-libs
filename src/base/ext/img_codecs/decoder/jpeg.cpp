@@ -72,5 +72,6 @@ namespace Base
 		}
 		L_CHECK(jpeg_finish_decompress(&decInfo));
 	}
+
 }
 #endif
