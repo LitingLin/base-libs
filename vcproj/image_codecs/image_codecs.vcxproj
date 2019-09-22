@@ -19,6 +19,7 @@
     <ClInclude Include="..\..\include\base\ext\img_codecs\encoder.h" />
     <ClInclude Include="..\..\include\base\ext\img_codecs\encoder\jpeg.h" />
     <ClInclude Include="..\..\include\base\ext\img_codecs\encoder\webp.h" />
+    <ClInclude Include="..\..\include\base\ext\img_codecs\processing\transform.h" />
     <ClInclude Include="..\..\include\base\ext\img_codecs\types.h" />
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +32,7 @@
     <ClCompile Include="..\..\src\base\ext\img_codecs\encoder.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\encoder\jpeg.cpp" />
     <ClCompile Include="..\..\src\base\ext\img_codecs\encoder\webp.cpp" />
+    <ClCompile Include="..\..\src\base\ext\img_codecs\processing\transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\base\base.vcxproj">

@@ -75,10 +75,6 @@ namespace Base
 #include <mfxvideo.h> /* SDK functions in C */
 #include <mfxjpeg.h>
 
-extern "C" {
-#include <libavutil/imgutils.h>
-#include <libswscale/swscale.h>
-}
 
 namespace Base{
 	
@@ -93,6 +89,7 @@ public:
 	void decode(void *buffer);
 private:
 	mfxSession _session;
+	mfxVideoParam _param;
 	Base::AlignedDynamicRawArray _buffer;
 	mfxSyncPoint _syncPoint;
 	int _currentHandle;
