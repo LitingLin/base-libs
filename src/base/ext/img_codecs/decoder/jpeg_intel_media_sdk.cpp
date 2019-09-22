@@ -15,7 +15,7 @@ namespace Base
 		mfxVersion version;
 		version.Major = 1;
 		version.Minor = 0;
-		L_CHECK_EQ(MFXInit(MFX_IMPL_HARDWARE, &version, &_session), MFX_ERR_NONE);
+		L_CHECK_EQ(MFXInit(MFX_IMPL_HARDWARE_ANY, &version, &_session), MFX_ERR_NONE);
 	}
 
 	IntelGraphicsJpegDecoder::~IntelGraphicsJpegDecoder()
@@ -25,13 +25,14 @@ namespace Base
 
 	void IntelGraphicsJpegDecoder::load(const void* data, size_t size)
 	{
+		L_CHECK_LE(size, std::numeric_limits<uint32_t>::max());
 		mfxBitstream bitstream;
 		memset(&bitstream, 0, sizeof(bitstream));
 		bitstream.DecodeTimeStamp = MFX_TIMESTAMP_UNKNOWN;
-		bitstream.TimeStamp = MFX_TIMESTAMP_UNKNOWN;
+		bitstream.TimeStamp = (mfxU64)MFX_TIMESTAMP_UNKNOWN;
 		bitstream.Data = (mfxU8*)data;
-		bitstream.DataLength = size;
-		bitstream.MaxLength = size;
+		bitstream.DataLength = (mfxU32)size;
+		bitstream.MaxLength = (mfxU32)size;
 		bitstream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
 
 		memset(&_param, 0, sizeof(_param));
@@ -41,12 +42,15 @@ namespace Base
 		memset(&buffer, 0, sizeof(mfxFrameSurface1));
 
 		buffer.Info = _param.mfx.FrameInfo;
-		buffer.Data.TimeStamp = MFX_TIMESTAMP_UNKNOWN;
+		buffer.Data.TimeStamp = (mfxU64)MFX_TIMESTAMP_UNKNOWN;
 		buffer.Data.MemType = MFX_MEMTYPE_SYSTEM_MEMORY;
 
 		auto height = _param.mfx.FrameInfo.Height;
 		auto width = _param.mfx.FrameInfo.Width;
 		auto format = _param.mfx.FrameInfo.FourCC;
+
+		L_CHECK_GT(_param.mfx.FrameInfo.CropW, 0);
+		L_CHECK_GT(_param.mfx.FrameInfo.CropH, 0);
 
 		if (format == MFX_FOURCC_NV12)
 		{
@@ -102,17 +106,56 @@ namespace Base
 			buffer.Data.PitchHigh = uint16_t(pitch >> 16);
 			buffer.Data.PitchLow = uint16_t(pitch);
 		}
+		else
+		{
+			L_UNREACHABLE_ERROR;
+		}
 		
 		mfxFrameSurface1* output;
 		L_CHECK_EQ(MFXVideoDECODE_DecodeFrameAsync(_session, &bitstream, &buffer, &output, &_syncPoint), MFX_ERR_NONE);
 		L_CHECK_EQ(output, &buffer);
 	}
-	void IntelGraphicsJpegDecoder::decode(void* buffer)
-	{
-		MFXVideoCORE_SyncOperation(_session, _syncPoint, INFINITE);
-		MFXVideoDECODE_Close(_session);
 
-		sws_getContext()
+	unsigned IntelGraphicsJpegDecoder::getWidth()
+	{
+		return _param.mfx.FrameInfo.CropW;
 	}
 
+	unsigned IntelGraphicsJpegDecoder::getHeight()
+	{
+		return _param.mfx.FrameInfo.CropH;
+	}
+
+	uint64_t IntelGraphicsJpegDecoder::getDecompressedSize()
+	{
+		return uint64_t(_param.mfx.FrameInfo.CropW) * uint64_t(_param.mfx.FrameInfo.CropH) * 3;
+	}
+
+	void IntelGraphicsJpegDecoder::decode(void* buffer)
+	{
+		L_CHECK_EQ(MFXVideoCORE_SyncOperation(_session, _syncPoint, INFINITE), MFX_ERR_NONE);
+		L_CHECK_EQ(MFXVideoDECODE_Close(_session), MFX_ERR_NONE);
+
+		AVPixelFormat sourceFormat;
+		switch (_param.mfx.FrameInfo.FourCC)
+		{
+		case MFX_FOURCC_NV12:
+			sourceFormat = AV_PIX_FMT_NV12;
+			break;
+		case MFX_FOURCC_YUY2:
+			sourceFormat = AV_PIX_FMT_YUYV422;
+			break;
+		case MFX_FOURCC_RGB4:
+			sourceFormat = AV_PIX_FMT_RGBA;
+			break;
+		default:
+			L_UNREACHABLE_ERROR;
+		}
+
+		_formatTransformer.transform(_param.mfx.FrameInfo.Width, _param.mfx.FrameInfo.Height, sourceFormat,
+			_param.mfx.FrameInfo.CropX, _param.mfx.FrameInfo.CropY, _param.mfx.FrameInfo.CropW, _param.mfx.FrameInfo.CropH,
+			_param.mfx.FrameInfo.CropW, _param.mfx.FrameInfo.CropH, AV_PIX_FMT_RGB24, 
+			0, 0, _param.mfx.FrameInfo.CropW, _param.mfx.FrameInfo.CropH,
+			false, (uint8_t*)_buffer.get(), (uint8_t*)buffer);
+	}
 }

@@ -6,24 +6,24 @@
 #include <turbojpeg.h>
 #include <cstdint>
 namespace Base {
-    class IMAGE_CODECS_INTERFACE JPEGDecoder {
-    public:
-        JPEGDecoder();
-        JPEGDecoder(const JPEGDecoder &) = delete;
-        JPEGDecoder(JPEGDecoder &&object) noexcept;
-        ~JPEGDecoder();
-        void load(const void *pointer, uint64_t size);
-        int getWidth();
-        int getHeight();
-        int getDecompressedSize();
-        void decode(void *buffer);
-    private:
-        const unsigned char *_pointer;
-        unsigned long _fileSize;
-        tjhandle _handle;
-        int _width, _height;
-        int _jpegSubsamp, _jpegColorspace;
-    };
+	class IMAGE_CODECS_INTERFACE JPEGDecoder {
+	public:
+		JPEGDecoder();
+		JPEGDecoder(const JPEGDecoder&) = delete;
+		JPEGDecoder(JPEGDecoder&& object) noexcept;
+		~JPEGDecoder();
+		void load(const void* pointer, uint64_t size);
+		int getWidth();
+		int getHeight();
+		int getDecompressedSize();
+		void decode(void* buffer);
+	private:
+		const unsigned char* _pointer;
+		unsigned long _fileSize;
+		tjhandle _handle;
+		int _width, _height;
+		int _jpegSubsamp, _jpegColorspace;
+	};
 }
 #elif defined HAVE_LIB_JPEG
 #ifdef _WIN32
@@ -47,7 +47,7 @@ namespace Base {
 #include <cstdint>
 
 namespace Base
-{	
+{
 	class IMAGE_CODECS_INTERFACE JPEGDecoder
 	{
 	public:
@@ -63,7 +63,7 @@ namespace Base
 	private:
 		const unsigned char* _pointer;
 		unsigned long _fileSize;
-		
+
 		jpeg_decompress_struct decInfo;
 		struct jpeg_error_mgr jerr;
 	};
@@ -72,28 +72,45 @@ namespace Base
 
 #ifdef HAVE_INTEL_MEDIA_SDK
 #include <base/memory_alignment.h>
+
+#ifdef _MSC_VER
+#pragma warning(push, 0)
+#elif defined __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+#endif
 #include <mfxvideo.h> /* SDK functions in C */
-#include <mfxjpeg.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#elif defined __GNUC__
+#pragma GCC diagnostic pop
+#endif
+#include <cstdint>
 
+#include <base/ext/img_codecs/processing/transform.h>
 
-namespace Base{
-	
-class IMAGE_CODECS_INTERFACE IntelGraphicsJpegDecoder
-{
-public:
-	IntelGraphicsJpegDecoder();
-	~IntelGraphicsJpegDecoder();
-	// 32-bytes(256bits) aligned
-	void load(const void* data, size_t size);
+namespace Base {
+	class IMAGE_CODECS_INTERFACE IntelGraphicsJpegDecoder
+	{
+	public:
+		IntelGraphicsJpegDecoder();
+		~IntelGraphicsJpegDecoder();
+		// 32-bytes(256bits) aligned
+		void load(const void* data, size_t size);
 
-	void decode(void *buffer);
-private:
-	mfxSession _session;
-	mfxVideoParam _param;
-	Base::AlignedDynamicRawArray _buffer;
-	mfxSyncPoint _syncPoint;
-	int _currentHandle;
-};
+		[[nodiscard]] unsigned getWidth();
+		[[nodiscard]] unsigned getHeight();
+		[[nodiscard]] uint64_t getDecompressedSize();
+		
+		void decode(void* buffer);
+	private:
+		mfxSession _session;
+		mfxVideoParam _param;
+		Base::AlignedDynamicRawArray _buffer;
+		mfxSyncPoint _syncPoint;
+		int _currentHandle;
+		ImageFormatTransformer _formatTransformer;
+	};
 }
 #endif
 
