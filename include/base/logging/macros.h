@@ -95,7 +95,7 @@ loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE:
 (condition) ? (void) 0 : _LOG_IMPL_NAMESPACE::_StreamTypeVoidify() & loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #condition)
 
 #define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
-if (auto _values_ = _LOG_IMPL_NAMESPACE::_Comparator<decltype(leftExp), functional_op> ((leftExp), (rightExp))) ; else loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #leftExp, #op, #rightExp) << "(" << LOG_GET_LEFT_EXPRESSION_RC << " vs " << LOG_GET_RIGHT_EXPRESSION_RC << ") "
+if (auto _values_ = _LOG_IMPL_NAMESPACE::_Comparator<decltype(leftExp), functional_op> ((leftExp), (rightExp))) ; else loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #leftExp, #op, #rightExp)
 
 #define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
 _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to, loggingClass, errorCodeType, errorCode, handler)

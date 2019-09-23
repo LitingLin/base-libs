@@ -117,5 +117,23 @@ namespace Base {
 #ifdef HAVE_NVJPEG
 #include <nvjpeg.h>
 
+namespace Base
+{
+	class IMAGE_CODECS_INTERFACE NVJpegDecoder
+	{
+	public:
+		NVJpegDecoder();
+		~NVJpegDecoder();
+		void load(const void* data, size_t size);
+
+		[[nodiscard]] unsigned getWidth();
+		[[nodiscard]] unsigned getHeight();
+		[[nodiscard]] uint64_t getDecompressedSize();
+
+		void decode(void* buffer);
+	private:
+		nvjpegHandle_t _handle;
+	};
+}
 
 #endif

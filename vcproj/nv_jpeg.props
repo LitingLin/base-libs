@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <CUDA_TOOLKIT_PATH>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1\</CUDA_TOOLKIT_PATH>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LocalDebuggerEnvironment>PATH=$(CUDA_TOOLKIT_PATH)bin\x64;%PATH%
+</LocalDebuggerEnvironment>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(CUDA_TOOLKIT_PATH)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVE_NVJPEG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(CUDA_TOOLKIT_PATH)lib\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>nvjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="CUDA_TOOLKIT_PATH">
+      <Value>$(CUDA_TOOLKIT_PATH)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

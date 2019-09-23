@@ -95,5 +95,8 @@
     <ClCompile Include="..\..\src\base\ext\img_codecs\processing\transform.cpp">
       <Filter>Source Files\Processing</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\nvjpeg.cpp">
+      <Filter>Source Files\Decoder</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
