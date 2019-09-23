@@ -90,12 +90,9 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="test_intel_mfx_jpeg_decoding.cpp" />
-    <ClCompile Include="test_random.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\vcproj\base\base.vcxproj">

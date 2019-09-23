@@ -57,7 +57,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -84,7 +84,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>COMPILING_IMAGE_CODECS;HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+      <ObjectFileName>$(IntDir)\%(Directory)\</ObjectFileName>
       <DisableSpecificWarnings>4251;4275</DisableSpecificWarnings>
       <AdditionalOptions>/Zc:throwingNew /Zc:strictStrings /Zc:inline /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -108,7 +108,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>COMPILING_IMAGE_CODECS;HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+      <ObjectFileName>$(IntDir)\%(Directory)\</ObjectFileName>
       <DisableSpecificWarnings>4251;4275</DisableSpecificWarnings>
       <AdditionalOptions>/Zc:throwingNew /Zc:strictStrings /Zc:inline /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>

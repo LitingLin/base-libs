@@ -11,68 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\base\com.h" />
     <ClInclude Include="..\..\include\base\common.h" />
-    <ClInclude Include="..\..\include\base\config\ini.h" />
-    <ClInclude Include="..\..\include\base\config\ini_parser.h" />
     <ClInclude Include="..\..\include\base\cpu_info.h" />
-    <ClInclude Include="..\..\include\base\d2d_window.h" />
     <ClInclude Include="..\..\include\base\data_structures.hpp" />
-    <ClInclude Include="..\..\include\base\dump_generator.h" />
-    <ClInclude Include="..\..\include\base\crypto.h" />
-    <ClInclude Include="..\..\include\base\event.h" />
     <ClInclude Include="..\..\include\base\file.h" />
     <ClInclude Include="..\..\include\base\fragmented_udp.h" />
-    <ClInclude Include="..\..\include\base\image_decoder.h" />
     <ClInclude Include="..\..\include\base\memory_alignment.h" />
     <ClInclude Include="..\..\include\base\memory_mapped_io.h" />
-    <ClInclude Include="..\..\include\base\message_box.h" />
-    <ClInclude Include="..\..\include\base\message_notifier.h" />
-    <ClInclude Include="..\..\include\base\mutex.h" />
-    <ClInclude Include="..\..\include\base\native_event_looper.h" />
-    <ClInclude Include="..\..\include\base\network.h" />
     <ClInclude Include="..\..\include\base\preprocessor.h" />
-    <ClInclude Include="..\..\include\base\process.h" />
     <ClInclude Include="..\..\include\base\random.hpp" />
-    <ClInclude Include="..\..\include\base\registry.h" />
-    <ClInclude Include="..\..\include\base\rw_spin_lock.h" />
-    <ClInclude Include="..\..\include\base\security_attributes.h" />
-    <ClInclude Include="..\..\include\base\shared_memory.h" />
-    <ClInclude Include="..\..\include\base\sync.h" />
-    <ClInclude Include="..\..\include\base\thread.h" />
-    <ClInclude Include="..\..\include\base\time.h" />
-    <ClInclude Include="..\..\include\base\timer.h" />
     <ClInclude Include="..\..\include\base\utils.h" />
     <ClInclude Include="..\..\src\base\cpu_info\msvc.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\base\com.cpp" />
-    <ClCompile Include="..\..\src\base\config\ini.c" />
-    <ClCompile Include="..\..\src\base\config\ini_parser.cpp" />
     <ClCompile Include="..\..\src\base\cpu_info\gcc.cpp" />
     <ClCompile Include="..\..\src\base\cpu_info\msvc.cpp" />
-    <ClCompile Include="..\..\src\base\d2d_window.cpp" />
     <ClCompile Include="..\..\src\base\dll_entry.cpp" />
-    <ClCompile Include="..\..\src\base\dump_generator.cpp" />
-    <ClCompile Include="..\..\src\base\crypto.cpp" />
-    <ClCompile Include="..\..\src\base\event.cpp" />
     <ClCompile Include="..\..\src\base\file.cpp" />
-    <ClCompile Include="..\..\src\base\fragmented_udp.cpp" />
-    <ClCompile Include="..\..\src\base\image_decoder.cpp" />
     <ClCompile Include="..\..\src\base\memory_alignment.cpp" />
     <ClCompile Include="..\..\src\base\memory_mapped_io.cpp" />
-    <ClCompile Include="..\..\src\base\message_box.cpp" />
-    <ClCompile Include="..\..\src\base\mutex.cpp" />
-    <ClCompile Include="..\..\src\base\native_event_looper.cpp" />
-    <ClCompile Include="..\..\src\base\network.cpp" />
-    <ClCompile Include="..\..\src\base\process.cpp" />
-    <ClCompile Include="..\..\src\base\registry.cpp" />
-    <ClCompile Include="..\..\src\base\security_attributes.cpp" />
-    <ClCompile Include="..\..\src\base\shared_memory.cpp" />
-    <ClCompile Include="..\..\src\base\sync.cpp" />
-    <ClCompile Include="..\..\src\base\thread.cpp" />
-    <ClCompile Include="..\..\src\base\time.cpp" />
-    <ClCompile Include="..\..\src\base\timer.cpp" />
     <ClCompile Include="..\..\src\base\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +87,7 @@
       <PreprocessorDefinitions>COMPILING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <ObjectFileName>$(IntDir)\%(Directory)\</ObjectFileName>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -152,6 +110,7 @@
       <PreprocessorDefinitions>COMPILING_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <ObjectFileName>$(IntDir)\%(Directory)\</ObjectFileName>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
