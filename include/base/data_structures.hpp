@@ -139,7 +139,7 @@ namespace Base {
 		~CircularQueue();
 		void push(const Type& item);
 		void push(Type&& item);
-		Type&& pop();
+		void pop();
 		size_t size() const;
 		Type& front();
 		Type& back();
@@ -196,12 +196,13 @@ namespace Base {
 	}
 
 	template <typename Type>
-	Type&& CircularQueue<Type>::pop()
+	void CircularQueue<Type>::pop()
 	{
 		if (_back_index == _front_index)
 			throw std::runtime_error("queue is empty");
 
-		return std::move(_ptr[(_front_index++) % _capacity]);
+		_ptr[(_front_index++) % _capacity].~Type();
+		_front_index++;
 	}
 
 	template <typename Type>
