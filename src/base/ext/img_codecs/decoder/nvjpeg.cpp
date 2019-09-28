@@ -1,3 +1,4 @@
+#ifdef HAVE_NVJPEG
 #include <base/ext/img_codecs/decoder/jpeg.h>
 
 #include <base/logging.h>
@@ -23,3 +24,4 @@ namespace Base
 		L_CHECK_EQ(nvjpegGetImageInfo(_handle, (const unsigned char*)data, size, &n_components, &chroma_subsampling, widths, heights), NVJPEG_STATUS_SUCCESS);
 	}
 }
+#endif
