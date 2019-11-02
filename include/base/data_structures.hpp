@@ -201,7 +201,7 @@ namespace Base {
 		if (_back_index == _front_index)
 			throw std::runtime_error("queue is empty");
 
-		_ptr[(_front_index++) % _capacity].~Type();
+		_ptr[_front_index % _capacity].~Type();
 		_front_index++;
 	}
 
