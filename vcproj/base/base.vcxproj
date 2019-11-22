@@ -16,6 +16,8 @@
     <ClInclude Include="..\..\include\base\data_structures.hpp" />
     <ClInclude Include="..\..\include\base\file.h" />
     <ClInclude Include="..\..\include\base\fragmented_udp.h" />
+    <ClInclude Include="..\..\include\base\generator.hpp" />
+    <ClInclude Include="..\..\include\base\iterator.hpp" />
     <ClInclude Include="..\..\include\base\memory_alignment.h" />
     <ClInclude Include="..\..\include\base\memory_mapped_io.h" />
     <ClInclude Include="..\..\include\base\preprocessor.h" />
