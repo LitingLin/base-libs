@@ -1,15 +1,100 @@
 #pragma once
 
-#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <functional>
+#include <type_traits>
 
 namespace Base
 {
-	class EndIterationException : std::exception
-	{
-	};
-	
-	template <class List>
-	class ConstRandomAccessListIteratorWrapper
+	namespace Details {
+		template<typename C>
+		struct IsType1Iterator {
+		private:
+			template<typename T>
+			static constexpr auto check(T*)
+				->std::bool_constant<
+				std::is_lvalue_reference_v<
+				decltype(std::declval<T>().get(std::declval<size_t>()))> &&
+				std::is_same_v<decltype(std::declval<T>().size()), size_t>
+				>;
+
+			template<typename>
+			static constexpr std::false_type check(...);
+
+			typedef decltype(check<C>(0)) type;
+
+		public:
+			static constexpr bool value = type::value;
+		};
+
+		template<typename C>
+		struct IsType1Generator {
+		private:
+			template<typename T>
+			static constexpr auto check(T*)
+				->std::bool_constant<
+				!std::is_lvalue_reference_v<
+				decltype(std::declval<T>().get(std::declval<size_t>()))> &&
+				std::is_same_v<decltype(std::declval<T>().size()), size_t>>;
+
+			template<typename>
+			static constexpr std::false_type check(...);
+
+			typedef decltype(check<C>(0)) type;
+
+		public:
+			static constexpr bool value = type::value;
+		};
+
+		template<typename C>
+		struct IsType2Iterator {
+		private:
+			template<typename T>
+			static constexpr auto check(T*)
+				->std::bool_constant <
+				std::is_lvalue_reference_v<
+				decltype(std::declval<T>().current())> &&
+				std::is_same_v<decltype(std::declval<T>().moveNext()), bool>>;
+
+			template<typename>
+			static constexpr std::false_type check(...);
+
+			typedef decltype(check<C>(0)) type;
+
+		public:
+			static constexpr bool value = type::value;
+		};
+
+		template<typename C>
+		struct IsType2Generator {
+		private:
+			template<typename T>
+			static constexpr auto check(T*)
+				->std::bool_constant<
+				!std::is_lvalue_reference_v<
+				decltype(std::declval<T>().current())> &&
+				std::is_same_v<decltype(std::declval<T>().moveNext()), bool>>;
+
+			template<typename>
+			static constexpr std::false_type check(...);
+
+			typedef decltype(check<C>(0)) type;
+
+		public:
+			static constexpr bool value = type::value;
+		};
+	}
+
+	template <typename, typename = void>
+	class ConstIteratorWrapper;
+
+	template <typename, typename = void>
+	class IteratorWrapper;
+
+	template <typename List>
+	class ConstIteratorWrapper<List, std::enable_if_t<Details::IsType1Iterator<List>::value>>
 	{
 	public:
 		typedef std::random_access_iterator_tag iterator_category;
@@ -19,47 +104,48 @@ namespace Base
 		typedef const value_type& reference;
 
 	protected:
-		List _list;
+		std::optional<List> _list;
 		size_t _index;
 	public:
-		ConstRandomAccessListIteratorWrapper(const List& list, size_t index = 0) : _list(list), _index(index) {}
-		
-		ConstRandomAccessListIteratorWrapper(size_t index = 0) : _index(index) {}
-		
+		ConstIteratorWrapper(size_t index, std::nullopt_t) : _list(std::nullopt), _index(index) {}
+
+		template <class... ArgumentTypes>
+		ConstIteratorWrapper(size_t index, std::in_place_t, ArgumentTypes&&...arguments) : _list(std::in_place, std::forward<ArgumentTypes>(arguments)...), _index(index) {}
+
 		reference operator*() const
 		{
-			return _list.get(_index);
+			return _list.value().get(_index);
 		}
 
 		const value_type* operator->() const
 		{
-			return &_list.get(_index);
+			return &_list.value().get(_index);
 		}
 
 		reference operator[](difference_type off) const
 		{
-			return _list.get(off + _index);
+			return _list.value().get(off + _index);
 		}
 
 		//Increment / Decrement
-		ConstRandomAccessListIteratorWrapper& operator++()
+		ConstIteratorWrapper& operator++()
 		{
 			++_index;  return *this;
 		}
 
-		ConstRandomAccessListIteratorWrapper operator++(int)
+		ConstIteratorWrapper operator++(int)
 		{
 			auto tmp = *this;
 			++* this;
-			return tmp;			
+			return tmp;
 		}
 
-		ConstRandomAccessListIteratorWrapper& operator--()
+		ConstIteratorWrapper& operator--()
 		{
 			--_index; return *this;
 		}
 
-		ConstRandomAccessListIteratorWrapper operator--(int)
+		ConstIteratorWrapper operator--(int)
 		{
 			auto tmp = *this;
 			--* this;
@@ -67,86 +153,84 @@ namespace Base
 		}
 
 		//Arithmetic
-		ConstRandomAccessListIteratorWrapper& operator+=(difference_type off)
+		ConstIteratorWrapper& operator+=(difference_type off)
 		{
 			_index += off; return *this;
 		}
 
-		ConstRandomAccessListIteratorWrapper operator+(difference_type off) const
+		ConstIteratorWrapper operator+(difference_type off) const
 		{
 			auto tmp = *this;
 			tmp._index += off;
 			return tmp;
 		}
 
-		friend ConstRandomAccessListIteratorWrapper operator+(difference_type off, const ConstRandomAccessListIteratorWrapper& right)
+		friend ConstIteratorWrapper operator+(difference_type off, const ConstIteratorWrapper& right)
 		{
 			auto tmp = right;
 			tmp._index += off;
 			return tmp;
 		}
 
-		ConstRandomAccessListIteratorWrapper& operator-=(difference_type off)
+		ConstIteratorWrapper& operator-=(difference_type off)
 		{
 			_index -= off; return *this;
 		}
 
-		ConstRandomAccessListIteratorWrapper operator-(difference_type off) const
+		ConstIteratorWrapper operator-(difference_type off) const
 		{
 			auto tmp = *this;
 			tmp._index -= off;
 			return tmp;
 		}
 
-		difference_type operator-(const ConstRandomAccessListIteratorWrapper& right) const
+		difference_type operator-(const ConstIteratorWrapper& right) const
 		{
 			return _index - right._index;
 		}
 
 		//Comparison operators
-		bool operator==(const ConstRandomAccessListIteratorWrapper& r)  const
+		bool operator==(const ConstIteratorWrapper& r)  const
 		{
 			return _index == r._index;
 		}
 
-		bool operator!=(const ConstRandomAccessListIteratorWrapper& r)  const
+		bool operator!=(const ConstIteratorWrapper& r)  const
 		{
 			return _index != r._index;
 		}
 
-		bool operator<(const ConstRandomAccessListIteratorWrapper& r)  const
+		bool operator<(const ConstIteratorWrapper& r)  const
 		{
 			return _index < r._index;
 		}
 
-		bool operator<=(const ConstRandomAccessListIteratorWrapper& r)  const
+		bool operator<=(const ConstIteratorWrapper& r)  const
 		{
 			return _index <= r._index;
 		}
 
-		bool operator>(const ConstRandomAccessListIteratorWrapper& r)  const
+		bool operator>(const ConstIteratorWrapper& r)  const
 		{
 			return _index > r._index;
 		}
 
-		bool operator>=(const ConstRandomAccessListIteratorWrapper& r)  const
+		bool operator>=(const ConstIteratorWrapper& r)  const
 		{
 			return _index >= r._index;
 		}
 	};
 
 	template <class List>
-	class RandomAccessListIteratorWrapper
-		: public ConstRandomAccessListIteratorWrapper<List>
+	class IteratorWrapper<List, std::enable_if_t<Details::IsType1Iterator<List>::value>>
+		: public ConstIteratorWrapper<List>
 	{
 	public:
-		RandomAccessListIteratorWrapper(const List& list, size_t index = 0)
-			: ConstRandomAccessListIteratorWrapper<List>(list, index) {}
+		IteratorWrapper(size_t index, std::nullopt_t) : ConstIteratorWrapper(index, std::nullopt) {}
 
-		RandomAccessListIteratorWrapper(size_t index = 0)
-			: ConstRandomAccessListIteratorWrapper<List>(index)
-		{}
-	public:
+		template <class... ArgumentTypes>
+		IteratorWrapper(size_t index, std::in_place_t, ArgumentTypes&&...arguments) : ConstIteratorWrapper(index, std::in_place, std::forward<ArgumentTypes>(arguments)...) {}
+
 		typedef std::random_access_iterator_tag iterator_category;
 		typedef typename List::value_type value_type;
 		typedef size_t difference_type;
@@ -156,141 +240,258 @@ namespace Base
 		//Pointer like operators
 		reference operator*()  const
 		{
-			return this->_list.get();
+			return this->_list.value().get();
 		}
 
 		value_type* operator->() const
 		{
-			return this->_list.get();
+			return this->_list.value().get();
 		}
 
 		reference operator[](difference_type off) const
 		{
-			return this->_list[off + this->_index];
+			return this->_list.value()[off + this->_index];
 		}
 
 		//Increment / Decrement
-		RandomAccessListIteratorWrapper& operator++()
+		IteratorWrapper& operator++()
 		{
 			++this->_index; return *this;
 		}
 
-		RandomAccessListIteratorWrapper operator++(int)
+		IteratorWrapper operator++(int)
 		{
 			auto tmp = *this; ++* this; return tmp;
 		}
 
-		RandomAccessListIteratorWrapper& operator--()
+		IteratorWrapper& operator--()
 		{
 			--this->_index; return *this;
 		}
 
-		RandomAccessListIteratorWrapper operator--(int)
+		IteratorWrapper operator--(int)
 		{
 			auto tmp = *this; --* this; return tmp;
 		}
 
 		// Arithmetic
-		RandomAccessListIteratorWrapper& operator+=(difference_type off)
+		IteratorWrapper& operator+=(difference_type off)
 		{
 			this->_index += off;  return *this;
 		}
 
-		RandomAccessListIteratorWrapper operator+(difference_type off) const
+		IteratorWrapper operator+(difference_type off) const
 		{
 			auto tmp = *this;
 			tmp._index += off;
 			return tmp;
 		}
 
-		friend RandomAccessListIteratorWrapper operator+(difference_type off, const RandomAccessListIteratorWrapper& right)
+		friend IteratorWrapper operator+(difference_type off, const IteratorWrapper& right)
 		{
 			auto tmp = right;
 			tmp._index += off;
 			return tmp;
 		}
 
-		RandomAccessListIteratorWrapper& operator-=(difference_type off)
+		IteratorWrapper& operator-=(difference_type off)
 		{
 			this->_index -= off; return *this;
 		}
 
-		RandomAccessListIteratorWrapper operator-(difference_type off) const
+		IteratorWrapper operator-(difference_type off) const
 		{
 			auto tmp = *this;
 			tmp._index -= off;
 			return tmp;
 		}
 
-		difference_type operator-(const ConstRandomAccessListIteratorWrapper<List>& right) const
+		difference_type operator-(const ConstIteratorWrapper<List>& right) const
 		{
-			return static_cast<const ConstRandomAccessListIteratorWrapper<List>&>(*this) - right;
+			return static_cast<const ConstIteratorWrapper<List>&>(*this) - right;
+		}
+	};
+
+	template <typename List>
+	class IteratorWrapper<List, std::enable_if_t<Details::IsType1Generator<List>::value>>
+	{
+	public:
+		typedef typename List::value_type value_type;
+		typedef size_t difference_type;
+
+	protected:
+		std::optional<List> _list;
+		size_t _index;
+	public:
+		IteratorWrapper(size_t index, std::nullopt_t) : _list(std::nullopt), _index(index) {}
+
+
+		template <class... ArgumentTypes>
+		IteratorWrapper(size_t index, std::in_place_t, ArgumentTypes&&...arguments) : _list(std::in_place, std::forward<ArgumentTypes>(arguments)...), _index(index) {}
+
+		value_type operator*() const
+		{
+			return _list.value().get(_index);
+		}
+
+		value_type operator[](difference_type off) const
+		{
+			return _list.value().get(off + _index);
+		}
+
+		//Increment / Decrement
+		IteratorWrapper& operator++()
+		{
+			++_index;
+			return *this;
+		}
+
+		IteratorWrapper operator++(int)
+		{
+			auto tmp = *this;
+			++* this;
+			return tmp;
+		}
+
+		IteratorWrapper& operator--()
+		{
+			--_index;
+			return *this;
+		}
+
+		IteratorWrapper operator--(int)
+		{
+			auto tmp = *this;
+			--* this;
+			return tmp;
+		}
+
+		//Arithmetic
+		IteratorWrapper& operator+=(difference_type off)
+		{
+			_index += off; return *this;
+		}
+
+		IteratorWrapper operator+(difference_type off) const
+		{
+			auto tmp = *this;
+			tmp._index += off;
+			return tmp;
+		}
+
+		friend IteratorWrapper operator+(difference_type off, const IteratorWrapper& right)
+		{
+			auto tmp = right;
+			tmp._index += off;
+			return tmp;
+		}
+
+		IteratorWrapper& operator-=(difference_type off)
+		{
+			_index -= off; return *this;
+		}
+
+		IteratorWrapper operator-(difference_type off) const
+		{
+			auto tmp = *this;
+			tmp._index -= off;
+			return tmp;
+		}
+
+		difference_type operator-(const IteratorWrapper& right) const
+		{
+			return _index - right._index;
+		}
+
+		//Comparison operators
+		bool operator==(const IteratorWrapper& r)  const
+		{
+			return _index == r._index;
+		}
+
+		bool operator!=(const IteratorWrapper& r)  const
+		{
+			return _index != r._index;
+		}
+
+		bool operator<(const IteratorWrapper& r)  const
+		{
+			return _index < r._index;
+		}
+
+		bool operator<=(const IteratorWrapper& r)  const
+		{
+			return _index <= r._index;
+		}
+
+		bool operator>(const IteratorWrapper& r)  const
+		{
+			return _index > r._index;
+		}
+
+		bool operator>=(const IteratorWrapper& r)  const
+		{
+			return _index >= r._index;
 		}
 	};
 
 	template <class Enumerator>
-	 class ConstIteratorWrapper
-	 {
-	 public:
-		 typedef std::input_iterator_tag iterator_category;
-		 typedef typename Enumerator::value_type value_type;
-		 typedef size_t difference_type;
-		 typedef value_type* pointer;
-		 typedef const value_type& reference;
+	class ConstIteratorWrapper<Enumerator, std::enable_if_t<Details::IsType2Iterator<Enumerator>::value>>
+	{
+	public:
+		typedef std::input_iterator_tag iterator_category;
+		typedef typename Enumerator::value_type value_type;
+		typedef size_t difference_type;
+		typedef value_type* pointer;
+		typedef const value_type& reference;
 
-	 protected:
-		 Enumerator _enumerator;
-		 bool _endState;
-	 public:
-		 template <typename ...EnumeratorParameterTypes>
-		 ConstIteratorWrapper(std::tuple<EnumeratorParameterTypes...> enumeratorParameterTypes, bool endState = false) : _enumerator(std::make_from_tuple<Enumerator>(enumeratorParameterTypes...)), _endState(endState)
-		 {}
+	protected:
+		std::optional<Enumerator> _enumerator;
+	public:
+		ConstIteratorWrapper(std::nullopt_t) : _enumerator(std::nullopt) {}
 
-		 ConstIteratorWrapper(const Enumerator& enumerator, bool endState = false) : _enumerator(enumerator), _endState(endState) {}
+		template <class ...ParameterTypes>
+		ConstIteratorWrapper(std::in_place_t, ParameterTypes... parameterTypes) : _enumerator(std::in_place, std::forward<ParameterTypes>(parameterTypes)...) {}
 
-		 ConstIteratorWrapper(bool endState = false) : _endState(endState) {}
-	 
 		reference operator*() const
 		{
-			return _enumerator.current();
+			return _enumerator.value().current();
 		}
 
 		const value_type* operator->() const
 		{
-			return &_enumerator.current();
+			return &_enumerator.value().current();
 		}
 
 		//Increment / Decrement
 		ConstIteratorWrapper& operator++()
 		{
-			if (!_enumerator.moveNext()) _endState = true;
+			if (!_enumerator.value().moveNext()) _enumerator.reset();
 			return *this;
 		}
-		
+
 		//Comparison operators
-		bool operator==(const ConstIteratorWrapper& r)  const
+		bool operator==(const ConstIteratorWrapper& r) const
 		{
-			return _endState == r._endState;
+			return _enumerator == r._enumerator;
 		}
 
-		bool operator!=(const ConstIteratorWrapper& r)  const
+		bool operator!=(const ConstIteratorWrapper& r) const
 		{
-			return _endState != r._endState;
+			return _enumerator != r._enumerator;
 		}
 	};
-	
+
 	template <class Enumerator>
-	class IteratorWrapper
+	class IteratorWrapper<Enumerator, std::enable_if_t<Details::IsType2Iterator<Enumerator>::value>>
 		: public ConstIteratorWrapper<Enumerator>
 	{
 	public:
-		template <typename ...EnumeratorParameterTypes>
-		IteratorWrapper(std::tuple<EnumeratorParameterTypes...> enumeratorParameterTypes, bool endState = false) : ConstIteratorWrapper<Enumerator>(enumeratorParameterTypes, endState)
-		{}
+		IteratorWrapper(std::nullopt_t) : ConstIteratorWrapper(std::nullopt) {}
 
-		IteratorWrapper(const Enumerator& enumerator, bool endState = false) : ConstIteratorWrapper<Enumerator>(enumerator, endState) {}
+		template <class ...ParameterTypes>
+		IteratorWrapper(std::in_place_t, ParameterTypes... parameterTypes) : ConstIteratorWrapper(std::in_place, std::forward<ParameterTypes>(parameterTypes)...) {}
 
-		IteratorWrapper(bool endState = false) : ConstIteratorWrapper<Enumerator>(endState) {}
 		typedef std::input_iterator_tag iterator_category;
 		typedef typename Enumerator::value_type value_type;
 		typedef size_t difference_type;
@@ -300,31 +501,247 @@ namespace Base
 		//Pointer like operators
 		reference operator*()  const
 		{
-			return this->_enumerator.current();
+			return this->_enumerator.value().current();
 		}
 
 		value_type* operator->() const
 		{
-			return &this->_enumerator.current();
-		}
-
-		reference operator[](difference_type off) const
-		{
-			return this->_list[off + this->_index];
+			return &this->_enumerator.value().current();
 		}
 
 		//Increment / Decrement
 		IteratorWrapper& operator++()
 		{
-			++this->_index; return *this;
+			if (!this->_enumerator.value().moveNext()) this->_enumerator.reset();
+			return *this;
+		}
+
+		//Comparison operators
+		bool operator==(const IteratorWrapper& r)  const
+		{
+			return this->_enumerator == r._enumerator;
+		}
+
+		bool operator!=(const IteratorWrapper& r)  const
+		{
+			return this->_enumerator != r._enumerator;
 		}
 	};
 
-	class 
-	
-	class EnumeratorIteratorWrapper
+	template <typename Enumerator>
+	class IteratorWrapper<Enumerator, std::enable_if_t<Details::IsType2Generator<Enumerator>::value>>
 	{
 	public:
-		
+		using value_type = typename Enumerator::value_type;
+
+	protected:
+		std::optional<Enumerator> _enumerator;
+	public:
+		IteratorWrapper(std::nullopt_t) : _enumerator(std::nullopt) {}
+
+
+		template <class... ArgumentTypes>
+		IteratorWrapper(std::in_place_t, ArgumentTypes&&...arguments) : _enumerator(std::in_place, std::forward<ArgumentTypes>(arguments)...) {}
+
+		value_type operator*() const
+		{
+			return _enumerator.value().current();
+		}
+
+		//Increment / Decrement
+		IteratorWrapper& operator++()
+		{
+			if (!this->_enumerator.value().moveNext()) this->_enumerator.reset();
+			return *this;
+		}
+
+		//Comparison operators
+		bool operator==(const IteratorWrapper& r)  const
+		{
+			return _enumerator == r._enumerator;
+		}
+
+		bool operator!=(const IteratorWrapper& r)  const
+		{
+			return _enumerator != r._enumerator;
+		}
+	};
+
+	template <typename T>
+	class Type1IteratorPtrWrapper
+	{
+	public:
+		Type1IteratorPtrWrapper(T* pointer) : _pointer(pointer) {}
+		auto get() { return _pointer->get(); }
+		size_t size() { return _pointer->size(); }
+	private:
+		T* _pointer;
+	};
+
+	template <typename, typename = void>
+	class RangeWrapper;
+
+	template <typename T>
+	class RangeWrapper<T, std::enable_if_t<Details::IsType1Iterator<T>::value>>
+	{
+	public:
+		template <typename... IteratorParameters>
+		RangeWrapper(IteratorParameters...parameters) :
+			_iterator(std::forward<IteratorParameters>(parameters)...) {}
+		typedef ConstIteratorWrapper<Type1IteratorPtrWrapper<T>> const_iterator;
+		typedef IteratorWrapper<Type1IteratorPtrWrapper<T>> iterator;
+
+		const_iterator begin() const
+		{
+			return const_iterator(std::in_place, 0, &_iterator);
+		}
+		const_iterator end() const
+		{
+			return const_iterator(std::nullopt, _iterator.size());
+		}
+
+		iterator begin()
+		{
+			return iterator(std::in_place, 0, &_iterator);
+		}
+
+		iterator end()
+		{
+			return iterator(std::nullopt, _iterator.size());
+		}
+	private:
+		T _iterator;
+	};
+
+	template <typename T>
+	class RangeWrapper<T, std::enable_if_t<Details::IsType1Generator<T>::value>>
+	{
+	public:
+		template <typename... IteratorParameters>
+		RangeWrapper(IteratorParameters&&...parameters) :
+			_iterator(std::forward<IteratorParameters>(parameters)...) {}
+		typedef IteratorWrapper<Type1IteratorPtrWrapper<T>> iterator;
+
+		iterator begin()
+		{
+			return iterator(std::in_place, 0, &_iterator);
+		}
+
+		iterator end()
+		{
+			return iterator(std::nullopt, _iterator.size());
+		}
+	private:
+		T _iterator;
+	};
+
+	template <typename T>
+	class RangeWrapper<T, std::enable_if_t<Details::IsType2Iterator<T>::value>>
+	{
+	public:
+		typedef ConstIteratorWrapper<T> const_iterator;
+		typedef IteratorWrapper<T> iterator;
+
+		struct IteratorConstructorImpl
+		{
+			template <typename Tuple, size_t... I>
+			static constexpr const_iterator construct_const(Tuple& parameters, std::index_sequence<I...>)
+			{
+				return const_iterator(std::in_place, std::get<I>(parameters)...);
+			}
+
+			template <typename Tuple, size_t... I>
+			static constexpr iterator construct(Tuple& parameters, std::index_sequence<I...>)
+			{
+				return iterator(std::in_place, std::get<I>(parameters)...);
+			}
+		};
+
+		template <typename... IteratorParameters>
+		RangeWrapper(IteratorParameters&&... parameters)
+		{
+			using TupleType = std::tuple<std::decay_t<IteratorParameters>...>;
+
+			_parameters = new TupleType(std::forward<IteratorParameters>(parameters)...);
+
+			_deleter = [](RangeWrapper* pointer) {delete (TupleType*)pointer->_parameters; };
+			_constIteratorGetter = [](RangeWrapper* pointer) { return IteratorConstructorImpl::construct_const(*((TupleType*)pointer->_parameters), std::make_index_sequence<std::tuple_size<TupleType>::value>()); };
+			_iteratorGetter = [](RangeWrapper* pointer) { return IteratorConstructorImpl::construct(*((TupleType*)pointer->_parameters), std::make_index_sequence<std::tuple_size<TupleType>::value>()); };
+		}
+
+		~RangeWrapper()
+		{
+			_deleter(this);
+		}
+
+		const_iterator begin() const
+		{
+			return _constIteratorGetter(this);
+		}
+		const_iterator end() const
+		{
+			return const_iterator(std::nullopt);
+		}
+
+		iterator begin()
+		{
+			return _iteratorGetter(this);
+		}
+
+		iterator end()
+		{
+			return iterator(std::nullopt);
+		}
+	private:
+		void* _parameters;
+		std::function<void(RangeWrapper*)> _deleter;
+		std::function<const_iterator> _constIteratorGetter;
+		std::function<iterator> _iteratorGetter;
+	};
+
+	template <typename T>
+	class RangeWrapper<T, std::enable_if_t<Details::IsType2Generator<T>::value>>
+	{
+	public:
+		typedef IteratorWrapper<T> iterator;
+
+		struct IteratorConstructorImpl
+		{
+			template <typename Tuple, size_t... I>
+			static constexpr iterator construct(Tuple& parameters, std::index_sequence<I...>)
+			{
+				return iterator(std::in_place, std::get<I>(parameters)...);
+			}
+		};
+
+		template <typename... IteratorParameters>
+		RangeWrapper(IteratorParameters&&... parameters)
+		{
+			using TupleType = std::tuple<std::decay_t<IteratorParameters>...>;
+
+			_parameters = new TupleType(std::forward<IteratorParameters>(parameters)...);
+
+			_deleter = [](RangeWrapper* pointer) {delete (TupleType*)pointer->_parameters; };
+			_iteratorGetter = [](RangeWrapper* pointer) { return IteratorConstructorImpl::construct(*((TupleType*)pointer->_parameters), std::make_index_sequence<std::tuple_size<TupleType>::value>()); };
+		}
+
+		~RangeWrapper()
+		{
+			_deleter(this);
+		}
+
+		iterator begin()
+		{
+			return _iteratorGetter(this);
+		}
+
+		iterator end()
+		{
+			return iterator(std::nullopt);
+		}
+	private:
+		void* _parameters;
+		std::function<void(RangeWrapper*)> _deleter;
+		std::function<iterator> _iteratorGetter;
 	};
 }
