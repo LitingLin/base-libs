@@ -10,36 +10,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\include\base\ext\img_codecs\common.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\decoder.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\decoder\jpeg.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\decoder\png.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\decoder\webp.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\encoder.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\encoder\jpeg.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\encoder\webp.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\processing\transform.h" />
-    <ClInclude Include="..\..\include\base\ext\img_codecs\types.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\base\dll_entry.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\jpeg.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\jpeg_intel_media_sdk.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\nvjpeg.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\png.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\decoder\webp.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\encoder.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\encoder\jpeg.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\encoder\webp.cpp" />
-    <ClCompile Include="..\..\src\base\ext\img_codecs\processing\transform.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\base\base.vcxproj">
-      <Project>{34b7c3f3-324a-4370-963e-8725df78c145}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{63DDE045-7F6E-4BF6-8DFB-96C9F47BC91D}</ProjectGuid>
@@ -48,13 +18,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -67,19 +37,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\intel_media_sdk.props" />
-    <Import Project="..\debug.props" />
+    <Import Project="..\..\..\intel_media_sdk.props" />
+    <Import Project="..\..\..\debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\intel_media_sdk.props" />
-    <Import Project="..\release.props" />
+    <Import Project="..\..\..\intel_media_sdk.props" />
+    <Import Project="..\..\..\release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\include;$(ProjectDir)..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>COMPILING_IMAGE_CODECS;HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -88,13 +58,43 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\include;$(ProjectDir)..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>COMPILING_IMAGE_CODECS;HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>base.lib;logging.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\common.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder\jpeg.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder\png.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder\webp.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\encoder.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\encoder\jpeg.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\encoder\webp.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\processing\transform.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\base\dll_entry.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\jpeg.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\jpeg_intel_media_sdk.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\nvjpeg.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\png.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\webp.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\encoder.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\encoder\jpeg.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\encoder\webp.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\processing\transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\base\base.vcxproj">
+      <Project>{34b7c3f3-324a-4370-963e-8725df78c145}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

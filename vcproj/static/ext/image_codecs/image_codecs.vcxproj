@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{C6FFD922-888E-4964-831F-5D8841183655}</ProjectGuid>
+    <RootNamespace>imagecodecs</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\release.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>COMPILING_IMAGE_CODECS;HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>base.lib;logging.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;$(ProjectDir)..\..\..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>COMPILING_IMAGE_CODECS;HAVE_LIB_PNG;HAVE_LIB_JPEG;HAVE_LIB_WEBP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>base.lib;logging.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\common.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder\jpeg.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder\png.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\decoder\webp.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\encoder.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\encoder\jpeg.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\encoder\webp.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\processing\transform.h" />
+    <ClInclude Include="..\..\..\..\include\base\ext\img_codecs\types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\base\dll_entry.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\jpeg.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\jpeg_intel_media_sdk.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\nvjpeg.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\png.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\decoder\webp.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\encoder.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\encoder\jpeg.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\encoder\webp.cpp" />
+    <ClCompile Include="..\..\..\..\src\base\ext\img_codecs\processing\transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\base\base.vcxproj">
+      <Project>{337c5e2d-ffde-458c-8c2b-b1dc6cdb5707}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

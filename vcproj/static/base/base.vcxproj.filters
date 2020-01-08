@@ -14,77 +14,77 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Source Files\cpu_info">
-      <UniqueIdentifier>{f4124d01-664e-4633-bf60-44465cdc1441}</UniqueIdentifier>
+      <UniqueIdentifier>{57682bd6-3c52-4273-bad8-c32898e72f77}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\cpu_info">
-      <UniqueIdentifier>{e3abb44e-8290-485c-8834-0031ae797a64}</UniqueIdentifier>
+      <UniqueIdentifier>{cbfa1c90-0bb3-4cb6-9739-6dca2e0ce33b}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
+  </ItemGroup>  
   <ItemGroup>
-    <ClInclude Include="..\..\include\base\file.h">
+    <ClInclude Include="..\..\..\include\base\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\fragmented_udp.h">
+    <ClInclude Include="..\..\..\include\base\cpu_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\memory_mapped_io.h">
+    <ClInclude Include="..\..\..\include\base\data_structures.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\utils.h">
+    <ClInclude Include="..\..\..\include\base\file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\preprocessor.h">
+    <ClInclude Include="..\..\..\include\base\fragmented_udp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\data_structures.hpp">
+    <ClInclude Include="..\..\..\include\base\iterator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\random.hpp">
+    <ClInclude Include="..\..\..\include\base\memory_alignment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\cpu_info.h">
+    <ClInclude Include="..\..\..\include\base\memory_mapped_io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\memory_alignment.h">
+    <ClInclude Include="..\..\..\include\base\preprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\common.h">
+    <ClInclude Include="..\..\..\include\base\random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\cpu_info\msvc.h">
+    <ClInclude Include="..\..\..\include\base\random.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\base\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\base\cpu_info\msvc.h">
       <Filter>Header Files\cpu_info</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\random.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\base\iterator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\base\file.cpp">
+    <ClCompile Include="..\..\..\src\base\dll_entry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\memory_mapped_io.cpp">
+    <ClCompile Include="..\..\..\src\base\file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\utils.cpp">
+    <ClCompile Include="..\..\..\src\base\memory_alignment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\cpu_info\msvc.cpp">
+    <ClCompile Include="..\..\..\src\base\memory_mapped_io.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\base\random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\base\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\base\cpu_info\msvc.cpp">
       <Filter>Source Files\cpu_info</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\cpu_info\gcc.cpp">
+    <ClCompile Include="..\..\..\src\base\cpu_info\gcc.cpp">
       <Filter>Source Files\cpu_info</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\memory_alignment.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\dll_entry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\random.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
