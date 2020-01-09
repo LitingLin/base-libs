@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\3rd_party\fmt\fmt.vcxproj">
+      <Project>{0648da17-fc38-43ac-9c51-99cd61d46b94}</Project>
+    </ProjectReference>
     <ProjectReference Include="logging\logging.vcxproj">
       <Project>{dd05e230-eb4d-4507-93f7-e3a3ba7e8e7e}</Project>
     </ProjectReference>

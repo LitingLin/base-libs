@@ -33,9 +33,6 @@
     <ClInclude Include="..\..\..\include\base\file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\base\fragmented_udp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\base\iterator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
