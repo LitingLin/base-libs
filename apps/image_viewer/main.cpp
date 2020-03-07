@@ -10,7 +10,8 @@
 
 #include <base/porting.h>
 #include <base/memory_mapped_io.h>
-#include <base/image_decoder.h>
+#include <base/ext/img_codecs/decoder/jpeg.h>
+#include <base/ext/img_codecs/decoder/png.h>
 #include <base/utils.h>
 
 #ifdef _WIN32

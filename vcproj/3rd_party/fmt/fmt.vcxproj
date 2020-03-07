@@ -37,43 +37,43 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\debug.props" />
+    <Import Project="..\..\debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\release.props" />
+    <Import Project="..\..\release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\3rd_party\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\chrono.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\color.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\compile.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\core.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\format-inl.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\format.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\locale.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\ostream.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\posix.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\printf.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\ranges.h" />
-    <ClInclude Include="..\..\3rd_party\fmt\include\fmt\safe-duration-cast.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\chrono.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\color.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\compile.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\core.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\format-inl.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\format.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\locale.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\ostream.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\posix.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\printf.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\ranges.h" />
+    <ClInclude Include="..\..\..\3rd_party\fmt\include\fmt\safe-duration-cast.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\3rd_party\fmt\src\format.cc" />
-    <ClCompile Include="..\..\3rd_party\fmt\src\posix.cc" />
+    <ClCompile Include="..\..\..\3rd_party\fmt\src\format.cc" />
+    <ClCompile Include="..\..\..\3rd_party\fmt\src\posix.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

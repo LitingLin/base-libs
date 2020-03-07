@@ -71,11 +71,11 @@
     <ClCompile Include="test_intel_mfx_jpeg_decoding.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\vcproj\base\base.vcxproj">
-      <Project>{34b7c3f3-324a-4370-963e-8725df78c145}</Project>
+    <ProjectReference Include="..\vcproj\static\base\base.vcxproj">
+      <Project>{337c5e2d-ffde-458c-8c2b-b1dc6cdb5707}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\vcproj\image_codecs\image_codecs.vcxproj">
-      <Project>{63dde045-7f6e-4bf6-8dfb-96c9f47bc91d}</Project>
+    <ProjectReference Include="..\vcproj\static\ext\image_codecs\image_codecs.vcxproj">
+      <Project>{c6ffd922-888e-4964-831f-5d8841183655}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,3 +1,4 @@
+#ifdef HAVE_INTEL_MEDIA_SDK
 #include <base/ext/img_codecs/decoder/jpeg.h>
 
 #include <base/logging.h>
@@ -194,3 +195,4 @@ namespace Base
 			false, (uint8_t*)_buffer.get(), (uint8_t*)buffer);
 	}
 }
+#endif

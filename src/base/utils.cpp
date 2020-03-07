@@ -64,6 +64,24 @@ namespace Base
 		L_CHECK_NE_WIN32API(WideCharToMultiByte(CP_UTF8, 0, str.data(), str_size, &localMultiByteString[0], size + 1, NULL, NULL), 0);
 		return localMultiByteString;
 	}
+
+    std::string UTF16ToASCII(std::wstring_view str)
+	{
+        if (str.empty())
+            return std::string();
+        int str_size;
+        if (str.size() > size_t(std::numeric_limits<int>::max()))
+            str_size = std::numeric_limits<int>::max();
+        else
+            str_size = int(str.size());
+        int size = WideCharToMultiByte(CP_ACP, 0, str.data(), str_size, nullptr, 0, NULL, NULL);
+
+        std::string localMultiByteString;
+        localMultiByteString.resize(size);
+        L_CHECK_NE_WIN32API(WideCharToMultiByte(CP_ACP, 0, str.data(), str_size, &localMultiByteString[0], size + 1, NULL, NULL), 0);
+        return localMultiByteString;
+	}
+	
 	std::wstring toLowerCase(std::wstring_view str)
 	{
 		std::wstring lowercaseString(str);

@@ -51,96 +51,96 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\base\logging\base.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\base.cpp">
       <Filter>Source Files\logging</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\logging\dispatcher\dispatcher.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\dispatcher\dispatcher.cpp">
       <Filter>Source Files\logging\dispatcher</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\logging\sinks\stdout.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\sinks\stdout.cpp">
       <Filter>Source Files\logging\sinks</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\logging\win32\utils.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\win32\utils.cpp">
       <Filter>Source Files\logging\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\logging\sinks\file.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\sinks\file.cpp">
       <Filter>Source Files\logging\sinks</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\logging\sinks\win32_debugger.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\sinks\win32_debugger.cpp">
       <Filter>Source Files\logging\sinks</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\logging\macros.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\macros.cpp">
       <Filter>Source Files\logging</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\error_codes\win32\stringify.cpp">
+    <ClCompile Include="..\..\..\..\src\base\error_codes\win32\stringify.cpp">
       <Filter>Source Files\error_codes\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\error_codes\stringify.cpp">
+    <ClCompile Include="..\..\..\..\src\base\error_codes\stringify.cpp">
       <Filter>Source Files\error_codes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\stack_trace.cpp">
+    <ClCompile Include="..\..\..\..\src\base\stack_trace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\exception.cpp">
+    <ClCompile Include="..\..\..\..\src\base\exception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\logging\interface.cpp">
+    <ClCompile Include="..\..\..\..\src\base\logging\interface.cpp">
       <Filter>Source Files\logging</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\dll_entry.cpp">
+    <ClCompile Include="..\..\..\..\src\base\dll_entry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\base\logging\win32.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\win32.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging.h">
+    <ClInclude Include="..\..\..\..\include\base\logging.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\macros.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\macros.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\exception.h">
+    <ClInclude Include="..\..\..\..\include\base\exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\base.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\base.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\debugging.h">
+    <ClInclude Include="..\..\..\..\include\base\debugging.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\dispatcher\dispatcher.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\dispatcher\dispatcher.h">
       <Filter>Header Files\logging\dispatcher</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\sinks\stdout.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\sinks\stdout.h">
       <Filter>Header Files\logging\sinks</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\win32\utils.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\win32\utils.h">
       <Filter>Header Files\logging\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\sinks\file.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\sinks\file.h">
       <Filter>Header Files\logging\sinks</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\sinks\win32_debugger.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\sinks\win32_debugger.h">
       <Filter>Header Files\logging\sinks</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\error_codes.h">
+    <ClInclude Include="..\..\..\..\include\base\error_codes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\error_codes\stringify.h">
+    <ClInclude Include="..\..\..\..\include\base\error_codes\stringify.h">
       <Filter>Header Files\error_codes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\error_codes\win32\stringify.h">
+    <ClInclude Include="..\..\..\..\include\base\error_codes\win32\stringify.h">
       <Filter>Header Files\error_codes\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\interface.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\interface.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\common.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\common.h">
       <Filter>Header Files\logging</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\base\logging\sinks\interface.h">
+    <ClInclude Include="..\..\..\..\include\base\logging\sinks\interface.h">
       <Filter>Header Files\logging\sinks</Filter>
     </ClInclude>
   </ItemGroup>

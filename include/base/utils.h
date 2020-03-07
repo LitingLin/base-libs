@@ -35,6 +35,8 @@ namespace Base
 	std::wstring UTF8ToUTF16(std::string_view str);
 	ATTRIBUTE_INTERFACE
 	std::string UTF16ToUTF8(std::wstring_view str);
+	ATTRIBUTE_INTERFACE
+	std::string UTF16ToASCII(std::wstring_view str);
 	//std::string toUpperCase(const std::string &str);
 	//std::wstring toUpperCase(const std::wstring &str);
 	//std::string toLowerCase(const std::string &str);
