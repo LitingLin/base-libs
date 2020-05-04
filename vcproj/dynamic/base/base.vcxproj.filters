@@ -57,6 +57,12 @@
     <ClInclude Include="..\..\..\src\base\cpu_info\msvc.h">
       <Filter>Header Files\cpu_info</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\base\shared_memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\base\named_semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\base\dll_entry.cpp">
@@ -82,6 +88,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\base\cpu_info\gcc.cpp">
       <Filter>Source Files\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\base\shared_memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\base\named_semaphore.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

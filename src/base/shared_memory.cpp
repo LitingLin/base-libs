@@ -25,11 +25,11 @@ namespace Base
 		close();
 	}
 
-	void SharedMemory::create(const wchar_t* name, size_t size)
+	bool SharedMemory::createOrOpen(const wchar_t* name, size_t size)
 	{
 		_hMapFile = CreateFileMapping(
 			INVALID_HANDLE_VALUE,    // use paging file
-			_securityAttributes.get(),
+			nullptr,
 			PAGE_READWRITE,          // read/write access
 #ifdef _M_X64
 			HIDWORD(size),                       // maximum object size (high-order DWORD)
@@ -40,12 +40,16 @@ namespace Base
 			name);                 // name of mapping object
 		L_CHECK_WIN32API(_hMapFile);
 
-		_ptr = (char*)MapViewOfFile(_hMapFile,
+		bool exists = (GetLastError() == ERROR_ALREADY_EXISTS);
+		
+		_ptr = MapViewOfFile(_hMapFile,
 			FILE_MAP_ALL_ACCESS,
 			0,
 			0,
-			size);
+			0);
 		L_CHECK_WIN32API(_ptr);
+
+		return !exists;
 	}
 
 	void SharedMemory::open(const wchar_t* name)
@@ -56,7 +60,7 @@ namespace Base
 			name);
 		L_CHECK_WIN32API(_hMapFile);
 
-		_ptr = (char*)MapViewOfFile(
+		_ptr = MapViewOfFile(
 			_hMapFile,
 			FILE_MAP_ALL_ACCESS,  // read/write permission
 			0,
@@ -79,8 +83,15 @@ namespace Base
 		}
 	}
 
-	char* SharedMemory::get()
+	size_t SharedMemory::getSize()
 	{
-		return _ptr;
+		MEMORY_BASIC_INFORMATION memoryInformation;
+		L_CHECK_GE_WIN32API(VirtualQuery(_ptr, &memoryInformation, sizeof(memoryInformation)), offsetof(MEMORY_BASIC_INFORMATION, RegionSize) + sizeof(MEMORY_BASIC_INFORMATION::RegionSize));
+		return memoryInformation.RegionSize;
+	}
+
+	unsigned char* SharedMemory::get()
+	{
+		return (unsigned char*)_ptr;
 	}
 }
