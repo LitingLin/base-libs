@@ -98,13 +98,13 @@ namespace Base
 	{
 	public:
 		typedef std::random_access_iterator_tag iterator_category;
-		typedef typename List::value_type value_type;
+		typedef std::decay_t<decltype(std::declval<List>().get(std::declval<size_t>()))> value_type;
 		typedef size_t difference_type;
 		typedef value_type* pointer;
 		typedef const value_type& reference;
 
 	protected:
-		std::optional<List> _list;
+		mutable std::optional<List> _list;
 		size_t _index;
 	public:
 		ConstIteratorWrapper(size_t index, std::nullopt_t) : _list(std::nullopt), _index(index) {}
@@ -226,26 +226,26 @@ namespace Base
 		: public ConstIteratorWrapper<List>
 	{
 	public:
-		IteratorWrapper(size_t index, std::nullopt_t) : ConstIteratorWrapper(index, std::nullopt) {}
+		IteratorWrapper(size_t index, std::nullopt_t) : ConstIteratorWrapper<List>(index, std::nullopt) {}
 
 		template <class... ArgumentTypes>
-		IteratorWrapper(size_t index, std::in_place_t, ArgumentTypes&&...arguments) : ConstIteratorWrapper(index, std::in_place, std::forward<ArgumentTypes>(arguments)...) {}
+		IteratorWrapper(size_t index, std::in_place_t, ArgumentTypes&&...arguments) : ConstIteratorWrapper<List>(index, std::in_place, std::forward<ArgumentTypes>(arguments)...) {}
 
 		typedef std::random_access_iterator_tag iterator_category;
-		typedef typename List::value_type value_type;
+		typedef std::decay_t<decltype(std::declval<List>().get(std::declval<size_t>()))> value_type;
 		typedef size_t difference_type;
 		typedef value_type* pointer;
 		typedef value_type& reference;
 
 		//Pointer like operators
-		reference operator*()  const
+		reference operator*() const
 		{
-			return this->_list.value().get();
+			return this->_list.value().get(this->_index);
 		}
 
 		value_type* operator->() const
 		{
-			return this->_list.value().get();
+			return this->_list.value().get(this->_index);
 		}
 
 		reference operator[](difference_type off) const
@@ -316,15 +316,14 @@ namespace Base
 	class IteratorWrapper<List, std::enable_if_t<Details::IsType1Generator<List>::value>>
 	{
 	public:
-		typedef typename List::value_type value_type;
+		typedef decltype(std::declval<List>().get(std::declval<size_t>())) value_type;
 		typedef size_t difference_type;
 
 	protected:
-		std::optional<List> _list;
+		mutable std::optional<List> _list;
 		size_t _index;
 	public:
 		IteratorWrapper(size_t index, std::nullopt_t) : _list(std::nullopt), _index(index) {}
-
 
 		template <class... ArgumentTypes>
 		IteratorWrapper(size_t index, std::in_place_t, ArgumentTypes&&...arguments) : _list(std::in_place, std::forward<ArgumentTypes>(arguments)...), _index(index) {}
@@ -333,7 +332,7 @@ namespace Base
 		{
 			return _list.value().get(_index);
 		}
-
+				
 		value_type operator[](difference_type off) const
 		{
 			return _list.value().get(off + _index);
@@ -440,13 +439,13 @@ namespace Base
 	{
 	public:
 		typedef std::input_iterator_tag iterator_category;
-		typedef typename Enumerator::value_type value_type;
+		typedef std::decay_t<decltype(std::declval<Enumerator>().current())> value_type;
 		typedef size_t difference_type;
 		typedef value_type* pointer;
 		typedef const value_type& reference;
 
 	protected:
-		std::optional<Enumerator> _enumerator;
+		mutable std::optional<Enumerator> _enumerator;
 	public:
 		ConstIteratorWrapper(std::nullopt_t) : _enumerator(std::nullopt) {}
 
@@ -473,12 +472,12 @@ namespace Base
 		//Comparison operators
 		bool operator==(const ConstIteratorWrapper& r) const
 		{
-			return _enumerator == r._enumerator;
+			return (!_enumerator.has_value() && !r._enumerator.has_value());
 		}
 
 		bool operator!=(const ConstIteratorWrapper& r) const
 		{
-			return _enumerator != r._enumerator;
+			return _enumerator.has_value() || r._enumerator.has_value();
 		}
 	};
 
@@ -487,13 +486,13 @@ namespace Base
 		: public ConstIteratorWrapper<Enumerator>
 	{
 	public:
-		IteratorWrapper(std::nullopt_t) : ConstIteratorWrapper(std::nullopt) {}
+		IteratorWrapper(std::nullopt_t) : ConstIteratorWrapper<Enumerator>(std::nullopt) {}
 
 		template <class ...ParameterTypes>
-		IteratorWrapper(std::in_place_t, ParameterTypes... parameterTypes) : ConstIteratorWrapper(std::in_place, std::forward<ParameterTypes>(parameterTypes)...) {}
+		IteratorWrapper(std::in_place_t, ParameterTypes... parameterTypes) : ConstIteratorWrapper<Enumerator>(std::in_place, std::forward<ParameterTypes>(parameterTypes)...) {}
 
 		typedef std::input_iterator_tag iterator_category;
-		typedef typename Enumerator::value_type value_type;
+		typedef std::decay_t<decltype(std::declval<Enumerator>().current())> value_type;
 		typedef size_t difference_type;
 		typedef value_type* pointer;
 		typedef value_type& reference;
@@ -519,12 +518,12 @@ namespace Base
 		//Comparison operators
 		bool operator==(const IteratorWrapper& r)  const
 		{
-			return this->_enumerator == r._enumerator;
+			return (!this->_enumerator.has_value() && !r._enumerator.has_value());
 		}
 
 		bool operator!=(const IteratorWrapper& r)  const
 		{
-			return this->_enumerator != r._enumerator;
+			return this->_enumerator.has_value() || r._enumerator.has_value();
 		}
 	};
 
@@ -532,10 +531,10 @@ namespace Base
 	class IteratorWrapper<Enumerator, std::enable_if_t<Details::IsType2Generator<Enumerator>::value>>
 	{
 	public:
-		using value_type = typename Enumerator::value_type;
+		typedef decltype(std::declval<Enumerator>().current()) value_type;
 
 	protected:
-		std::optional<Enumerator> _enumerator;
+		mutable std::optional<Enumerator> _enumerator;
 	public:
 		IteratorWrapper(std::nullopt_t) : _enumerator(std::nullopt) {}
 
@@ -558,26 +557,28 @@ namespace Base
 		//Comparison operators
 		bool operator==(const IteratorWrapper& r)  const
 		{
-			return _enumerator == r._enumerator;
+			return (!_enumerator.has_value() && !r._enumerator.has_value());
 		}
 
 		bool operator!=(const IteratorWrapper& r)  const
 		{
-			return _enumerator != r._enumerator;
+			return _enumerator.has_value() || r._enumerator.has_value();
 		}
 	};
 
-	template <typename T>
-	class Type1IteratorPtrWrapper
-	{
-	public:
-		Type1IteratorPtrWrapper(T* pointer) : _pointer(pointer) {}
-		auto get() { return _pointer->get(); }
-		size_t size() { return _pointer->size(); }
-	private:
-		T* _pointer;
-	};
-
+	namespace Details {
+		template <typename T>
+		class Type1IteratorPtrWrapper
+		{
+		public:
+			Type1IteratorPtrWrapper(T* pointer) : _pointer(pointer) {}
+			decltype(auto) get(size_t index) { return _pointer->get(index); }
+			size_t size() { return _pointer->size(); }
+		private:
+			T* _pointer;
+		};
+	}
+	
 	template <typename, typename = void>
 	class RangeWrapper;
 
@@ -588,26 +589,26 @@ namespace Base
 		template <typename... IteratorParameters>
 		RangeWrapper(IteratorParameters...parameters) :
 			_iterator(std::forward<IteratorParameters>(parameters)...) {}
-		typedef ConstIteratorWrapper<Type1IteratorPtrWrapper<T>> const_iterator;
-		typedef IteratorWrapper<Type1IteratorPtrWrapper<T>> iterator;
+		typedef ConstIteratorWrapper<Details::Type1IteratorPtrWrapper<T>> const_iterator;
+		typedef IteratorWrapper<Details::Type1IteratorPtrWrapper<T>> iterator;
 
 		const_iterator begin() const
 		{
-			return const_iterator(std::in_place, 0, &_iterator);
+			return const_iterator(0, std::in_place, &_iterator);
 		}
 		const_iterator end() const
 		{
-			return const_iterator(std::nullopt, _iterator.size());
+			return const_iterator(_iterator.size(), std::nullopt);
 		}
 
 		iterator begin()
 		{
-			return iterator(std::in_place, 0, &_iterator);
+			return iterator(0, std::in_place, &_iterator);
 		}
 
 		iterator end()
 		{
-			return iterator(std::nullopt, _iterator.size());
+			return iterator(_iterator.size(), std::nullopt);
 		}
 	private:
 		T _iterator;
@@ -620,16 +621,16 @@ namespace Base
 		template <typename... IteratorParameters>
 		RangeWrapper(IteratorParameters&&...parameters) :
 			_iterator(std::forward<IteratorParameters>(parameters)...) {}
-		typedef IteratorWrapper<Type1IteratorPtrWrapper<T>> iterator;
+		typedef IteratorWrapper<Details::Type1IteratorPtrWrapper<T>> iterator;
 
 		iterator begin()
 		{
-			return iterator(std::in_place, 0, &_iterator);
+			return iterator(0, std::in_place, &_iterator);
 		}
 
 		iterator end()
 		{
-			return iterator(std::nullopt, _iterator.size());
+			return iterator(_iterator.size(), std::nullopt);
 		}
 	private:
 		T _iterator;
@@ -695,8 +696,8 @@ namespace Base
 	private:
 		void* _parameters;
 		std::function<void(RangeWrapper*)> _deleter;
-		std::function<const_iterator> _constIteratorGetter;
-		std::function<iterator> _iteratorGetter;
+		std::function<const_iterator(RangeWrapper*)> _constIteratorGetter;
+		std::function<iterator(RangeWrapper*)> _iteratorGetter;
 	};
 
 	template <typename T>
@@ -742,6 +743,6 @@ namespace Base
 	private:
 		void* _parameters;
 		std::function<void(RangeWrapper*)> _deleter;
-		std::function<iterator> _iteratorGetter;
+		std::function<iterator(RangeWrapper*)> _iteratorGetter;
 	};
 }
