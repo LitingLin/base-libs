@@ -44,6 +44,10 @@ L_ENSURE_NTSTATUS_WITH_FINALIZER(condition, nullptr)
 
 /* ----------------------------- UNEXPECTED ERROR ----------------------------- */
 // But recoverable
+
+#define L_THROW_WIN32_RUNTIME_EXCEPTION \
+_LOG_GENERIC(_LOG_RUNTIME_EXCEPTION_LOGGING_STREAM_CLASS, Base::ErrorCodeType::WIN32API, GetLastError(), nullptr) << Base::getWin32LastErrorString()
+
 #define L_CHECK_WIN32API_WITH_FINALIZER(condition, finalizer) \
 _L_CHECK_WITH_FINALIZER_4(condition, Base::ErrorCodeType::WIN32API, GetLastError(), finalizer) << Base::getWin32LastErrorString()
 

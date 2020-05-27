@@ -7,6 +7,7 @@
 namespace Base
 {
 	// File backend
+	// Assuming one instance take ownership for one file, so no **volatile** qualifier
 	class ATTRIBUTE_INTERFACE MemoryMappedIO
 	{
 	public:

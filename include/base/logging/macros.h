@@ -68,6 +68,30 @@ namespace Base {
 			typedef Finalizer<FatalErrorLoggingStream, ErrorCodeType, int64_t> FatalErrorLoggingStreamWithFinalizer;
 			typedef Finalizer<RuntimeExceptionLoggingStream, ErrorCodeType, int64_t> RuntimeExceptionLoggingStreamWithFinalizer;
 			typedef Finalizer<EventLoggingStream, ErrorCodeType, int64_t> EventLoggingStreamWithFinalizer;
+			
+			template<typename S, typename T, typename = void>
+			struct is_to_stream_writable : std::false_type {};
+
+			template<typename S, typename T>
+			struct is_to_stream_writable<S, T,
+				std::void_t<  decltype(std::declval<S&>() << std::declval<T>())  > >
+				: std::true_type {};
+
+			template <typename T,
+				typename = std::enable_if_t<
+				is_to_stream_writable<std::ostream, T>::value>>
+				const T& make_stream_writable(const T& v)
+			{
+				return v;
+			}
+
+			template <typename T,
+				typename = std::enable_if_t<!
+				is_to_stream_writable<std::ostream, T>::value>>
+				std::string make_stream_writable(const T& v)
+			{
+				return "(unstringifiable)";
+			}
 		}
 	}
 }
@@ -95,7 +119,7 @@ loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE:
 (condition) ? (void) 0 : _LOG_IMPL_NAMESPACE::_StreamTypeVoidify() & loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #condition)
 
 #define _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, op, functional_op, loggingClass, errorCodeType, errorCode, handler) \
-if (auto _values_ = _LOG_IMPL_NAMESPACE::_Comparator<decltype(leftExp), functional_op> ((leftExp), (rightExp))) ; else loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #leftExp, #op, #rightExp)
+if (auto _values_ = _LOG_IMPL_NAMESPACE::_Comparator<decltype(leftExp), functional_op> ((leftExp), (rightExp))) ; else loggingClass(handler, errorCodeType, errorCode).stream() << _LOG_IMPL_NAMESPACE::generateHeader(__FILE__, __LINE__, __func__, #leftExp, #op, #rightExp) << "(" << _LOG_IMPL_NAMESPACE::make_stream_writable(LOG_GET_LEFT_EXPRESSION_RC) << " vs. " << _LOG_IMPL_NAMESPACE::make_stream_writable(LOG_GET_RIGHT_EXPRESSION_RC) << ") "
 
 #define _LOG_CONDITIONED_BINARY_OP_EQ_GENERIC(leftExp, rightExp, loggingClass, errorCodeType, errorCode, handler) \
 _LOG_CONDITIONED_BINARY_OP_GENERIC(leftExp, rightExp, ==, std::equal_to, loggingClass, errorCodeType, errorCode, handler)
