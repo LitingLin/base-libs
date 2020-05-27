@@ -7,15 +7,15 @@ set(FMT_HEADERS
         ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/format.h
         ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/format-inl.h
         ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/locale.h
+        ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/os.h
         ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/ostream.h
         ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/posix.h
         ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/printf.h
         ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/ranges.h
-        ${CMAKE_CURRENT_LIST_DIR}/fmt/include/fmt/safe-duration-cast.h
         )
 set(FMT_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/fmt/src/format.cc
-        ${CMAKE_CURRENT_LIST_DIR}/fmt/src/posix.cc)
+        ${CMAKE_CURRENT_LIST_DIR}/fmt/src/os.cc)
 
 add_library(fmt STATIC ${FMT_HEADERS} ${FMT_SOURCES})
 target_include_directories(fmt PUBLIC ${FMT_INCLUDE_DIRS})

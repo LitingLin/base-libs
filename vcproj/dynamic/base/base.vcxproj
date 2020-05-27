@@ -79,9 +79,11 @@
     <ClInclude Include="..\..\..\include\base\iterator.hpp" />
     <ClInclude Include="..\..\..\include\base\memory_alignment.h" />
     <ClInclude Include="..\..\..\include\base\memory_mapped_io.h" />
+    <ClInclude Include="..\..\..\include\base\named_semaphore.h" />
     <ClInclude Include="..\..\..\include\base\preprocessor.h" />
     <ClInclude Include="..\..\..\include\base\random.h" />
     <ClInclude Include="..\..\..\include\base\random.hpp" />
+    <ClInclude Include="..\..\..\include\base\shared_memory.h" />
     <ClInclude Include="..\..\..\include\base\utils.h" />
     <ClInclude Include="..\..\..\src\base\cpu_info\msvc.h" />
   </ItemGroup>
@@ -92,7 +94,9 @@
     <ClCompile Include="..\..\..\src\base\file.cpp" />
     <ClCompile Include="..\..\..\src\base\memory_alignment.cpp" />
     <ClCompile Include="..\..\..\src\base\memory_mapped_io.cpp" />
+    <ClCompile Include="..\..\..\src\base\named_semaphore.cpp" />
     <ClCompile Include="..\..\..\src\base\random.cpp" />
+    <ClCompile Include="..\..\..\src\base\shared_memory.cpp" />
     <ClCompile Include="..\..\..\src\base\utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
