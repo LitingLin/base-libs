@@ -48,10 +48,10 @@ namespace Base
 	{		
 		_jpegCompress.image_width = width;
 		_jpegCompress.image_height = height;
-		unsigned char* buffer;
+		unsigned char* buffer = nullptr;
 		unsigned long bufferSize;
 		jpeg_mem_dest(&_jpegCompress, &buffer, &bufferSize);
-
+		L_CHECK(buffer);
 		try {
 			jpeg_start_compress(&_jpegCompress, TRUE);
 
