@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\3rd_party\fmt\src\format.cc" />
-    <ClCompile Include="..\..\..\3rd_party\fmt\src\posix.cc" />
+    <ClCompile Include="..\..\..\3rd_party\fmt\src\os.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
