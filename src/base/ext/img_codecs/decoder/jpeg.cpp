@@ -55,18 +55,19 @@ namespace Base
 
 	uint64_t JPEGDecoder::getDecompressedSize()
 	{
-		L_CHECK_GT(decInfo.num_components, 0);
-		return decInfo.image_height * decInfo.image_width * uint64_t(decInfo.num_components);
+		return decInfo.image_height * decInfo.image_width * 3;
 	}
 
 	void JPEGDecoder::decode(void* buffer)
 	{
 		L_CHECK(jpeg_start_decompress(&decInfo));
-		L_CHECK_GT(decInfo.num_components, 0);
+		L_CHECK_EQ(decInfo.output_components, 3);
+		L_CHECK_EQ(decInfo.image_width, decInfo.output_width);
+		L_CHECK_EQ(decInfo.image_height, decInfo.output_height);
 
-		size_t rowSize = decInfo.image_width * unsigned(decInfo.num_components);
+		size_t rowSize = decInfo.output_width * unsigned(decInfo.output_components);
 		unsigned char* currentBuffer = (unsigned char*)buffer;
-		while (decInfo.output_scanline < decInfo.image_height) {
+		while (decInfo.output_scanline < decInfo.output_height) {
 			L_CHECK_EQ(jpeg_read_scanlines(&decInfo, &currentBuffer, 1), 1);
 			currentBuffer += rowSize;
 		}
