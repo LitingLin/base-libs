@@ -825,10 +825,8 @@ namespace Base
                 L_UNREACHABLE_ERROR;
         }
 
-		if (flag & O_CREAT || flag & O_TMPFILE)
-			_fd = ::open(path.data(), flag, 0666);
-		else
-			_fd = ::open(path.data(), flag);
+		_fd = ::open(path.data(), flag, 0666);
+
 	    L_CHECK_NE_STDCAPI(_fd, -1) << " open() failed with path: " << path << ", flag: " << flag;
     }
 
