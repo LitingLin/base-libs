@@ -252,7 +252,7 @@ add_dependencies(base fmt mozjpeg)
 option(RELEASE_INSTALL "install binary files only" OFF)
 
 if (${RELEASE_INSTALL})
-    if (${BUILD_SHARED_LIBS})
+    if (${BUILD_SHARED_LIB})
         install(TARGETS base
                 RUNTIME DESTINATION .
                 LIBRARY DESTINATION .)
