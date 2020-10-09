@@ -23,7 +23,7 @@ namespace Base
         }
     }
 
-	unsigned ImageDecoder::getHeight() {
+	unsigned ImageDecoder::getHeight() const {
         switch (_format)
         {
             case ImageFormatType::JPEG:
@@ -41,7 +41,7 @@ namespace Base
         }
     }
 
-	unsigned ImageDecoder::getWidth() {
+	unsigned ImageDecoder::getWidth() const {
         switch (_format)
         {
             case ImageFormatType::JPEG:
@@ -59,7 +59,7 @@ namespace Base
         }
     }
 
-	uint64_t ImageDecoder::getDecompressedSize() {
+	uint64_t ImageDecoder::getDecompressedSize() const {
         switch (_format)
         {
             case ImageFormatType::JPEG:

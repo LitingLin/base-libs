@@ -13,11 +13,10 @@ namespace Base
     {
     public:
         void load(const void *buffer, size_t size, ImageFormatType formatType);
-		[[nodiscard]] unsigned getHeight();
-		[[nodiscard]] unsigned getWidth();
-		[[nodiscard]] uint64_t getDecompressedSize();
+		[[nodiscard]] unsigned getHeight() const;
+		[[nodiscard]] unsigned getWidth() const;
+		[[nodiscard]] uint64_t getDecompressedSize() const;
         void decode(void *output);
-
     private:
         JPEGDecoder _jpegDecoder;
         PNGDecoder _pngDecoder;

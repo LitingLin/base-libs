@@ -19,7 +19,7 @@ namespace Base
 		void load(const void* image, uint64_t size);
 		[[nodiscard]] unsigned getWidth() const;
 		[[nodiscard]] unsigned getHeight() const;
-		[[nodiscard]] uint64_t getDecompressedSize();
+		[[nodiscard]] uint64_t getDecompressedSize() const;
 		void decode(void* buffer);
 	private:
 		unsigned char* _sourceImage;

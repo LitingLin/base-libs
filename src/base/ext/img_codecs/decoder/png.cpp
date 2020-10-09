@@ -49,7 +49,7 @@ namespace Base
 		return _image_height;
 	}
 
-	uint64_t PNGDecoder::getDecompressedSize()
+	uint64_t PNGDecoder::getDecompressedSize() const
 	{
 		return uint64_t(_image_width) * uint64_t(_image_height) * 3ULL;
 	}

@@ -15,17 +15,17 @@ namespace Base
 		_size = size;
 	}
 
-	unsigned WebPDecoder::getWidth()
+	unsigned WebPDecoder::getWidth() const
 	{
 		return unsigned(_width);
 	}
 
-	unsigned WebPDecoder::getHeight()
+	unsigned WebPDecoder::getHeight() const
 	{
 		return unsigned(_height);
 	}
 
-	uint64_t WebPDecoder::getDecompressedSize()
+	uint64_t WebPDecoder::getDecompressedSize() const
 	{
 		return uint64_t(_width) * uint64_t(_height) * 3ULL;
 	}

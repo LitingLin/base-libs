@@ -43,17 +43,17 @@ namespace Base
 		decInfo.raw_data_out = false;
 	}
 
-	unsigned JPEGDecoder::getWidth()
+	unsigned JPEGDecoder::getWidth() const
 	{
 		return decInfo.image_width;
 	}
 
-	unsigned JPEGDecoder::getHeight()
+	unsigned JPEGDecoder::getHeight() const
 	{
 		return decInfo.image_height;
 	}
 
-	uint64_t JPEGDecoder::getDecompressedSize()
+	uint64_t JPEGDecoder::getDecompressedSize() const
 	{
 		return decInfo.image_height * decInfo.image_width * 3;
 	}
