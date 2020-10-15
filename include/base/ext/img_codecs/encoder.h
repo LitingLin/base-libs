@@ -2,9 +2,11 @@
 
 #include <cstddef>
 
+#include <base/ext/img_codecs/common.h>
+
 namespace Base
 {
-	class EncodedImageContainer
+	class IMAGE_CODECS_INTERFACE EncodedImageContainer
 	{
 	public:
 		EncodedImageContainer(void* ptr, size_t size);

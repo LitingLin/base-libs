@@ -38,9 +38,9 @@ namespace Base
 	void JPEGDecoder::load(const void* pointer, const uint64_t fileSize)
 	{
 		jpeg_mem_src(&decInfo, (const unsigned char*)pointer, (unsigned long)fileSize);
-		L_CHECK(jpeg_read_header(&decInfo, true));
+		L_CHECK(jpeg_read_header(&decInfo, TRUE));
 		decInfo.out_color_space = JCS_RGB;
-		decInfo.raw_data_out = false;
+        decInfo.raw_data_out = FALSE;
 	}
 
 	unsigned JPEGDecoder::getWidth() const
