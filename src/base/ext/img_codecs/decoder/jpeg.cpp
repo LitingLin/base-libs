@@ -5,6 +5,8 @@
 
 #include <cstring>
 
+#include <jpegint.h>
+
 namespace Base
 {
 	static void jpegErrorExit(j_common_ptr cinfo)
@@ -16,6 +18,7 @@ namespace Base
 	}
 	
 	JPEGDecoder::JPEGDecoder()
+		: _state(State::closed)
 	{
 		decInfo.err = jpeg_std_error(&jerr);
 		jerr.error_exit = jpegErrorExit;
@@ -23,6 +26,7 @@ namespace Base
 	}
 
 	JPEGDecoder::JPEGDecoder(JPEGDecoder&& object) noexcept
+		: _state(object._state)
 	{
 		memcpy(&decInfo, &object.decInfo, sizeof(decInfo));
 		memcpy(&jerr, &object.jerr, sizeof(jerr));
@@ -37,29 +41,35 @@ namespace Base
 
 	void JPEGDecoder::load(const void* pointer, const uint64_t fileSize)
 	{
+		close();
 		jpeg_mem_src(&decInfo, (const unsigned char*)pointer, (unsigned long)fileSize);
 		L_CHECK(jpeg_read_header(&decInfo, TRUE));
 		decInfo.out_color_space = JCS_RGB;
         decInfo.raw_data_out = FALSE;
+		_state = State::loaded;
 	}
 
 	unsigned JPEGDecoder::getWidth() const
 	{
+		L_CHECK_NE(_state, State::closed);
 		return decInfo.image_width;
 	}
 
 	unsigned JPEGDecoder::getHeight() const
 	{
+		L_CHECK_NE(_state, State::closed);
 		return decInfo.image_height;
 	}
 
 	uint64_t JPEGDecoder::getDecompressedSize() const
 	{
+		L_CHECK_NE(_state, State::closed);
 		return decInfo.image_height * decInfo.image_width * 3;
 	}
 
 	void JPEGDecoder::decode(void* buffer)
 	{
+		L_CHECK_EQ(_state, State::loaded);
 		L_CHECK(jpeg_start_decompress(&decInfo));
 		L_CHECK_EQ(decInfo.output_components, 3);
 		L_CHECK_EQ(decInfo.image_width, decInfo.output_width);
@@ -72,6 +82,15 @@ namespace Base
 			currentBuffer += rowSize;
 		}
 		L_CHECK(jpeg_finish_decompress(&decInfo));
+		_state = State::decompressed;
+	}
+
+	void JPEGDecoder::close()
+	{
+		if (_state == State::loaded) {
+			jpeg_abort_decompress(&decInfo);			
+		}
+		_state = State::closed;
 	}
 }
 #endif

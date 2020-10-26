@@ -60,12 +60,20 @@ namespace Base
 		[[nodiscard]] unsigned getHeight() const;
 		[[nodiscard]] uint64_t getDecompressedSize() const;
 		void decode(void* buffer);
+		void close();
 	private:
 		const unsigned char* _pointer;
 		unsigned long _fileSize;
 
 		jpeg_decompress_struct decInfo;
 		struct jpeg_error_mgr jerr;
+
+		enum class State
+		{
+			loaded,
+			decompressed,
+			closed
+		} _state;
 	};
 }
 #endif
