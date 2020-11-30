@@ -18,10 +18,15 @@ namespace Base
 		[[nodiscard]] uint64_t getDecompressedSize() const;
         void decode(void *output);
     private:
+#if (defined HAVE_LIB_JPEG) || (defined HAVE_LIB_JPEG_TURBO)
         JPEGDecoder _jpegDecoder;
+#endif
+#if (defined HAVE_LIB_PNG)
         PNGDecoder _pngDecoder;
+#endif
+#if (defined HAVE_LIB_WEBP)
         WebPDecoder _webpDecoder;
-
+#endif
         ImageFormatType _format;
     };
 }
