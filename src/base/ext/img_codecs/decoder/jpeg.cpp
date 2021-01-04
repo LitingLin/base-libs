@@ -5,7 +5,7 @@
 
 #include <cstring>
 
-#include <jpegint.h>
+#include <jpeglib.h>
 
 namespace Base
 {
